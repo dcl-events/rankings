@@ -22,12 +22,18 @@ POCOCHA_REPORT = ROOT.parent / "pococha" / "data" / "event_report.csv"
 JST = timezone(timedelta(hours=9))
 TOP_N = 20  # ランキング表示の既定上限（events.json の top_n で個別上書き可）
 
-# DeNA Creator Links ブランドカラーで統一（暖色系）
+# プラットフォーム別テーマ。accent=順位番号/チップ/カード左バー上, accent2=グラデ相方, hero=ヒーロー背景
 PF_THEME = {
-    "Pococha":     {"accent": "#f177c4", "label": "Pococha"},      # ブランドピンク
-    "TikTok LIVE": {"accent": "#eb5000", "label": "TikTok LIVE"},  # ブランドオレンジ
+    # Pococha はモノクロ（白黒）イメージ
+    "Pococha":     {"accent": "#1a1a1a", "accent2": "#7a7a7a", "label": "Pococha",
+                    "hero": "linear-gradient(120deg,#1c1c1c 0%,#3a3a3a 55%,#6e6e6e 100%)"},
+    # TikTok LIVE は DCL ブランドの暖色（オレンジ→イエロー）
+    "TikTok LIVE": {"accent": "#eb5000", "accent2": "#facd00", "label": "TikTok LIVE",
+                    "hero": "linear-gradient(115deg,#eb5000 0%,#ff7a1a 46%,#facd00 100%)"},
 }
-DEFAULT_THEME = {"accent": "#eb5000", "label": "イベント"}
+# 一覧トップ（DeNA Creator Links ブランド）= 暖色
+DEFAULT_THEME = {"accent": "#eb5000", "accent2": "#facd00", "label": "イベント",
+                 "hero": "linear-gradient(115deg,#eb5000 0%,#ff7a1a 46%,#facd00 100%)"}
 
 
 # ---------- データ読み込み ----------
@@ -104,7 +110,10 @@ def fmt_score(score, ev_cfg):
 
 
 # ---------- HTML ----------
-def page_shell(title, body, accent):
+def page_shell(title, body, theme):
+    accent = theme["accent"]
+    accent2 = theme.get("accent2", accent)
+    hero = theme.get("hero", DEFAULT_THEME["hero"])
     return f"""<!doctype html>
 <html lang="ja"><head>
 <meta charset="utf-8">
@@ -117,7 +126,7 @@ def page_shell(title, body, accent):
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500;600;700;800&family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
 :root {{
-  --accent:{accent};
+  --accent:{accent}; --accent2:{accent2}; --hero:{hero};
   --brand-orange:#eb5000; --brand-yellow:#facd00; --brand-pink:#f177c4;
   --ink:#333; --muted:#9a8f86; --cream:#fff9ef; --line:#f0e7dd;
   --gold:#f6b400; --silver:#b9b3ac; --bronze:#d08a4e;
@@ -139,8 +148,8 @@ body{{margin:0;
 /* ヒーロー */
 header.hero{{position:relative;overflow:hidden;color:#fff;border-radius:22px;
   padding:26px 24px;margin-bottom:22px;
-  background:linear-gradient(115deg,var(--brand-orange) 0%,#ff7a1a 46%,var(--brand-yellow) 100%);
-  box-shadow:0 14px 30px rgba(235,80,0,.22)}}
+  background:var(--hero);
+  box-shadow:0 14px 30px rgba(0,0,0,.20)}}
 header.hero::after{{content:"";position:absolute;right:-40px;top:-60px;width:200px;height:200px;
   border-radius:50%;background:rgba(255,255,255,.16)}}
 header.hero .pf{{position:relative;font-family:'Jost',sans-serif;font-size:12px;font-weight:700;
@@ -182,8 +191,8 @@ li .unit{{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--muted
   margin-bottom:14px;border:1px solid var(--line);box-shadow:0 6px 18px rgba(120,80,20,.06);
   transition:transform .15s ease, box-shadow .15s ease;overflow:hidden}}
 .card::before{{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;
-  background:linear-gradient(180deg,var(--c),#facd00)}}
-.card:hover{{transform:translateY(-2px);box-shadow:0 12px 26px rgba(235,80,0,.14)}}
+  background:linear-gradient(180deg,var(--c),var(--c2))}}
+.card:hover{{transform:translateY(-2px);box-shadow:0 12px 26px rgba(0,0,0,.14)}}
 .card .pf{{display:inline-block;font-family:'Jost',sans-serif;font-size:11px;font-weight:700;
   letter-spacing:.06em;color:#fff;background:var(--c);border-radius:999px;padding:3px 11px}}
 .card h2{{margin:9px 0 5px;font-size:19px;font-weight:800}}
@@ -247,7 +256,7 @@ def build_event(ev_cfg, report):
 <div class="updated">最終更新: {now} JST</div>
 <ul class="rank">{items}</ul>"""
     (DOCS / f"{ev_cfg['id']}.html").write_text(
-        page_shell(meta["title"], body, theme["accent"]), encoding="utf-8")
+        page_shell(meta["title"], body, theme), encoding="utf-8")
     return meta
 
 
@@ -258,7 +267,7 @@ def build_index(cards_meta):
         theme = PF_THEME.get(ev_cfg["platform"], DEFAULT_THEME)
         period = f"{meta['period_start']} 〜 {meta['period_end']}" if meta["period_start"] else ""
         cards.append(
-            f'<a href="{ev_cfg["id"]}.html"><div class="card" style="--c:{theme["accent"]}">'
+            f'<a href="{ev_cfg["id"]}.html"><div class="card" style="--c:{theme["accent"]};--c2:{theme.get("accent2", theme["accent"])}">'
             f'<span class="arrow">›</span>'
             f'<div class="pf">{html.escape(theme["label"])}</div>'
             f'<h2>{html.escape(meta["title"])}</h2>'
@@ -271,7 +280,7 @@ def build_index(cards_meta):
 <div class="updated">最終更新: {now} JST</div>
 <div class="card-list">{''.join(cards)}</div>"""
     (DOCS / "index.html").write_text(
-        page_shell("事務所イベント ランキング", body, DEFAULT_THEME["accent"]), encoding="utf-8")
+        page_shell("事務所イベント ランキング", body, DEFAULT_THEME), encoding="utf-8")
 
 
 def main():

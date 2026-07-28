@@ -273,6 +273,11 @@ def build_event(ev_cfg, report):
 
 def build_index(cards_meta):
     now = datetime.now(JST).strftime("%Y-%m-%d %H:%M")
+    # 開催日が新しい順（開始日→終了日の降順）に並べる。日付は YYYY-MM-DD なので文字列比較でOK
+    cards_meta = sorted(
+        cards_meta,
+        key=lambda cm: (cm[1].get("period_start", ""), cm[1].get("period_end", "")),
+        reverse=True)
     cards = []
     for ev_cfg, meta in cards_meta:
         theme = PF_THEME.get(ev_cfg["platform"], DEFAULT_THEME)

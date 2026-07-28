@@ -206,7 +206,7 @@ def build_index(cards_meta):
             f'<h2>{html.escape(meta["title"])}</h2>'
             f'<div class="meta">{period}</div></div></a>')
     body = f"""<header class="hero">
-  <div class="pf" style="text-transform:lowercase">DeNA Creator Links</div>
+  <div class="pf" style="text-transform:none">DeNA Creator Links</div>
   <h1>事務所イベント ランキング</h1>
   <div class="meta">Pococha ／ TikTok LIVE</div>
 </header>

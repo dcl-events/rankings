@@ -155,14 +155,13 @@ header.hero::after{{content:"";position:absolute;right:-40px;top:-60px;width:200
 /* トップ専用：紙吹雪風のお祭りあしらい */
 .index-hero::before{{content:"";position:absolute;inset:0;pointer-events:none;opacity:.9;
   background:
-    radial-gradient(circle at 14% 26%, #fff 0 5px, transparent 6px),
-    radial-gradient(circle at 34% 74%, #ffe45e 0 6px, transparent 7px),
-    radial-gradient(circle at 52% 30%, rgba(255,255,255,.85) 0 3px, transparent 4px),
-    radial-gradient(circle at 68% 78%, #fff 0 4px, transparent 5px),
-    radial-gradient(circle at 82% 22%, rgba(255,255,255,.9) 0 5px, transparent 6px),
-    radial-gradient(circle at 90% 52%, #ffd0ec 0 4px, transparent 5px),
-    radial-gradient(circle at 24% 50%, rgba(255,255,255,.7) 0 3px, transparent 4px),
-    radial-gradient(circle at 46% 88%, rgba(255,255,255,.8) 0 3px, transparent 4px)}}
+    radial-gradient(circle at 70% 18%, #fff 0 5px, transparent 6px),
+    radial-gradient(circle at 88% 34%, #ffe45e 0 6px, transparent 7px),
+    radial-gradient(circle at 78% 58%, rgba(255,255,255,.85) 0 4px, transparent 5px),
+    radial-gradient(circle at 94% 72%, #fff 0 4px, transparent 5px),
+    radial-gradient(circle at 66% 82%, #ffd0ec 0 5px, transparent 6px),
+    radial-gradient(circle at 86% 88%, rgba(255,255,255,.8) 0 3px, transparent 4px),
+    radial-gradient(circle at 96% 50%, rgba(255,255,255,.7) 0 3px, transparent 4px)}}
 .index-hero h1{{text-shadow:0 2px 10px rgba(0,0,0,.16)}}
 header.hero .pf{{position:relative;font-family:'Jost',sans-serif;font-size:12px;font-weight:700;
   letter-spacing:.12em;text-transform:uppercase;opacity:.95}}

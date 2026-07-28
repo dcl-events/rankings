@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500;600;700;800&family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
-  --accent:#eb5000; --accent2:#facd00; --hero:linear-gradient(115deg,#eb5000 0%,#ff7a1a 46%,#facd00 100%);
+  --accent:#eb5000; --accent2:#facd00; --hero:linear-gradient(120deg,#7c3aed 0%,#f062b0 30%,#f2600f 66%,#ffc400 100%);
   --brand-orange:#eb5000; --brand-yellow:#facd00; --brand-pink:#f177c4;
   --ink:#333; --muted:#9a8f86; --cream:#fff9ef; --line:#f0e7dd;
   --gold:#f6b400; --silver:#b9b3ac; --bronze:#d08a4e;
@@ -36,6 +36,18 @@ header.hero{position:relative;overflow:hidden;color:#fff;border-radius:22px;
   box-shadow:0 14px 30px rgba(0,0,0,.20)}
 header.hero::after{content:"";position:absolute;right:-40px;top:-60px;width:200px;height:200px;
   border-radius:50%;background:rgba(255,255,255,.16)}
+/* トップ専用：紙吹雪風のお祭りあしらい */
+.index-hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.9;
+  background:
+    radial-gradient(circle at 14% 26%, #fff 0 5px, transparent 6px),
+    radial-gradient(circle at 34% 74%, #ffe45e 0 6px, transparent 7px),
+    radial-gradient(circle at 52% 30%, rgba(255,255,255,.85) 0 3px, transparent 4px),
+    radial-gradient(circle at 68% 78%, #fff 0 4px, transparent 5px),
+    radial-gradient(circle at 82% 22%, rgba(255,255,255,.9) 0 5px, transparent 6px),
+    radial-gradient(circle at 90% 52%, #ffd0ec 0 4px, transparent 5px),
+    radial-gradient(circle at 24% 50%, rgba(255,255,255,.7) 0 3px, transparent 4px),
+    radial-gradient(circle at 46% 88%, rgba(255,255,255,.8) 0 3px, transparent 4px)}
+.index-hero h1{text-shadow:0 2px 10px rgba(0,0,0,.16)}
 header.hero .pf{position:relative;font-family:'Jost',sans-serif;font-size:12px;font-weight:700;
   letter-spacing:.12em;text-transform:uppercase;opacity:.95}
 header.hero h1{position:relative;margin:8px 0 10px;font-size:26px;line-height:1.28;
@@ -91,12 +103,12 @@ a.back{display:inline-block;margin-bottom:14px;color:var(--muted);text-decoratio
 a.back:hover{color:var(--brand-orange)}
 </style></head><body><div class="wrap">
 <div class="brandbar"><a href="index.html"><img src="assets/dcl_logo.png" alt="DeNA Creator Links"></a></div>
-<header class="hero">
+<header class="hero index-hero">
   <div class="chip">DeNA Creator Links</div>
   <h1>事務所イベント ランキング</h1>
   <div class="meta">Pococha ／ TikTok LIVE</div>
 </header>
-<div class="updated">最終更新: 2026-07-28 17:43 JST</div>
+<div class="updated">最終更新: 2026-07-28 17:46 JST</div>
 <div class="card-list"><a href="pococha-202607-diamondbattle.html"><div class="card" style="--c:#1668c9;--c2:#7fc4f0"><span class="arrow">›</span><div class="pf">Pococha</div><h2>ダイヤ獲得ランキングバトル</h2><div class="meta">2026-07-22 〜 2026-07-26</div></div></a><a href="tiktok-202607-dclmatch.html"><div class="card" style="--c:#eb5000;--c2:#facd00"><span class="arrow">›</span><div class="pf">TikTok LIVE</div><h2>DCL MATCH（7/28〜7/31）</h2><div class="meta">2026-07-28 〜 2026-07-31</div></div></a><a href="tiktok-202607-dclmatch-0722.html"><div class="card" style="--c:#eb5000;--c2:#facd00"><span class="arrow">›</span><div class="pf">TikTok LIVE</div><h2>DCL MATCH（7/22〜7/26）</h2><div class="meta">2026-07-22 〜 2026-07-26</div></div></a></div>
 <footer>DeNA Creator Links — Event Rankings</footer>
 </div></body></html>

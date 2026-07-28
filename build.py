@@ -31,9 +31,9 @@ PF_THEME = {
     "TikTok LIVE": {"accent": "#eb5000", "accent2": "#facd00", "label": "TikTok LIVE",
                     "hero": "linear-gradient(115deg,#eb5000 0%,#ff7a1a 46%,#facd00 100%)"},
 }
-# 一覧トップ（DeNA Creator Links ブランド）= 暖色
+# 一覧トップ（DeNA Creator Links ブランド）= ロゴの全色を使ったお祭り感マルチカラー
 DEFAULT_THEME = {"accent": "#eb5000", "accent2": "#facd00", "label": "イベント",
-                 "hero": "linear-gradient(115deg,#eb5000 0%,#ff7a1a 46%,#facd00 100%)"}
+                 "hero": "linear-gradient(120deg,#7c3aed 0%,#f062b0 30%,#f2600f 66%,#ffc400 100%)"}
 
 
 # ---------- データ読み込み ----------
@@ -152,6 +152,18 @@ header.hero{{position:relative;overflow:hidden;color:#fff;border-radius:22px;
   box-shadow:0 14px 30px rgba(0,0,0,.20)}}
 header.hero::after{{content:"";position:absolute;right:-40px;top:-60px;width:200px;height:200px;
   border-radius:50%;background:rgba(255,255,255,.16)}}
+/* トップ専用：紙吹雪風のお祭りあしらい */
+.index-hero::before{{content:"";position:absolute;inset:0;pointer-events:none;opacity:.9;
+  background:
+    radial-gradient(circle at 14% 26%, #fff 0 5px, transparent 6px),
+    radial-gradient(circle at 34% 74%, #ffe45e 0 6px, transparent 7px),
+    radial-gradient(circle at 52% 30%, rgba(255,255,255,.85) 0 3px, transparent 4px),
+    radial-gradient(circle at 68% 78%, #fff 0 4px, transparent 5px),
+    radial-gradient(circle at 82% 22%, rgba(255,255,255,.9) 0 5px, transparent 6px),
+    radial-gradient(circle at 90% 52%, #ffd0ec 0 4px, transparent 5px),
+    radial-gradient(circle at 24% 50%, rgba(255,255,255,.7) 0 3px, transparent 4px),
+    radial-gradient(circle at 46% 88%, rgba(255,255,255,.8) 0 3px, transparent 4px)}}
+.index-hero h1{{text-shadow:0 2px 10px rgba(0,0,0,.16)}}
 header.hero .pf{{position:relative;font-family:'Jost',sans-serif;font-size:12px;font-weight:700;
   letter-spacing:.12em;text-transform:uppercase;opacity:.95}}
 header.hero h1{{position:relative;margin:8px 0 10px;font-size:26px;line-height:1.28;
@@ -272,7 +284,7 @@ def build_index(cards_meta):
             f'<div class="pf">{html.escape(theme["label"])}</div>'
             f'<h2>{html.escape(meta["title"])}</h2>'
             f'<div class="meta">{period}</div></div></a>')
-    body = f"""<header class="hero">
+    body = f"""<header class="hero index-hero">
   <div class="chip">DeNA Creator Links</div>
   <h1>事務所イベント ランキング</h1>
   <div class="meta">Pococha ／ TikTok LIVE</div>

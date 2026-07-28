@@ -22,11 +22,12 @@ POCOCHA_REPORT = ROOT.parent / "pococha" / "data" / "event_report.csv"
 JST = timezone(timedelta(hours=9))
 TOP_N = 20  # ランキング表示の既定上限（events.json の top_n で個別上書き可）
 
+# DeNA Creator Links ブランドカラーで統一（暖色系）
 PF_THEME = {
-    "Pococha":     {"accent": "#ff5a8a", "label": "Pococha"},
-    "TikTok LIVE": {"accent": "#00c4bd", "label": "TikTok LIVE"},
+    "Pococha":     {"accent": "#f177c4", "label": "Pococha"},      # ブランドピンク
+    "TikTok LIVE": {"accent": "#eb5000", "label": "TikTok LIVE"},  # ブランドオレンジ
 }
-DEFAULT_THEME = {"accent": "#6366f1", "label": "イベント"}
+DEFAULT_THEME = {"accent": "#eb5000", "label": "イベント"}
 
 
 # ---------- データ読み込み ----------
@@ -110,37 +111,93 @@ def page_shell(title, body, accent):
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
 <title>{html.escape(title)}</title>
+<link rel="icon" href="assets/dcl_mark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@500;600;700;800&family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
-:root {{ --accent:{accent}; }}
+:root {{
+  --accent:{accent};
+  --brand-orange:#eb5000; --brand-yellow:#facd00; --brand-pink:#f177c4;
+  --ink:#333; --muted:#9a8f86; --cream:#fff9ef; --line:#f0e7dd;
+  --gold:#f6b400; --silver:#b9b3ac; --bronze:#d08a4e;
+}}
 *{{box-sizing:border-box}}
-body{{margin:0;font-family:-apple-system,'Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;
-  background:#f7f7fb;color:#1a1a2e;line-height:1.5}}
-.wrap{{max-width:680px;margin:0 auto;padding:24px 16px 64px}}
-header.hero{{background:linear-gradient(135deg,var(--accent),#222);color:#fff;
-  border-radius:18px;padding:28px 24px;margin-bottom:24px;box-shadow:0 8px 24px rgba(0,0,0,.12)}}
-header.hero .pf{{font-size:13px;font-weight:700;letter-spacing:.08em;opacity:.9;text-transform:uppercase}}
-header.hero h1{{margin:6px 0 10px;font-size:24px;line-height:1.3}}
-header.hero .meta{{font-size:13px;opacity:.92}}
-.updated{{font-size:12px;color:#8a8aa0;text-align:right;margin:-8px 0 16px}}
+body{{margin:0;
+  font-family:'Noto Sans JP','Hiragino Kaku Gothic ProN',sans-serif;
+  background:
+    radial-gradient(1200px 380px at 12% -8%, #ffe9c9 0%, rgba(255,233,201,0) 60%),
+    radial-gradient(1000px 360px at 100% 4%, #ffe0ed 0%, rgba(255,224,237,0) 55%),
+    #fffdf8;
+  color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}}
+.wrap{{max-width:680px;margin:0 auto;padding:22px 16px 72px}}
+
+/* ブランドヘッダー（ロゴ） */
+.brandbar{{display:flex;justify-content:center;margin:8px 0 20px}}
+.brandbar img{{height:34px;width:auto}}
+
+/* ヒーロー */
+header.hero{{position:relative;overflow:hidden;color:#fff;border-radius:22px;
+  padding:26px 24px;margin-bottom:22px;
+  background:linear-gradient(115deg,var(--brand-orange) 0%,#ff7a1a 46%,var(--brand-yellow) 100%);
+  box-shadow:0 14px 30px rgba(235,80,0,.22)}}
+header.hero::after{{content:"";position:absolute;right:-40px;top:-60px;width:200px;height:200px;
+  border-radius:50%;background:rgba(255,255,255,.16)}}
+header.hero .pf{{position:relative;font-family:'Jost',sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;opacity:.95}}
+header.hero h1{{position:relative;margin:8px 0 10px;font-size:26px;line-height:1.28;
+  font-weight:800;letter-spacing:.01em}}
+header.hero .meta{{position:relative;font-size:13px;opacity:.95;font-weight:500}}
+.chip{{display:inline-block;background:rgba(255,255,255,.22);border-radius:999px;
+  padding:3px 12px;font-size:12px;font-weight:700;margin-bottom:4px}}
+
+.updated{{font-size:12px;color:var(--muted);text-align:right;margin:-6px 2px 16px}}
+
+/* ランキング */
 ul.rank{{list-style:none;margin:0;padding:0}}
-ul.rank li{{display:flex;align-items:center;gap:14px;background:#fff;border-radius:14px;
-  padding:14px 18px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.05)}}
-li .num{{font-size:20px;font-weight:800;min-width:42px;text-align:center;color:var(--accent)}}
-li.top .num{{font-size:26px}}
+ul.rank li{{display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;
+  padding:14px 16px;margin-bottom:10px;border:1px solid var(--line);
+  box-shadow:0 4px 14px rgba(120,80,20,.05)}}
+li .num{{font-family:'Jost',sans-serif;font-size:20px;font-weight:700;min-width:46px;
+  text-align:center;color:var(--accent);line-height:1.05}}
+li .num .m{{font-size:20px}}
+li.top{{border-color:transparent}}
+li.g1{{background:linear-gradient(100deg,#fff6d8,#fff)}}
+li.g2{{background:linear-gradient(100deg,#f3f1ee,#fff)}}
+li.g3{{background:linear-gradient(100deg,#fbe8d6,#fff)}}
+li.g1 .num{{color:var(--gold)}} li.g2 .num{{color:var(--silver)}} li.g3 .num{{color:var(--bronze)}}
+li.top .num{{font-size:22px}}
 li .body{{flex:1;min-width:0}}
-li .nm{{font-weight:600;font-size:16px;word-break:break-all}}
-li .bar{{height:7px;border-radius:4px;background:var(--accent);margin-top:6px;opacity:.85}}
-li .sc{{font-variant-numeric:tabular-nums;font-weight:700;font-size:16px;white-space:nowrap}}
-li .unit{{font-size:12px;color:#8a8aa0;margin-left:3px}}
+li .nm{{font-weight:700;font-size:16px;word-break:break-word}}
+li .bar{{height:7px;border-radius:4px;margin-top:7px;
+  background:linear-gradient(90deg,var(--brand-orange),var(--brand-yellow))}}
+li .sc{{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;font-weight:700;
+  font-size:18px;white-space:nowrap;color:var(--ink)}}
+li .unit{{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--muted);
+  margin-left:3px;font-weight:500}}
+
+/* イベント一覧カード */
 .card-list a{{text-decoration:none;color:inherit}}
-.card{{display:block;background:#fff;border-radius:14px;padding:18px 20px;margin-bottom:12px;
-  box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:5px solid var(--c)}}
-.card .pf{{font-size:12px;font-weight:700;color:var(--c)}}
-.card h2{{margin:4px 0 6px;font-size:18px}}
-.card .meta{{font-size:13px;color:#8a8aa0}}
-footer{{text-align:center;font-size:12px;color:#aaa;margin-top:40px}}
-a.back{{display:inline-block;margin-bottom:16px;color:#8a8aa0;text-decoration:none;font-size:14px}}
+.card{{position:relative;display:block;background:#fff;border-radius:18px;padding:18px 20px 18px 22px;
+  margin-bottom:14px;border:1px solid var(--line);box-shadow:0 6px 18px rgba(120,80,20,.06);
+  transition:transform .15s ease, box-shadow .15s ease;overflow:hidden}}
+.card::before{{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;
+  background:linear-gradient(180deg,var(--c),#facd00)}}
+.card:hover{{transform:translateY(-2px);box-shadow:0 12px 26px rgba(235,80,0,.14)}}
+.card .pf{{display:inline-block;font-family:'Jost',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:.06em;color:#fff;background:var(--c);border-radius:999px;padding:3px 11px}}
+.card h2{{margin:9px 0 5px;font-size:19px;font-weight:800}}
+.card .meta{{font-size:13px;color:var(--muted);font-weight:500}}
+.card .arrow{{position:absolute;right:18px;top:50%;transform:translateY(-50%);
+  color:var(--c);font-size:20px}}
+
+footer{{text-align:center;font-size:12px;color:var(--muted);margin-top:44px;
+  font-family:'Jost',sans-serif;letter-spacing:.04em}}
+a.back{{display:inline-block;margin-bottom:14px;color:var(--muted);text-decoration:none;
+  font-size:14px;font-weight:600}}
+a.back:hover{{color:var(--brand-orange)}}
 </style></head><body><div class="wrap">
+<div class="brandbar"><a href="index.html"><img src="assets/dcl_logo.png" alt="DeNA Creator Links"></a></div>
 {body}
 <footer>DeNA Creator Links — Event Rankings</footer>
 </div></body></html>"""
@@ -148,8 +205,8 @@ a.back{{display:inline-block;margin-bottom:16px;color:#8a8aa0;text-decoration:no
 
 def render_item(rank, r, ev_cfg, maxscore):
     display = ev_cfg.get("display", "value")
-    top = "top" if rank <= 3 else ""
-    num = f'{medal(rank)}<br>{rank}' if rank <= 3 else str(rank)
+    top = f"top g{rank}" if rank <= 3 else ""
+    num = f'<span class="m">{medal(rank)}</span><br>{rank}' if rank <= 3 else str(rank)
     name = html.escape(r["name"])
     if display == "rank":
         body = f'<div class="nm">{name}</div>'
@@ -183,9 +240,9 @@ def build_event(ev_cfg, report):
     cap = f"（上位{top_n}位 / 参加 {total} 名）" if total > top_n else f"／ 参加 {total} 名"
     body = f"""<a class="back" href="index.html">← イベント一覧</a>
 <header class="hero">
-  <div class="pf">{html.escape(theme['label'])}</div>
+  <div class="chip">{html.escape(theme['label'])}</div>
   <h1>{html.escape(meta['title'])}</h1>
-  <div class="meta">{period} {cap}</div>
+  <div class="meta">{period}　{cap}</div>
 </header>
 <div class="updated">最終更新: {now} JST</div>
 <ul class="rank">{items}</ul>"""
@@ -202,11 +259,12 @@ def build_index(cards_meta):
         period = f"{meta['period_start']} 〜 {meta['period_end']}" if meta["period_start"] else ""
         cards.append(
             f'<a href="{ev_cfg["id"]}.html"><div class="card" style="--c:{theme["accent"]}">'
+            f'<span class="arrow">›</span>'
             f'<div class="pf">{html.escape(theme["label"])}</div>'
             f'<h2>{html.escape(meta["title"])}</h2>'
             f'<div class="meta">{period}</div></div></a>')
     body = f"""<header class="hero">
-  <div class="pf" style="text-transform:none">DeNA Creator Links</div>
+  <div class="chip">DeNA Creator Links</div>
   <h1>事務所イベント ランキング</h1>
   <div class="meta">Pococha ／ TikTok LIVE</div>
 </header>

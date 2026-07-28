@@ -13,57 +13,6 @@
       "score_label": "pt",
       "format": "int",
       "display": "value"
-    },
-    {
-      "id": "tiktok-202606-diamond",
-      "platform": "TikTok LIVE",
-      "source": "csv",
-      "data_file": "tiktok-202606-agency.csv",
-      "title": "TikTok LIVE 事務所ランキング｜ダイヤ獲得",
-      "period_start": "2026-06-01",
-      "period_end": "2026-06-20",
-      "score_field": "diamond",
-      "score_label": "ダイヤ",
-      "format": "int",
-      "display": "value"
-    },
-    {
-      "id": "tiktok-202606-livetime",
-      "platform": "TikTok LIVE",
-      "source": "csv",
-      "data_file": "tiktok-202606-agency.csv",
-      "title": "TikTok LIVE 事務所ランキング｜配信時間",
-      "period_start": "2026-06-01",
-      "period_end": "2026-06-20",
-      "score_field": "live_time_sec",
-      "format": "duration_sec",
-      "display": "value"
-    },
-    {
-      "id": "tiktok-202606-battle",
-      "platform": "TikTok LIVE",
-      "source": "csv",
-      "data_file": "tiktok-202606-agency.csv",
-      "title": "TikTok LIVE 事務所ランキング｜バトル率",
-      "period_start": "2026-06-01",
-      "period_end": "2026-06-20",
-      "score_field": "battle_ratio",
-      "score_label": "%",
-      "format": "percent",
-      "display": "value"
-    },
-    {
-      "id": "tiktok-202606-growth",
-      "platform": "TikTok LIVE",
-      "source": "csv",
-      "data_file": "tiktok-202606-agency.csv",
-      "title": "TikTok LIVE 事務所ランキング｜先月比成長率",
-      "period_start": "2026-06-01",
-      "period_end": "2026-06-20",
-      "score_field": "growth_ratio",
-      "score_label": "%",
-      "format": "percent",
-      "display": "value"
     }
   ]
 }

@@ -24,9 +24,9 @@ TOP_N = 20  # ランキング表示の既定上限（events.json の top_n で�
 
 # プラットフォーム別テーマ。accent=順位番号/チップ/カード左バー上, accent2=グラデ相方, hero=ヒーロー背景
 PF_THEME = {
-    # Pococha はモノクロ（白黒）イメージ
-    "Pococha":     {"accent": "#1a1a1a", "accent2": "#7a7a7a", "label": "Pococha",
-                    "hero": "linear-gradient(120deg,#1c1c1c 0%,#3a3a3a 55%,#6e6e6e 100%)"},
+    # Pococha は青白（ブルー×ホワイト）イメージ
+    "Pococha":     {"accent": "#1668c9", "accent2": "#7fc4f0", "label": "Pococha",
+                    "hero": "linear-gradient(120deg,#0d5bbf 0%,#2b8fe6 52%,#8fd0f5 100%)"},
     # TikTok LIVE は DCL ブランドの暖色（オレンジ→イエロー）
     "TikTok LIVE": {"accent": "#eb5000", "accent2": "#facd00", "label": "TikTok LIVE",
                     "hero": "linear-gradient(115deg,#eb5000 0%,#ff7a1a 46%,#facd00 100%)"},

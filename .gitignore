@@ -1,0 +1,21 @@
+# --- 機密ガード（絶対に公開しないもの） ---
+# ※ Pococha 認証・鍵は隣の ../pococha にあり、このリポジトリには元々含めない。
+#    念のためここでもブロックしておく。
+.session
+.token
+.studio_token
+.slack_token
+service_account.json
+*.pem
+*.key
+.env
+.env.*
+
+# macOS / エディタ
+.DS_Store
+.claude/
+
+# Python
+__pycache__/
+*.pyc
+.venv/

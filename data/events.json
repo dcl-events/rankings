@@ -2,6 +2,19 @@
   "_comment": "公開するイベントだけをここに列挙する。source=pococha_report は ../pococha/data/event_report.csv から event_identifier で抽出。source=csv は data/<data_file> を読む(TikTok貼り付け用)。score_field=応援ptなど集計列。display: value(金額表示) / rank(順位のみ) / bar(1位を100%とした相対バー)。",
   "events": [
     {
+      "id": "tiktok-202607-dclmatch",
+      "platform": "TikTok LIVE",
+      "source": "csv",
+      "data_file": "tiktok-202607-dclmatch.csv",
+      "title": "DCL MATCH",
+      "period_start": "2026-07-28",
+      "period_end": "2026-07-31",
+      "score_field": "point",
+      "score_label": "pt",
+      "format": "int",
+      "display": "value"
+    },
+    {
       "id": "tiktok-202606-diamond",
       "platform": "TikTok LIVE",
       "source": "csv",

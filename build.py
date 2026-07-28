@@ -216,6 +216,11 @@ footer{{text-align:center;font-size:12px;color:var(--muted);margin-top:44px;
 a.back{{display:inline-block;margin-bottom:14px;color:var(--muted);text-decoration:none;
   font-size:14px;font-weight:600}}
 a.back:hover{{color:var(--brand-orange)}}
+/* スマホ幅：見出しが折り返すと紙吹雪が文字に被るため、狭い画面では紙吹雪を消す */
+@media (max-width:560px){{
+  header.hero h1{{font-size:22px}}
+  .index-hero::before{{display:none}}
+}}
 </style></head><body><div class="wrap">
 <div class="brandbar"><a href="index.html"><img src="assets/dcl_logo.png" alt="DeNA Creator Links"></a></div>
 {body}

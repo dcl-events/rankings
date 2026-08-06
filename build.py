@@ -257,7 +257,11 @@ def build_event(ev_cfg, report):
     now = datetime.now(JST).strftime("%Y-%m-%d %H:%M")
     items = "".join(render_item(i, r, ev_cfg, maxscore) for i, r in enumerate(shown, 1))
     period = f"{meta['period_start']} 〜 {meta['period_end']}" if meta["period_start"] else ""
-    cap = f"（上位{top_n}位 / 参加 {total} 名）" if total > top_n else f"／ 参加 {total} 名"
+    # show_count:false で参加人数の表記を消せる（上位N位のみ表示中はその旨だけ出す）
+    if ev_cfg.get("show_count", True):
+        cap = f"（上位{top_n}位 / 参加 {total} 名）" if total > top_n else f"／ 参加 {total} 名"
+    else:
+        cap = f"（上位{top_n}位）" if total > top_n else ""
     body = f"""<a class="back" href="index.html">← イベント一覧</a>
 <header class="hero">
   <div class="chip">{html.escape(theme['label'])}</div>

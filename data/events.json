@@ -2,6 +2,18 @@
   "_comment": "公開するイベントだけをここに列挙する。source=pococha_report は ../pococha/data/event_report.csv から event_identifier で抽出。source=csv は data/<data_file> を読む(TikTok貼り付け用)。score_field=応援ptなど集計列。display: value(金額表示) / rank(順位のみ) / bar(1位を100%とした相対バー)。",
   "events": [
     {
+      "id": "pococha-202607-growthbattle",
+      "platform": "Pococha",
+      "source": "csv",
+      "data_file": "pococha-202607-growthbattle.csv",
+      "title": "🏆 7月成長率バトルランキング〈Pococha部門〉",
+      "period_start": "2026-07-01",
+      "period_end": "2026-07-31",
+      "score_field": "order",
+      "display": "rank",
+      "show_count": false
+    },
+    {
       "id": "tiktok-202608-newcomer",
       "platform": "TikTok LIVE",
       "source": "csv",

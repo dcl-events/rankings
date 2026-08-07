@@ -12,7 +12,8 @@
       "score_field": "point",
       "score_label": "ダイヤ",
       "format": "int",
-      "display": "value"
+      "display": "value",
+      "show_gap": true
     },
     {
       "id": "tiktok-202607-growthbattle",

@@ -189,6 +189,8 @@ li.g1 .num{{color:var(--gold)}} li.g2 .num{{color:var(--silver)}} li.g3 .num{{co
 li.top .num{{font-size:22px}}
 li .body{{flex:1;min-width:0}}
 li .nm{{font-weight:700;font-size:16px;word-break:break-word}}
+li .gap{{margin-top:4px;font-size:12px;font-weight:600;color:var(--brand-orange);
+  font-family:'Noto Sans JP',sans-serif}}
 li .bar{{height:7px;border-radius:4px;margin-top:7px;
   background:linear-gradient(90deg,var(--brand-orange),var(--brand-yellow))}}
 li .sc{{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;font-weight:700;
@@ -223,21 +225,22 @@ a.back:hover{{color:var(--brand-orange)}}
 </div></body></html>"""
 
 
-def render_item(rank, r, ev_cfg, maxscore):
+def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
     display = ev_cfg.get("display", "value")
     top = f"top g{rank}" if rank <= 3 else ""
     num = f'<span class="m">{medal(rank)}</span><br>{rank}' if rank <= 3 else str(rank)
     name = html.escape(r["name"])
+    gap = f'<div class="gap">{html.escape(gap_text)}</div>' if gap_text else ""
     if display == "rank":
-        body = f'<div class="nm">{name}</div>'
+        body = f'<div class="nm">{name}</div>{gap}'
         sc = ""
     elif display == "bar":
         pct = int(r["score"] / maxscore * 100) if maxscore else 0
-        body = f'<div class="nm">{name}</div><div class="bar" style="width:{pct}%"></div>'
+        body = f'<div class="nm">{name}</div><div class="bar" style="width:{pct}%"></div>{gap}'
         sc = ""
     else:  # value
         val, unit = fmt_score(r["score"], ev_cfg)
-        body = f'<div class="nm">{name}</div>'
+        body = f'<div class="nm">{name}</div>{gap}'
         sc = f'<div class="sc">{val}<span class="unit">{html.escape(unit)}</span></div>'
     return (f'<li class="{top}"><div class="num">{num}</div>'
             f'<div class="body">{body}</div>{sc}</li>')
@@ -255,7 +258,17 @@ def build_event(ev_cfg, report):
     top_n = ev_cfg.get("top_n", TOP_N)
     shown = rows[:top_n]
     now = datetime.now(JST).strftime("%Y-%m-%d %H:%M")
-    items = "".join(render_item(i, r, ev_cfg, maxscore) for i, r in enumerate(shown, 1))
+    # 次の1人までの距離（show_gap:true のとき各行に表示）
+    gap_unit = ev_cfg.get("score_label", "")
+    def gap_for(i, r):
+        if not ev_cfg.get("show_gap"):
+            return ""
+        if i == 1:
+            return "首位"
+        need = int(round(shown[i - 2]["score"] - r["score"])) + 1
+        return f"あと {need:,}{gap_unit} で1人抜き"
+    items = "".join(render_item(i, r, ev_cfg, maxscore, gap_for(i, r))
+                    for i, r in enumerate(shown, 1))
     period = f"{meta['period_start']} 〜 {meta['period_end']}" if meta["period_start"] else ""
     # show_count:false で参加人数の表記を消せる（上位N位のみ表示中はその旨だけ出す）
     if ev_cfg.get("show_count", True):

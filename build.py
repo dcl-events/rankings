@@ -73,6 +73,7 @@ def rows_from_csv(ev_cfg):
     数値化できない/0以下の行は除外（非アクティブ・#DIV/0! を落とす）。"""
     path = DATA / ev_cfg["data_file"]
     field = ev_cfg.get("score_field", "score")
+    time_field = ev_cfg.get("time_field")  # 任意: 配信時間などの補助列
     with open(path, encoding="utf-8") as f:
         raw = [r for r in csv.DictReader(f)]
     rows = []
@@ -83,7 +84,10 @@ def rows_from_csv(ev_cfg):
             continue
         if v <= 0:
             continue
-        rows.append({"name": r["name"].strip(), "score": v})
+        row = {"name": r["name"].strip(), "score": v}
+        if time_field:
+            row["time"] = (r.get(time_field) or "").strip()
+        rows.append(row)
     meta = {
         "title": ev_cfg.get("title", ev_cfg["id"]),
         "period_start": ev_cfg.get("period_start", ""),
@@ -191,6 +195,8 @@ li .body{{flex:1;min-width:0}}
 li .nm{{font-weight:700;font-size:16px;word-break:break-word}}
 li .gap{{margin-top:4px;font-size:12px;font-weight:600;color:var(--brand-orange);
   font-family:'Noto Sans JP',sans-serif}}
+li .tm{{margin-top:3px;font-size:12px;font-weight:500;color:var(--muted);
+  font-family:'Noto Sans JP',sans-serif}}
 li .bar{{height:7px;border-radius:4px;margin-top:7px;
   background:linear-gradient(90deg,var(--brand-orange),var(--brand-yellow))}}
 li .sc{{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;font-weight:700;
@@ -231,16 +237,19 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
     num = f'<span class="m">{medal(rank)}</span><br>{rank}' if rank <= 3 else str(rank)
     name = html.escape(r["name"])
     gap = f'<div class="gap">{html.escape(gap_text)}</div>' if gap_text else ""
+    tm = r.get("time")
+    tline = f'<div class="tm">⏱ 配信 {html.escape(tm)}</div>' if tm else ""
+    sub = gap + tline
     if display == "rank":
-        body = f'<div class="nm">{name}</div>{gap}'
+        body = f'<div class="nm">{name}</div>{sub}'
         sc = ""
     elif display == "bar":
         pct = int(r["score"] / maxscore * 100) if maxscore else 0
-        body = f'<div class="nm">{name}</div><div class="bar" style="width:{pct}%"></div>{gap}'
+        body = f'<div class="nm">{name}</div><div class="bar" style="width:{pct}%"></div>{sub}'
         sc = ""
     else:  # value
         val, unit = fmt_score(r["score"], ev_cfg)
-        body = f'<div class="nm">{name}</div>{gap}'
+        body = f'<div class="nm">{name}</div>{sub}'
         sc = f'<div class="sc">{val}<span class="unit">{html.escape(unit)}</span></div>'
     return (f'<li class="{top}"><div class="num">{num}</div>'
             f'<div class="body">{body}</div>{sc}</li>')

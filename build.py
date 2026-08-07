@@ -265,7 +265,7 @@ def build_event(ev_cfg, report):
     body = f"""<a class="back" href="index.html">← イベント一覧</a>
 <header class="hero">
   <div class="chip">{html.escape(theme['label'])}</div>
-  <h1>{html.escape(meta['title'])}</h1>
+  <h1>{html.escape(meta['title']).replace(chr(10), '<br>')}</h1>
   <div class="meta">{period}　{cap}</div>
 </header>
 <div class="updated">最終更新: {now} JST</div>

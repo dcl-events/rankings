@@ -6,7 +6,7 @@
       "platform": "TikTok LIVE",
       "source": "csv",
       "data_file": "tiktok-202608-newcomer.csv",
-      "title": "🌱 TikTok新人ランキング（8/7時点・当月累計ダイヤ）",
+      "title": "🌱 TikTok新人ランキング\n（8/7時点・当月累計ダイヤ）",
       "period_start": "2026-08-01",
       "period_end": "2026-08-07",
       "score_field": "point",

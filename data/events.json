@@ -20,7 +20,7 @@
       "data_file": "tiktok-202608-newcomer.csv",
       "title": "🌱DCLビギナーランキング\n🎁 8月累計 point",
       "period_start": "2026-08-01",
-      "period_end": "2026-08-12",
+      "period_end": "2026-08-15",
       "score_field": "point",
       "score_label": "🎁point",
       "time_field": "livetime",

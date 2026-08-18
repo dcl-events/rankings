@@ -26,7 +26,8 @@
       "time_field": "livetime",
       "format": "int",
       "display": "value",
-      "show_gap": true
+      "show_gap": true,
+      "top_n": 500
     },
     {
       "id": "tiktok-202607-growthbattle",

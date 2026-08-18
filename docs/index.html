@@ -57,6 +57,22 @@ header.hero .meta{position:relative;font-size:13px;opacity:.95;font-weight:500}
 
 .updated{font-size:12px;color:var(--muted);text-align:right;margin:-6px 2px 16px}
 
+/* 折りたたみルール */
+details.rules{background:#fff;border:1px solid var(--line);border-radius:16px;
+  margin-bottom:16px;overflow:hidden;box-shadow:0 4px 14px rgba(120,80,20,.05)}
+details.rules>summary{list-style:none;cursor:pointer;padding:14px 16px;
+  font-weight:800;font-size:14px;color:var(--accent);user-select:none}
+details.rules>summary::-webkit-details-marker{display:none}
+details.rules>summary::after{content:"▼";float:right;font-size:10px;opacity:.6;
+  transition:transform .2s}
+details.rules[open]>summary::after{transform:rotate(180deg)}
+.rbody{padding:0 16px 12px}
+.rsec{margin-top:12px}
+.rsec .rh{font-weight:800;font-size:13px;margin-bottom:5px;
+  padding-left:9px;border-left:3px solid var(--accent)}
+.rsec ul{margin:0;padding-left:1.15em}
+.rsec li{font-size:13px;line-height:1.75;color:var(--ink);word-break:break-word}
+
 /* ランキング */
 ul.rank{list-style:none;margin:0;padding:0}
 ul.rank li{display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;
@@ -111,7 +127,7 @@ a.back:hover{color:var(--brand-orange)}
   <h1>事務所イベント</h1>
   <div class="meta">Pococha ／ TikTok LIVE</div>
 </header>
-<div class="updated">最終更新: 2026-08-18 16:51 JST</div>
+<div class="updated">最終更新: 2026-08-18 17:22 JST</div>
 <div class="card-list"><a href="tiktok-202608-newcomer.html"><div class="card" style="--c:#eb5000;--c2:#facd00"><span class="arrow">›</span><div class="pf">TikTok LIVE</div><h2>🌱DCLビギナーランキング
 🎁 8月累計 point</h2><div class="meta">2026-08-01 〜 2026-08-17</div></div></a><a href="tiktok-202608-rise.html"><div class="card" style="--c:#eb5000;--c2:#facd00"><span class="arrow">›</span><div class="pf">TikTok LIVE</div><h2>⚡️DCL RISE⚡️
 🎁 8月累計 point</h2><div class="meta">2026-08-01 〜 2026-08-17</div></div></a><a href="tiktok-202607-dclmatch.html"><div class="card" style="--c:#eb5000;--c2:#facd00"><span class="arrow">›</span><div class="pf">TikTok LIVE</div><h2>DCL MATCH（7/28〜7/31）</h2><div class="meta">2026-07-28 〜 2026-07-31</div></div></a><a href="pococha-202607-diamondbattle.html"><div class="card" style="--c:#1668c9;--c2:#7fc4f0"><span class="arrow">›</span><div class="pf">Pococha</div><h2>ダイヤ獲得ランキングバトル</h2><div class="meta">2026-07-22 〜 2026-07-26</div></div></a><a href="tiktok-202607-dclmatch-0722.html"><div class="card" style="--c:#eb5000;--c2:#facd00"><span class="arrow">›</span><div class="pf">TikTok LIVE</div><h2>DCL MATCH（7/22〜7/26）</h2><div class="meta">2026-07-22 〜 2026-07-26</div></div></a><a href="pococha-202607-growthbattle.html"><div class="card" style="--c:#1668c9;--c2:#7fc4f0"><span class="arrow">›</span><div class="pf">Pococha</div><h2>🏆 7月成長率バトルランキング〈Pococha部門〉</h2><div class="meta">2026-07-01 〜 2026-07-31</div></div></a><a href="tiktok-202607-growthbattle.html"><div class="card" style="--c:#eb5000;--c2:#facd00"><span class="arrow">›</span><div class="pf">TikTok LIVE</div><h2>🏆 7月成長率バトルランキング〈TikTok LIVE部門〉</h2><div class="meta">2026-07-01 〜 2026-07-31</div></div></a></div>

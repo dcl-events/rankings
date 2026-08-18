@@ -177,6 +177,22 @@ header.hero .meta{{position:relative;font-size:13px;opacity:.95;font-weight:500}
 
 .updated{{font-size:12px;color:var(--muted);text-align:right;margin:-6px 2px 16px}}
 
+/* 折りたたみルール */
+details.rules{{background:#fff;border:1px solid var(--line);border-radius:16px;
+  margin-bottom:16px;overflow:hidden;box-shadow:0 4px 14px rgba(120,80,20,.05)}}
+details.rules>summary{{list-style:none;cursor:pointer;padding:14px 16px;
+  font-weight:800;font-size:14px;color:var(--accent);user-select:none}}
+details.rules>summary::-webkit-details-marker{{display:none}}
+details.rules>summary::after{{content:"▼";float:right;font-size:10px;opacity:.6;
+  transition:transform .2s}}
+details.rules[open]>summary::after{{transform:rotate(180deg)}}
+.rbody{{padding:0 16px 12px}}
+.rsec{{margin-top:12px}}
+.rsec .rh{{font-weight:800;font-size:13px;margin-bottom:5px;
+  padding-left:9px;border-left:3px solid var(--accent)}}
+.rsec ul{{margin:0;padding-left:1.15em}}
+.rsec li{{font-size:13px;line-height:1.75;color:var(--ink);word-break:break-word}}
+
 /* ランキング */
 ul.rank{{list-style:none;margin:0;padding:0}}
 ul.rank li{{display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;
@@ -255,6 +271,20 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
             f'<div class="body">{body}</div>{sc}</li>')
 
 
+def rules_html(ev_cfg):
+    """events.json の rules(セクション配列) を折りたたみ(details)で描画。無ければ空。"""
+    rules = ev_cfg.get("rules")
+    if not rules:
+        return ""
+    secs = []
+    for s in rules:
+        items = "".join(f"<li>{html.escape(str(it))}</li>" for it in s.get("items", []))
+        secs.append(f'<div class="rsec"><div class="rh">{html.escape(s.get("h",""))}</div>'
+                    f'<ul>{items}</ul></div>')
+    return ('<details class="rules"><summary>📖 ランキングのルール</summary>'
+            f'<div class="rbody">{"".join(secs)}</div></details>')
+
+
 def build_event(ev_cfg, report):
     theme = PF_THEME.get(ev_cfg["platform"], DEFAULT_THEME)
     if ev_cfg["source"] == "pococha_report":
@@ -291,6 +321,7 @@ def build_event(ev_cfg, report):
   <div class="meta">{period}　{cap}</div>
 </header>
 <div class="updated">最終更新: {now} JST</div>
+{rules_html(ev_cfg)}
 <ul class="rank">{items}</ul>"""
     (DOCS / f"{ev_cfg['id']}.html").write_text(
         page_shell(meta["title"], body, theme), encoding="utf-8")

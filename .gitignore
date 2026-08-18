@@ -21,3 +21,4 @@ __pycache__/
 .venv/
 tools/*.log
 tools/.beginner.lock
+.slack_user_token

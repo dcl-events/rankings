@@ -77,6 +77,22 @@
       "score_label": "pt",
       "format": "int",
       "display": "value"
+    },
+    {
+      "id": "tiktok-202608-rise",
+      "platform": "TikTok LIVE",
+      "source": "csv",
+      "data_file": "tiktok-202608-rise.csv",
+      "title": "⚡️DCL RISE⚡️\n🎁 8月累計 point",
+      "period_start": "2026-08-01",
+      "period_end": "2026-08-17",
+      "score_field": "point",
+      "score_label": "🎁point",
+      "time_field": "livetime",
+      "format": "int",
+      "display": "value",
+      "show_gap": true,
+      "top_n": 500
     }
   ]
 }

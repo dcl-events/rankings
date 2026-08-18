@@ -19,3 +19,5 @@ service_account.json
 __pycache__/
 *.pyc
 .venv/
+tools/*.log
+tools/.beginner.lock

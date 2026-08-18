@@ -48,7 +48,7 @@ def hm(v):
 
 def main():
     args = sys.argv[1:]
-    month = "2026-08"; floor = 1000; date = ""; asof = ""; dry = False
+    month = "2026-08"; floor = 1000; date = ""; asof = ""; dry = False; bare = False
     i = 0
     while i < len(args):
         if args[i] == "--month": month = args[i+1]; i += 2
@@ -56,6 +56,7 @@ def main():
         elif args[i] == "--date": date = args[i+1]; i += 2
         elif args[i] == "--asof": asof = args[i+1]; i += 2
         elif args[i] == "--dry-run": dry = True; i += 1
+        elif args[i] == "--bare": bare = True; i += 1
         else: i += 1
     today = asof or datetime.now(JST).strftime("%Y-%m-%d")
 
@@ -141,8 +142,11 @@ def main():
     climbers.sort(key=lambda x: x[2])
 
     # Slackメッセージ
-    head = f"🌱 DCLビギナーランキング 更新（{date}時点）" if date else "🌱 DCLビギナーランキング 更新"
-    msg = [head, MENTION, URL, ""]
+    if bare:   # まとめ投稿に埋め込む用（メンション・「更新」表記は親側が持つ）
+        msg = ["🌱 DCLビギナーランキング", URL, ""]
+    else:
+        head = f"🌱 DCLビギナーランキング 更新（{date}時点）" if date else "🌱 DCLビギナーランキング 更新"
+        msg = [head, MENTION, URL, ""]
     if not prev:
         msg.append("（初回更新。順位変動の比較は次回から）")
     elif climbers:
@@ -157,13 +161,13 @@ def main():
         for name, drop in newgrads:
             m, d = drop[5:7].lstrip("0"), drop[8:10].lstrip("0")
             msg.append(f"・{name}：ビギナー掲載は {m}/{d} まで")
-        msg.append(RISE_URL)
+        if not bare: msg.append(RISE_URL)
     if dropped:
         msg.append("")
         msg.append("🏁 本日ビギナー掲載終了（⚡️DCL RISE⚡️で継続）")
         for _cid, name, _gon in dropped:
             msg.append(f"・{name}")
-        msg.append(RISE_URL)
+        if not bare: msg.append(RISE_URL)
     print("\n".join(msg))
 
     # スナップショット・卒業状態の更新

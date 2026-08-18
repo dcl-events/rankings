@@ -44,12 +44,14 @@ def hm(v):
 
 def main():
     args = sys.argv[1:]
-    month = "2026-08"; floor = GRAD_PT; date = ""
+    month = "2026-08"; floor = GRAD_PT; date = ""; dry = False; bare = False
     i = 0
     while i < len(args):
         if args[i] == "--month": month = args[i+1]; i += 2
         elif args[i] == "--floor": floor = int(args[i+1]); i += 2
         elif args[i] == "--date": date = args[i+1]; i += 2
+        elif args[i] == "--dry-run": dry = True; i += 1
+        elif args[i] == "--bare": bare = True; i += 1
         else: i += 1
 
     cands = sorted(glob.glob(os.path.join(TSV_DIR, "creator_data_*.tsv")))
@@ -80,10 +82,13 @@ def main():
     rise.sort(key=lambda x: -x["pt"])
 
     # CSV書き出し（ビギナーと同じ3列）
-    with open(CSV_OUT, "w", encoding="utf-8", newline="") as f:
-        w = csv.writer(f); w.writerow(["name", "point", "livetime"])
-        for b in rise:
-            w.writerow([b["name"], b["pt"], b["live"]])
+    if dry:
+        err(f"[dry-run] CSV未更新（掲載 {len(rise)}名の想定）")
+    else:
+        with open(CSV_OUT, "w", encoding="utf-8", newline="") as f:
+            w = csv.writer(f); w.writerow(["name", "point", "livetime"])
+            for b in rise:
+                w.writerow([b["name"], b["pt"], b["live"]])
     err(f"CSV {len(rise)}名 (中間層 {sum(1 for b in rise if b['route']=='中間層')} / "
         f"卒業 {sum(1 for b in rise if b['route']=='卒業')})")
 
@@ -104,8 +109,11 @@ def main():
     newcomers.sort(key=lambda x: x[1])
 
     # Slackメッセージ
-    head = f"⚡️DCL RISE⚡️ 更新（{date}時点）" if date else "⚡️DCL RISE⚡️ 更新"
-    msg = [head, MENTION, URL, ""]
+    if bare:
+        msg = ["⚡️DCL RISE⚡️", URL, ""]
+    else:
+        head = f"⚡️DCL RISE⚡️ 更新（{date}時点）" if date else "⚡️DCL RISE⚡️ 更新"
+        msg = [head, MENTION, URL, ""]
     if not prev:
         msg.append("（初回更新。順位変動の比較は次回から）")
     else:
@@ -124,6 +132,8 @@ def main():
     print("\n".join(msg))
 
     # スナップショット更新
+    if dry:
+        err("[dry-run] snapshotは未更新"); return
     json.dump({b["cid"]: {"rank": i + 1, "name": b["name"], "pt": b["pt"]}
                for i, b in enumerate(rise)},
               open(SNAP, "w"), ensure_ascii=False, indent=0)

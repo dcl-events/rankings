@@ -8,7 +8,7 @@
 
 ビギナー仕様:
   対象 = (先月ダイヤ < 10000 または 入会が対象月) かつ 当月ダイヤ >= 1
-  掲載 = ポイント >= FLOOR(=500)
+  掲載 = ポイント >= FLOOR(=1000)
 ポイント:
   point = M×10 + AH×5 + AG×1000
     M=ダイヤモンド, AH=LIVE Matchで獲得したダイヤモンド数, AG=LIVE Match数
@@ -37,7 +37,7 @@ def hm(v):
 
 def main():
     args = sys.argv[1:]
-    tsv = None; month = "2026-08"; floor = 500
+    tsv = None; month = "2026-08"; floor = 1000
     i = 0
     while i < len(args):
         if args[i] == "--tsv": tsv = args[i+1]; i += 2

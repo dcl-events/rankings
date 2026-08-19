@@ -9,14 +9,15 @@ daily_beginner.py と同じ構造・同じポイント式で、対象レンジ�
   A. 中間層     : 10000 <= 先月ダイヤ <= 200000
                   （＝前月10万pt以上・前月20万ダイヤ以下。※後述の近似あり）
   B. 卒業ピック : 先月ダイヤ < 10000（＝前月ビギナー該当）で、当月pt >= 100000
-共通: 先月ダイヤ > 200000 は除外（上位層）。掲載は pt >= floor。
+共通: 先月ダイヤ > 200000 は除外（上位層）。掲載は pt >= floor（既定1＝対象者は全員載せる。
+      当月pt=0 の人は build.py 側がスコア0行として自動除外する）。
 
 ⚠️近似について: クリエイターデータの「先月」列はダイヤ/時間/日数/フォロワー/LIVE数のみで
 LIVE Match実績が無いため、前月ポイントは 先月ダイヤ×10 で近似している
 （先月ダイヤ1万 ≒ 前月10万pt）。厳密にやる場合は前月分xlsxを取得して差し替える。
 
 使い方:
-  python3 tools/daily_rise.py [--month 2026-08] [--floor 100000] [--date 8/17]
+  python3 tools/daily_rise.py [--month 2026-08] [--floor 1] [--date 8/17]
 """
 import sys, os, re, csv, glob, json
 
@@ -44,7 +45,7 @@ def hm(v):
 
 def main():
     args = sys.argv[1:]
-    month = "2026-08"; floor = GRAD_PT; date = ""; dry = False; bare = False
+    month = "2026-08"; floor = 1; date = ""; dry = False; bare = False
     i = 0
     while i < len(args):
         if args[i] == "--month": month = args[i+1]; i += 2

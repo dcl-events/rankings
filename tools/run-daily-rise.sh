@@ -20,7 +20,7 @@ DATE="$(TZ=UTC date -v-1d '+%-m/%d')"   # 前日(UTC)=データ期間末
 say "===== 開始 (date=$DATE) ====="
 
 # 1. ランキング生成＋順位差分（Slack本文は stdout、診断は stderr→ログ）
-MSG="$(python3 tools/daily_rise.py --month 2026-08 --floor 100000 --date "$DATE" 2>>"$LOG")"
+MSG="$(python3 tools/daily_rise.py --month 2026-08 --floor 1 --date "$DATE" 2>>"$LOG")"
 if [ -z "$MSG" ]; then
   say "❌ 生成失敗（TSVなし等）"
   echo "<@U0A6WU3P3LL>"

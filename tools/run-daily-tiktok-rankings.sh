@@ -26,7 +26,7 @@ BEG="$(python3 tools/daily_beginner.py --month 2026-08 --floor 1000 --date "$DAT
 [ -n "$BEG" ] || fail "ビギナー生成失敗（データTSVが見つからない等）"
 
 # 2. ⚡️DCL RISE⚡️（中間層＋当月10万pt超えは即時ピック）
-RISE="$(python3 tools/daily_rise.py --month 2026-08 --floor 100000 --date "$DATE" --bare 2>>"$LOG")"
+RISE="$(python3 tools/daily_rise.py --month 2026-08 --floor 1 --date "$DATE" --bare 2>>"$LOG")"
 [ -n "$RISE" ] || fail "RISE生成失敗（データTSVが見つからない等）"
 
 # 3. サイト再生成（両ランキングまとめて1回）

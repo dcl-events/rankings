@@ -76,6 +76,7 @@ def rows_from_csv(ev_cfg):
     time_field = ev_cfg.get("time_field")  # 任意: 配信時間などの補助列
     days_field = ev_cfg.get("days_field")  # 任意: 有効LIVE日数（配信時間の横に出す）
     fans_field = ev_cfg.get("fans_field")  # 任意: ファンクラブのアクティブなファン
+    bonus_field = ev_cfg.get("bonus_field")  # 任意: 継続ボーナス(pt)。>0 の人にだけバッジを出す
     with open(path, encoding="utf-8") as f:
         raw = [r for r in csv.DictReader(f)]
     rows = []
@@ -93,6 +94,9 @@ def rows_from_csv(ev_cfg):
             row["days"] = (r.get(days_field) or "").strip()
         if fans_field:
             row["fans"] = (r.get(fans_field) or "").strip()
+        if bonus_field:
+            try: row["bonus"] = int(float(r.get(bonus_field) or 0))
+            except ValueError: row["bonus"] = 0
         rows.append(row)
     meta = {
         "title": ev_cfg.get("title", ev_cfg["id"]),
@@ -221,6 +225,7 @@ li .tm{{margin-top:3px;font-size:12px;font-weight:500;color:var(--muted);
   font-family:'Noto Sans JP',sans-serif;
   display:flex;flex-wrap:wrap;gap:1px 10px}}
 li .tm span{{white-space:nowrap}}
+li .tm .bns{{color:var(--brand-orange);font-weight:700}}
 li .bar{{height:7px;border-radius:4px;margin-top:7px;
   background:linear-gradient(90deg,var(--brand-orange),var(--brand-yellow))}}
 li .sc{{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;font-weight:700;
@@ -268,6 +273,8 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
     if tm: parts.append(f"⏱ 配信 {html.escape(tm)}")
     if dy: parts.append(f"📅 有効LIVE {html.escape(dy)}日")
     if fn: parts.append(f"💛 アクティブファン {html.escape(fn)}人")
+    bn = r.get("bonus") or 0
+    if bn: parts.append(f'<b class="bns">🔥 継続ボーナス +{bn:,}pt</b>')
     tline = ('<div class="tm">' + "".join(f"<span>{x}</span>" for x in parts) + "</div>") if parts else ""
     sub = gap + tline
     if display == "rank":

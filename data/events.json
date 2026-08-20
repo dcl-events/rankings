@@ -56,9 +56,7 @@
       ],
       "days_field": "days",
       "fans_field": "fans",
-      "bonus_field": "bonus",
-      "fanpct_field": "fanpct",
-      "fanbonus_field": "fanbonus"
+      "bonus_field": "bonus"
     },
     {
       "id": "tiktok-202607-growthbattle",
@@ -153,9 +151,7 @@
       ],
       "days_field": "days",
       "fans_field": "fans",
-      "bonus_field": "bonus",
-      "fanpct_field": "fanpct",
-      "fanbonus_field": "fanbonus"
+      "bonus_field": "bonus"
     }
   ]
 }

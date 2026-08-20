@@ -278,10 +278,8 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
     parts = []
     if tm: parts.append(f"⏱ 配信 {html.escape(tm)}")
     if dy: parts.append(f"📅 有効LIVE {html.escape(dy)}日")
-    if fn:
-        fp, fb = r.get("fanpct") or 0, r.get("fanbonus") or 0
-        parts.append(f"💛 アクティブファン {html.escape(fn)}人")
-        if fb: parts.append(f'<b class="bns">+{fp}%＝+{fb:,}pt</b>')
+    if fn: parts.append(f"💛 アクティブファン {html.escape(fn)}人")
+    # ファンクラブボーナス(fanpct/fanbonus)は人数表記があれば足りるのでカードには出さない
     bn = r.get("bonus") or 0
     if bn: parts.append(f'<b class="bns">🔥 継続ボーナス +{bn:,}pt</b>')
     tline = ('<div class="tm">' + "".join(f"<span>{x}</span>" for x in parts) + "</div>") if parts else ""

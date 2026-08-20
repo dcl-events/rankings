@@ -74,6 +74,7 @@ def rows_from_csv(ev_cfg):
     path = DATA / ev_cfg["data_file"]
     field = ev_cfg.get("score_field", "score")
     time_field = ev_cfg.get("time_field")  # 任意: 配信時間などの補助列
+    days_field = ev_cfg.get("days_field")  # 任意: 有効LIVE日数（配信時間の横に出す）
     with open(path, encoding="utf-8") as f:
         raw = [r for r in csv.DictReader(f)]
     rows = []
@@ -87,6 +88,8 @@ def rows_from_csv(ev_cfg):
         row = {"name": r["name"].strip(), "score": v}
         if time_field:
             row["time"] = (r.get(time_field) or "").strip()
+        if days_field:
+            row["days"] = (r.get(days_field) or "").strip()
         rows.append(row)
     meta = {
         "title": ev_cfg.get("title", ev_cfg["id"]),
@@ -254,7 +257,11 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
     name = html.escape(r["name"])
     gap = f'<div class="gap">{html.escape(gap_text)}</div>' if gap_text else ""
     tm = r.get("time")
-    tline = f'<div class="tm">⏱ 配信 {html.escape(tm)}</div>' if tm else ""
+    dy = r.get("days")
+    parts = []
+    if tm: parts.append(f"⏱ 配信 {html.escape(tm)}")
+    if dy: parts.append(f"📅 有効LIVE {html.escape(dy)}日")
+    tline = f'<div class="tm">{" ／ ".join(parts)}</div>' if parts else ""
     sub = gap + tline
     if display == "rank":
         body = f'<div class="nm">{name}</div>{sub}'

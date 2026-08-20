@@ -49,13 +49,16 @@
             "通常ダイヤポイント：ダイヤ数 × 10pt",
             "バトルダイヤポイント：ダイヤ数 × 5pt（通常ポイントに上乗せ）",
             "バトル回数ポイント：1000pt（バトル回数分、繰り返し加算）",
-            "継続ボーナス：有効LIVE日数18日以上 かつ LIVE時間70時間以上で 50,000pt（月間・1回）"
+            "継続ボーナス：有効LIVE日数18日以上 かつ LIVE時間70時間以上で 50,000pt（月間・1回）",
+            "ファンクラブボーナス：アクティブファン10人ごとに合計ポイント+1%（計算上限200人＝最大+20%）"
           ]
         }
       ],
       "days_field": "days",
       "fans_field": "fans",
-      "bonus_field": "bonus"
+      "bonus_field": "bonus",
+      "fanpct_field": "fanpct",
+      "fanbonus_field": "fanbonus"
     },
     {
       "id": "tiktok-202607-growthbattle",
@@ -143,13 +146,16 @@
             "通常ダイヤポイント：ダイヤ数 × 10pt",
             "バトルダイヤポイント：ダイヤ数 × 5pt（通常ポイントに上乗せ）",
             "バトル回数ポイント：1000pt（バトル回数分、繰り返し加算）",
-            "継続ボーナス：有効LIVE日数18日以上 かつ LIVE時間70時間以上で 50,000pt（月間・1回）"
+            "継続ボーナス：有効LIVE日数18日以上 かつ LIVE時間70時間以上で 50,000pt（月間・1回）",
+            "ファンクラブボーナス：アクティブファン10人ごとに合計ポイント+1%（計算上限200人＝最大+20%）"
           ]
         }
       ],
       "days_field": "days",
       "fans_field": "fans",
-      "bonus_field": "bonus"
+      "bonus_field": "bonus",
+      "fanpct_field": "fanpct",
+      "fanbonus_field": "fanbonus"
     }
   ]
 }

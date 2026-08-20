@@ -38,6 +38,7 @@ JST = timezone(timedelta(hours=9))
 BONUS_PT = 50000    # 継続ボーナス
 BONUS_DAYS = 18     # 有効LIVE日数（月間）
 BONUS_HOURS = 70    # LIVE時間（月間・時間）
+FAN_CAP = 200       # ファンクラブボーナスの計算上限人数（10人ごとに+1%＝最大+20%）
 
 def err(*a): print(*a, file=sys.stderr)
 def toint(v):
@@ -60,6 +61,12 @@ def live_hours(v):
 def keizoku_bonus(days, live_raw):
     """継続ボーナス：有効LIVE日数18日以上 かつ 月間LIVE時間70時間以上 で 50,000pt。"""
     return BONUS_PT if (days >= BONUS_DAYS and live_hours(live_raw) >= BONUS_HOURS) else 0
+
+def fan_bonus(fans, base_pt):
+    """ファンクラブボーナス：アクティブファン10人ごとに合計ポイント+1%（上限200人＝+20%）。
+    戻り値 (加算率%, 加算pt)。端数は切り捨て。"""
+    pct = min(fans, FAN_CAP) // 10
+    return pct, base_pt * pct // 100
 
 def main():
     args = sys.argv[1:]
@@ -104,7 +111,9 @@ def main():
         if cur < 1: continue
         if not ((last_i < 10000) or is_new): continue
         days = toint(r[DAYS]); bonus = keizoku_bonus(days, r[L])
-        pt = cur * 10 + ah * 5 + ag * 1000 + bonus
+        base = cur * 10 + ah * 5 + ag * 1000 + bonus
+        fans = toint(r[FANS]); fanpct, fanbonus = fan_bonus(fans, base)
+        pt = base + fanbonus
         if pt < floor: continue
         cid = str(r[ID]).strip(); name = r[N].strip()
 
@@ -121,7 +130,7 @@ def main():
             continue          # 猶予明け → ビギナーからは自動で消える
 
         beg.append({"cid": cid, "name": name, "pt": pt,
-                    "cur": cur, "ag": ag, "live": hm(r[L]), "days": days, "fans": toint(r[FANS]), "bonus": bonus,
+                    "cur": cur, "ag": ag, "live": hm(r[L]), "days": days, "fans": fans, "bonus": bonus, "fanpct": fanpct, "fanbonus": fanbonus,
                     "grace_until": g["drop_on"] if g else ""})
     beg.sort(key=lambda x: -x["pt"])
 
@@ -130,9 +139,10 @@ def main():
         err(f"[dry-run] CSV未更新（掲載 {len(beg)}名の想定）")
     else:
         with open(CSV_OUT, "w", encoding="utf-8", newline="") as f:
-            w = csv.writer(f); w.writerow(["name", "point", "livetime", "days", "fans", "bonus"])
+            w = csv.writer(f); w.writerow(["name", "point", "livetime", "days", "fans", "bonus", "fanpct", "fanbonus"])
             for b in beg:
-                w.writerow([b["name"], b["pt"], b["live"], b["days"], b["fans"], b["bonus"]])
+                w.writerow([b["name"], b["pt"], b["live"], b["days"], b["fans"], b["bonus"],
+                            b["fanpct"], b["fanbonus"]])
         err(f"CSV {len(beg)}名")
     err(f"asof={today} 卒業猶予中={sum(1 for b in beg if b['grace_until'])}名 "
         f"新規卒業={len(newgrads)}名 掲載終了={len(dropped)}名")

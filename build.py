@@ -77,6 +77,8 @@ def rows_from_csv(ev_cfg):
     days_field = ev_cfg.get("days_field")  # 任意: 有効LIVE日数（配信時間の横に出す）
     fans_field = ev_cfg.get("fans_field")  # 任意: ファンクラブのアクティブなファン
     bonus_field = ev_cfg.get("bonus_field")  # 任意: 継続ボーナス(pt)。>0 の人にだけバッジを出す
+    fanpct_field = ev_cfg.get("fanpct_field")      # 任意: ファンクラブボーナス率(%)
+    fanbonus_field = ev_cfg.get("fanbonus_field")  # 任意: ファンクラブボーナス(pt)
     with open(path, encoding="utf-8") as f:
         raw = [r for r in csv.DictReader(f)]
     rows = []
@@ -97,6 +99,10 @@ def rows_from_csv(ev_cfg):
         if bonus_field:
             try: row["bonus"] = int(float(r.get(bonus_field) or 0))
             except ValueError: row["bonus"] = 0
+        for key, fld in (("fanpct", fanpct_field), ("fanbonus", fanbonus_field)):
+            if fld:
+                try: row[key] = int(float(r.get(fld) or 0))
+                except ValueError: row[key] = 0
         rows.append(row)
     meta = {
         "title": ev_cfg.get("title", ev_cfg["id"]),
@@ -272,7 +278,10 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
     parts = []
     if tm: parts.append(f"⏱ 配信 {html.escape(tm)}")
     if dy: parts.append(f"📅 有効LIVE {html.escape(dy)}日")
-    if fn: parts.append(f"💛 アクティブファン {html.escape(fn)}人")
+    if fn:
+        fp, fb = r.get("fanpct") or 0, r.get("fanbonus") or 0
+        parts.append(f"💛 アクティブファン {html.escape(fn)}人")
+        if fb: parts.append(f'<b class="bns">+{fp}%＝+{fb:,}pt</b>')
     bn = r.get("bonus") or 0
     if bn: parts.append(f'<b class="bns">🔥 継続ボーナス +{bn:,}pt</b>')
     tline = ('<div class="tm">' + "".join(f"<span>{x}</span>" for x in parts) + "</div>") if parts else ""

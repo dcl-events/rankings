@@ -130,17 +130,46 @@ def fmt_score(score, ev_cfg):
 
 
 # ---------- HTML ----------
+DARK_CSS = """
+/* ダークテーマ（events.json の theme.dark:true で有効） */
+body{background:
+    radial-gradient(1100px 420px at 10% -10%, #24242a 0%, rgba(36,36,42,0) 62%),
+    radial-gradient(900px 380px at 100% 2%, #2a1a22 0%, rgba(42,26,34,0) 58%),
+    #0b0b0d;color:var(--ink)}
+.brandbar img{filter:none}   /* ロゴは無加工。ダーク時は公式のダークモード用ロゴを使う */
+header.hero{box-shadow:0 16px 34px rgba(0,0,0,.55);
+  border:1px solid rgba(255,255,255,.10)}
+header.hero::after{background:rgba(255,255,255,.06)}
+details.rules{background:#141418;border-color:#26262d;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.rsec li{color:#d8d8de}
+ul.rank li{background:#141418;border-color:#26262d;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+li.g1{background:linear-gradient(100deg,#2b230f,#141418)}
+li.g2{background:linear-gradient(100deg,#232327,#141418)}
+li.g3{background:linear-gradient(100deg,#2a1d13,#141418)}
+li.top{border-color:rgba(255,255,255,.14)}
+li .sc{color:#fff}
+li .gap{color:var(--accent)}
+footer{color:#6f6f78}
+"""
+
+
 def page_shell(title, body, theme):
     accent = theme["accent"]
     accent2 = theme.get("accent2", accent)
     hero = theme.get("hero", DEFAULT_THEME["hero"])
+    favicon = theme.get("favicon", "assets/dcl_mark.png")
+    dark = theme.get("dark")
+    ink, muted, line = ("#f1f1f4", "#9a9aa4", "#26262d") if dark else ("#333", "#9a8f86", "#f0e7dd")
+    dark_css = DARK_CSS if dark else ""
+    brandlogo = theme.get("brandlogo") or ("assets/dcl_logo_dark.png" if dark else "assets/dcl_logo.png")
     return f"""<!doctype html>
 <html lang="ja"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
 <title>{html.escape(title)}</title>
-<link rel="icon" href="assets/dcl_mark.png">
+<link rel="icon" href="{favicon}">
+<link rel="apple-touch-icon" href="{favicon}">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jost:wght@500;600;700;800&family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -148,7 +177,7 @@ def page_shell(title, body, theme):
 :root {{
   --accent:{accent}; --accent2:{accent2}; --hero:{hero};
   --brand-orange:#eb5000; --brand-yellow:#facd00; --brand-pink:#f177c4;
-  --ink:#333; --muted:#9a8f86; --cream:#fff9ef; --line:#f0e7dd;
+  --ink:{ink}; --muted:{muted}; --cream:#fff9ef; --line:{line};
   --gold:#f6b400; --silver:#b9b3ac; --bronze:#d08a4e;
 }}
 *{{box-sizing:border-box}}
@@ -188,6 +217,9 @@ header.hero .pf{{position:relative;font-family:'Jost',sans-serif;font-size:12px;
 header.hero h1{{position:relative;margin:8px 0 10px;font-size:26px;line-height:1.28;
   font-weight:800;letter-spacing:.01em}}
 header.hero .meta{{position:relative;font-size:13px;opacity:.95;font-weight:500}}
+header.hero .herologo{{position:relative;display:block;width:min(100%,340px);height:auto;
+  margin:12px 0 8px;filter:drop-shadow(0 4px 14px rgba(0,0,0,.45))}}
+header.hero .herosub{{position:relative;font-size:19px;font-weight:800;margin:0 0 8px}}
 .chip{{display:inline-block;background:rgba(255,255,255,.22);border-radius:999px;
   padding:3px 12px;font-size:12px;font-weight:700;margin-bottom:4px}}
 
@@ -259,8 +291,9 @@ footer{{text-align:center;font-size:12px;color:var(--muted);margin-top:44px;
 a.back{{display:inline-block;margin-bottom:14px;color:var(--muted);text-decoration:none;
   font-size:14px;font-weight:600}}
 a.back:hover{{color:var(--brand-orange)}}
+{dark_css}
 </style></head><body><div class="wrap">
-<div class="brandbar"><a href="index.html"><img src="assets/dcl_logo.png" alt="DeNA Creator Links"></a></div>
+<div class="brandbar"><a href="index.html"><img src="{brandlogo}" alt="DeNA Creator Links"></a></div>
 {body}
 <footer>DeNA Creator Links — Event Rankings</footer>
 </div></body></html>"""
@@ -314,7 +347,9 @@ def rules_html(ev_cfg):
 
 
 def build_event(ev_cfg, report):
-    theme = PF_THEME.get(ev_cfg["platform"], DEFAULT_THEME)
+    # プラットフォーム既定テーマに、events.json の theme(accent/accent2/hero/dark/favicon/logo)を上書き
+    theme = dict(PF_THEME.get(ev_cfg["platform"], DEFAULT_THEME))
+    theme.update(ev_cfg.get("theme", {}))
     if ev_cfg["source"] == "pococha_report":
         rows, meta = rows_from_pococha(ev_cfg, report)
     else:
@@ -342,10 +377,18 @@ def build_event(ev_cfg, report):
         cap = f"（上位{top_n}位 / 参加 {total} 名）" if total > top_n else f"／ 参加 {total} 名"
     else:
         cap = f"（上位{top_n}位）" if total > top_n else ""
+    # theme.logo があればタイトル1行目をロゴ画像に差し替え、2行目以降をサブタイトルにする
+    tlines = meta["title"].split("\n")
+    if theme.get("logo"):
+        sub = "<br>".join(html.escape(x) for x in tlines[1:])
+        head = (f'<img class="herologo" src="{theme["logo"]}" alt="{html.escape(tlines[0])}">'
+                + (f'<div class="herosub">{sub}</div>' if sub else ""))
+    else:
+        head = f"<h1>{html.escape(meta['title']).replace(chr(10), '<br>')}</h1>"
     body = f"""<a class="back" href="index.html">← イベント一覧</a>
 <header class="hero">
   <div class="chip">{html.escape(theme['label'])}</div>
-  <h1>{html.escape(meta['title']).replace(chr(10), '<br>')}</h1>
+  {head}
   <div class="meta">{period}　{cap}</div>
 </header>
 <div class="updated">最終更新: {now} JST</div>
@@ -365,7 +408,8 @@ def build_index(cards_meta):
         reverse=True)
     cards = []
     for ev_cfg, meta in cards_meta:
-        theme = PF_THEME.get(ev_cfg["platform"], DEFAULT_THEME)
+        theme = dict(PF_THEME.get(ev_cfg["platform"], DEFAULT_THEME))
+        theme.update(ev_cfg.get("theme", {}))   # 個別テーマ（RISEの黒×オレンジ等）を一覧カードにも反映
         period = f"{meta['period_start']} 〜 {meta['period_end']}" if meta["period_start"] else ""
         cards.append(
             f'<a href="{ev_cfg["id"]}.html"><div class="card" style="--c:{theme["accent"]};--c2:{theme.get("accent2", theme["accent"])}">'

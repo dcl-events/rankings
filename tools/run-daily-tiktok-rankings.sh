@@ -18,7 +18,12 @@ LOCK="$REPO/tools/.rankings.lock"
 if ! mkdir "$LOCK" 2>/dev/null; then say "既に実行中のため中止"; echo "（既に実行中のためスキップ）"; exit 0; fi
 trap 'rmdir "$LOCK" 2>/dev/null' EXIT
 
-DATE="$(TZ=UTC date -v-1d '+%-m/%d')"   # 前日(UTC)=データ期間末
+# データ期間末 = 実際に読むTSVのDL日 - 2日（Backstageの反映遅れ。tools/data_asof.py 参照）
+DATE="$(python3 tools/data_asof.py --fmt md 2>>"$LOG")"
+[ -n "$DATE" ] || fail "データ期間末の判定に失敗（TSVが見つからない等）"
+# サイト側の表示期間(period_end)も同じ日付に揃える
+python3 tools/data_asof.py --set-events tiktok-202608-newcomer,tiktok-202608-rise \
+  >/dev/null 2>>"$LOG" || fail "period_end の更新に失敗"
 say "===== 開始 (date=$DATE) ====="
 
 # 1. ビギナー（当月10万pt到達で卒業→7日猶予後に自動で掲載終了）

@@ -77,7 +77,7 @@ def main():
     rows = list(csv.reader(open(tsv, encoding="utf-8"), delimiter="\t"))
     hdr = rows[0]; c = {n: k for k, n in enumerate(hdr)}
     ID = c["クリエイターID"]; N = c["ライバー名"]; J = c["入会日"]; D = c["ダイヤモンド"]
-    L = c["LIVE時間"]; LAST = c["先月のダイヤモンド数"]; DAYS = c["有効LIVE日数"]
+    L = c["LIVE時間"]; LAST = c["先月のダイヤモンド数"]; DAYS = c["有効LIVE日数"]; FANS = c["ファンクラブのアクティブなファン"]
     AG = c["LIVE Match数"]; AH = c["LIVE Matchで獲得したダイヤモンド数"]
 
     beg = []; newgrads = []; dropped = []
@@ -105,7 +105,7 @@ def main():
             continue          # 猶予明け → ビギナーからは自動で消える
 
         beg.append({"cid": cid, "name": name, "pt": pt,
-                    "cur": cur, "ag": ag, "live": hm(r[L]), "days": toint(r[DAYS]),
+                    "cur": cur, "ag": ag, "live": hm(r[L]), "days": toint(r[DAYS]), "fans": toint(r[FANS]),
                     "grace_until": g["drop_on"] if g else ""})
     beg.sort(key=lambda x: -x["pt"])
 
@@ -114,9 +114,9 @@ def main():
         err(f"[dry-run] CSV未更新（掲載 {len(beg)}名の想定）")
     else:
         with open(CSV_OUT, "w", encoding="utf-8", newline="") as f:
-            w = csv.writer(f); w.writerow(["name", "point", "livetime", "days"])
+            w = csv.writer(f); w.writerow(["name", "point", "livetime", "days", "fans"])
             for b in beg:
-                w.writerow([b["name"], b["pt"], b["live"], b["days"]])
+                w.writerow([b["name"], b["pt"], b["live"], b["days"], b["fans"]])
         err(f"CSV {len(beg)}名")
     err(f"asof={today} 卒業猶予中={sum(1 for b in beg if b['grace_until'])}名 "
         f"新規卒業={len(newgrads)}名 掲載終了={len(dropped)}名")

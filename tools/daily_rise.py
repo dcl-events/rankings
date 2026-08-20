@@ -63,7 +63,7 @@ def main():
     rows = list(csv.reader(open(tsv, encoding="utf-8"), delimiter="\t"))
     hdr = rows[0]; c = {n: k for k, n in enumerate(hdr)}
     ID = c["クリエイターID"]; N = c["ライバー名"]; D = c["ダイヤモンド"]
-    L = c["LIVE時間"]; LAST = c["先月のダイヤモンド数"]; DAYS = c["有効LIVE日数"]
+    L = c["LIVE時間"]; LAST = c["先月のダイヤモンド数"]; DAYS = c["有効LIVE日数"]; FANS = c["ファンクラブのアクティブなファン"]
     AG = c["LIVE Match数"]; AH = c["LIVE Matchで獲得したダイヤモンド数"]
 
     rise = []
@@ -78,7 +78,7 @@ def main():
         if not (mid or grad): continue
         if pt < floor: continue
         rise.append({"cid": str(r[ID]).strip(), "name": r[N].strip(), "pt": pt,
-                     "cur": cur, "ag": ag, "live": hm(r[L]), "days": toint(r[DAYS]),
+                     "cur": cur, "ag": ag, "live": hm(r[L]), "days": toint(r[DAYS]), "fans": toint(r[FANS]),
                      "route": "卒業" if grad else "中間層"})
     rise.sort(key=lambda x: -x["pt"])
 
@@ -87,9 +87,9 @@ def main():
         err(f"[dry-run] CSV未更新（掲載 {len(rise)}名の想定）")
     else:
         with open(CSV_OUT, "w", encoding="utf-8", newline="") as f:
-            w = csv.writer(f); w.writerow(["name", "point", "livetime", "days"])
+            w = csv.writer(f); w.writerow(["name", "point", "livetime", "days", "fans"])
             for b in rise:
-                w.writerow([b["name"], b["pt"], b["live"], b["days"]])
+                w.writerow([b["name"], b["pt"], b["live"], b["days"], b["fans"]])
     err(f"CSV {len(rise)}名 (中間層 {sum(1 for b in rise if b['route']=='中間層')} / "
         f"卒業 {sum(1 for b in rise if b['route']=='卒業')})")
 

@@ -52,7 +52,8 @@
           ]
         }
       ],
-      "days_field": "days"
+      "days_field": "days",
+      "fans_field": "fans"
     },
     {
       "id": "tiktok-202607-growthbattle",
@@ -143,7 +144,8 @@
           ]
         }
       ],
-      "days_field": "days"
+      "days_field": "days",
+      "fans_field": "fans"
     }
   ]
 }

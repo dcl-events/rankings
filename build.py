@@ -75,6 +75,7 @@ def rows_from_csv(ev_cfg):
     field = ev_cfg.get("score_field", "score")
     time_field = ev_cfg.get("time_field")  # 任意: 配信時間などの補助列
     days_field = ev_cfg.get("days_field")  # 任意: 有効LIVE日数（配信時間の横に出す）
+    fans_field = ev_cfg.get("fans_field")  # 任意: ファンクラブのアクティブなファン
     with open(path, encoding="utf-8") as f:
         raw = [r for r in csv.DictReader(f)]
     rows = []
@@ -90,6 +91,8 @@ def rows_from_csv(ev_cfg):
             row["time"] = (r.get(time_field) or "").strip()
         if days_field:
             row["days"] = (r.get(days_field) or "").strip()
+        if fans_field:
+            row["fans"] = (r.get(fans_field) or "").strip()
         rows.append(row)
     meta = {
         "title": ev_cfg.get("title", ev_cfg["id"]),
@@ -215,7 +218,9 @@ li .nm{{font-weight:700;font-size:16px;word-break:break-word}}
 li .gap{{margin-top:4px;font-size:12px;font-weight:600;color:var(--brand-orange);
   font-family:'Noto Sans JP',sans-serif}}
 li .tm{{margin-top:3px;font-size:12px;font-weight:500;color:var(--muted);
-  font-family:'Noto Sans JP',sans-serif}}
+  font-family:'Noto Sans JP',sans-serif;
+  display:flex;flex-wrap:wrap;gap:1px 10px}}
+li .tm span{{white-space:nowrap}}
 li .bar{{height:7px;border-radius:4px;margin-top:7px;
   background:linear-gradient(90deg,var(--brand-orange),var(--brand-yellow))}}
 li .sc{{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;font-weight:700;
@@ -258,10 +263,12 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
     gap = f'<div class="gap">{html.escape(gap_text)}</div>' if gap_text else ""
     tm = r.get("time")
     dy = r.get("days")
+    fn = r.get("fans")
     parts = []
     if tm: parts.append(f"⏱ 配信 {html.escape(tm)}")
     if dy: parts.append(f"📅 有効LIVE {html.escape(dy)}日")
-    tline = f'<div class="tm">{" ／ ".join(parts)}</div>' if parts else ""
+    if fn: parts.append(f"💛 アクティブファン {html.escape(fn)}人")
+    tline = ('<div class="tm">' + "".join(f"<span>{x}</span>" for x in parts) + "</div>") if parts else ""
     sub = gap + tline
     if display == "rank":
         body = f'<div class="nm">{name}</div>{sub}'

@@ -148,6 +148,7 @@ li.g2{background:linear-gradient(100deg,#232327,#141418)}
 li.g3{background:linear-gradient(100deg,#2a1d13,#141418)}
 li.top{border-color:rgba(255,255,255,.14)}
 li .sc{color:#fff}
+.linkbox a{background:#141418;border-color:#26262d;box-shadow:0 6px 18px rgba(0,0,0,.35)}
 li .gap{color:var(--accent)}
 footer{color:#6f6f78}
 """
@@ -271,6 +272,15 @@ li .sc{{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;font-wei
 li .unit{{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--muted);
   margin-left:3px;font-weight:500}}
 
+/* ランキング下部のリンク */
+.linkbox{{margin:18px 0 4px}}
+.linkbox a{{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px 18px;
+  text-decoration:none;color:var(--ink);font-weight:700;font-size:14px;
+  box-shadow:0 4px 14px rgba(120,80,20,.05);transition:transform .15s ease,box-shadow .15s ease}}
+.linkbox a:hover{{transform:translateY(-2px);box-shadow:0 10px 22px rgba(0,0,0,.14)}}
+.linkbox a::after{{content:"›";color:var(--accent);font-size:20px;line-height:1}}
+
 /* イベント一覧カード */
 .card-list a{{text-decoration:none;color:inherit}}
 .card{{position:relative;display:block;background:#fff;border-radius:18px;padding:18px 20px 18px 22px;
@@ -346,6 +356,17 @@ def rules_html(ev_cfg):
             f'<div class="rbody">{"".join(secs)}</div></details>')
 
 
+def links_html(ev_cfg):
+    """events.json の links([{label,url}])をランキング下部にボタンで並べる。無ければ空。"""
+    links = ev_cfg.get("links")
+    if not links:
+        return ""
+    items = "".join(
+        f'<a href="{html.escape(l["url"])}" target="_blank" rel="noopener">'
+        f'<span>{html.escape(l["label"])}</span></a>' for l in links)
+    return f'<div class="linkbox">{items}</div>'
+
+
 def build_event(ev_cfg, report):
     # プラットフォーム既定テーマに、events.json の theme(accent/accent2/hero/dark/favicon/logo)を上書き
     theme = dict(PF_THEME.get(ev_cfg["platform"], DEFAULT_THEME))
@@ -393,7 +414,8 @@ def build_event(ev_cfg, report):
 </header>
 <div class="updated">最終更新: {now} JST</div>
 {rules_html(ev_cfg)}
-<ul class="rank">{items}</ul>"""
+<ul class="rank">{items}</ul>
+{links_html(ev_cfg)}"""
     (DOCS / f"{ev_cfg['id']}.html").write_text(
         page_shell(meta["title"], body, theme), encoding="utf-8")
     return meta

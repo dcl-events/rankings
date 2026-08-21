@@ -56,7 +56,13 @@
       ],
       "days_field": "days",
       "fans_field": "fans",
-      "bonus_field": "bonus"
+      "bonus_field": "bonus",
+      "links": [
+        {
+          "label": "⚡ TikTok LIVE 公式イベントはこちら",
+          "url": "https://dcl-event.github.io/dcl-tiktok-event-calendar/"
+        }
+      ]
     },
     {
       "id": "tiktok-202607-growthbattle",
@@ -159,7 +165,13 @@
         "dark": true,
         "favicon": "assets/rise_mark.png",
         "logo": "assets/rise_logo.png"
-      }
+      },
+      "links": [
+        {
+          "label": "⚡ TikTok LIVE 公式イベントはこちら",
+          "url": "https://dcl-event.github.io/dcl-tiktok-event-calendar/"
+        }
+      ]
     }
   ]
 }

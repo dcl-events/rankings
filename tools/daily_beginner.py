@@ -31,7 +31,7 @@ URL = "https://dcl-events.github.io/rankings/tiktok-202608-newcomer.html"
 MENTION = "<@U0A6WU3P3LL>"   # ito_sukeaki
 GRAD = os.path.join(REPO, "data", "beginner_graduated.json")
 RISE_URL = "https://dcl-events.github.io/rankings/tiktok-202608-rise.html"
-GRAD_PT = 100000    # この当月ptに達したらビギナー卒業（⚡️DCL RISE⚡️の対象）
+GRAD_PT = 300000    # この当月ptに達したらビギナー卒業（⚡️DCL RISE⚡️の対象）
 GRACE_DAYS = 7      # 卒業検知日からこの日数だけビギナーにも残す猶予
 JST = timezone(timedelta(hours=9))
 
@@ -119,6 +119,8 @@ def main():
 
         # 卒業判定：当月pt>=10万で卒業。初回検知日を記録し、猶予明けで掲載終了
         g = glivers.get(cid)
+        if g and pt < GRAD_PT:      # 卒業ライン変更で条件を満たさなくなった人は卒業を取り消す
+            del glivers[cid]; g = None
         if pt >= GRAD_PT and not g:
             g = {"name": name, "graduated_on": today,
                  "drop_on": (datetime.strptime(today, "%Y-%m-%d")

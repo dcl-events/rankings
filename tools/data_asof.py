@@ -13,6 +13,7 @@ Backstageのクリエイターデータは DL日の2日前まで しか反映さ
 使い方:
   python3 tools/data_asof.py                      # 2026-08-18
   python3 tools/data_asof.py --fmt md             # 8/18
+  python3 tools/data_asof.py --fmt month          # 2026-08（＝対象月。月替わりはこれに追従）
   python3 tools/data_asof.py --set-events ID,ID   # events.json の period_end を更新
 """
 import sys, os, re, glob, json
@@ -68,7 +69,12 @@ def main():
     if ids:
         for line in set_events(ids, end) or ["period_end 変更なし"]:
             print(line, file=sys.stderr)
-    print(end.strftime("%-m/%d") if fmt == "md" else end.isoformat())
+    if fmt == "md":
+        print(end.strftime("%-m/%-d"))
+    elif fmt == "month":
+        print(end.strftime("%Y-%m"))
+    else:
+        print(end.isoformat())
 
 
 if __name__ == "__main__":

@@ -15,7 +15,7 @@ point = M×10 + AH×5 + AG×1000  （M=ダイヤ, AH=Matchダイヤ, AG=Match数
 対象 = (先月ダイヤ<10000 or 入会が対象月) かつ 当月ダイヤ>=1、掲載= pt>=floor
 
 使い方:
-  python3 tools/daily_beginner.py [--month 2026-08] [--floor 1000] [--date 8/17]
+  python3 tools/daily_beginner.py [--month 2026-09] [--floor 1000] [--date 8/17]
                                   [--asof 2026-08-25] [--dry-run]
   --asof   : 猶予判定の基準日を上書き（既定=今日JST）。将来日で挙動を検証できる
   --dry-run: CSV・スナップショット・卒業状態を書かずにSlack本文だけ出す
@@ -24,13 +24,10 @@ import sys, os, re, csv, glob, json
 from datetime import datetime, timedelta, timezone
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CSV_OUT = os.path.join(REPO, "data", "tiktok-202608-newcomer.csv")
 SNAP = os.path.join(REPO, "data", "beginner_snapshot.json")
 TSV_DIR = os.path.expanduser("~/Claude/tiktok-automation/out")
-URL = "https://dcl-events.github.io/rankings/tiktok-202608-newcomer.html"
 MENTION = "<@U0A6WU3P3LL>"   # ito_sukeaki
 GRAD = os.path.join(REPO, "data", "beginner_graduated.json")
-RISE_URL = "https://dcl-events.github.io/rankings/tiktok-202608-rise.html"
 GRAD_PT = 300000    # この当月ptに達したらビギナー卒業（⚡️DCL RISE⚡️の対象）
 GRACE_DAYS = 7      # 卒業検知日からこの日数だけビギナーにも残す猶予
 JST = timezone(timedelta(hours=9))
@@ -39,6 +36,13 @@ BONUS_PT = 50000    # 継続ボーナス
 BONUS_DAYS = 18     # 有効LIVE日数（月間）
 BONUS_HOURS = 70    # LIVE時間（月間・時間）
 FAN_CAP = 200       # ファンクラブボーナスの計算上限人数（10人ごとに+1%＝最大+20%）
+
+def paths_for(month):
+    """対象月(YYYY-MM)から CSV出力先・公開URL を作る（月替わりで自動的に当月へ切り替わる）。"""
+    ym = month.replace("-", "")
+    return (os.path.join(REPO, "data", f"tiktok-{ym}-newcomer.csv"),
+            f"https://dcl-events.github.io/rankings/tiktok-{ym}-newcomer.html",
+            f"https://dcl-events.github.io/rankings/tiktok-{ym}-rise.html")
 
 def err(*a): print(*a, file=sys.stderr)
 def toint(v):
@@ -70,7 +74,10 @@ def fan_bonus(fans, base_pt):
 
 def main():
     args = sys.argv[1:]
-    month = "2026-08"; floor = 1000; date = ""; asof = ""; dry = False; bare = False
+    # 既定の対象月 = 「today − 2日」が属する月（Backstageの2日遅れに自動追従）。
+    # 通常は run-daily-tiktok-rankings.sh が実TSVから求めた --month で上書きされる。
+    month = (datetime.now(JST) - timedelta(days=2)).strftime("%Y-%m")
+    floor = 1000; date = ""; asof = ""; dry = False; bare = False
     i = 0
     while i < len(args):
         if args[i] == "--month": month = args[i+1]; i += 2
@@ -81,6 +88,7 @@ def main():
         elif args[i] == "--bare": bare = True; i += 1
         else: i += 1
     today = asof or datetime.now(JST).strftime("%Y-%m-%d")
+    CSV_OUT, URL, RISE_URL = paths_for(month)
 
     # 卒業状態（月が変わったらリセット）
     gstate = {"month": month, "livers": {}}
@@ -152,7 +160,10 @@ def main():
     # 前回スナップショットと比較（cid基準）
     prev = {}
     if os.path.exists(SNAP):
-        try: prev = json.load(open(SNAP))
+        try:
+            snap = json.load(open(SNAP))
+            # {"month": YYYY-MM, "ranks": {...}}。月が変わった初日は比較しない（＝初回更新扱い）
+            if snap.get("month") == month: prev = snap.get("ranks", {})
         except Exception: prev = {}
     # 卒業掲載終了で空いた枠のぶんだけ全員が繰り上がるので、
     # 前回順位は「卒業者を除いて再採番した順位」と比べる（誤って「N人抜き」と出さない）
@@ -202,8 +213,9 @@ def main():
     if dry:
         err("[dry-run] snapshot/卒業状態は未更新")
         return
-    json.dump({b["cid"]: {"rank": i + 1, "name": b["name"], "pt": b["pt"]}
-               for i, b in enumerate(beg)},
+    json.dump({"month": month,
+               "ranks": {b["cid"]: {"rank": i + 1, "name": b["name"], "pt": b["pt"]}
+                         for i, b in enumerate(beg)}},
               open(SNAP, "w"), ensure_ascii=False, indent=0)
     gstate["month"] = month; gstate["livers"] = glivers
     json.dump(gstate, open(GRAD, "w"), ensure_ascii=False, indent=1)

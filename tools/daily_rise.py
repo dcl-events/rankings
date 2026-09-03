@@ -17,16 +17,16 @@ LIVE Match実績が無いため、前月ポイントは 先月ダイヤ×10 で�
 （先月ダイヤ3万 ≒ 前月30万pt）。厳密にやる場合は前月分xlsxを取得して差し替える。
 
 使い方:
-  python3 tools/daily_rise.py [--month 2026-08] [--floor 1] [--date 8/17]
+  python3 tools/daily_rise.py [--month 2026-09] [--floor 1] [--date 8/17]
 """
 import sys, os, re, csv, glob, json
+from datetime import datetime, timedelta, timezone
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-CSV_OUT = os.path.join(REPO, "data", "tiktok-202608-rise.csv")
 SNAP = os.path.join(REPO, "data", "rise_snapshot.json")
 TSV_DIR = os.path.expanduser("~/Claude/tiktok-automation/out")
-URL = "https://dcl-events.github.io/rankings/tiktok-202608-rise.html"
 MENTION = "<@U0A6WU3P3LL>"   # ito_sukeaki
+JST = timezone(timedelta(hours=9))
 
 GRAD_PT = 300000      # ビギナー卒業ライン（当月pt）
 LAST_MIN = 30000      # 中間層の下限（先月ダイヤ ≒ 前月30万pt）
@@ -36,6 +36,12 @@ BONUS_PT = 50000    # 継続ボーナス
 BONUS_DAYS = 18     # 有効LIVE日数（月間）
 BONUS_HOURS = 70    # LIVE時間（月間・時間）
 FAN_CAP = 200       # ファンクラブボーナスの計算上限人数（10人ごとに+1%＝最大+20%）
+
+def paths_for(month):
+    """対象月(YYYY-MM)から CSV出力先・公開URL を作る（月替わりで自動的に当月へ切り替わる）。"""
+    ym = month.replace("-", "")
+    return (os.path.join(REPO, "data", f"tiktok-{ym}-rise.csv"),
+            f"https://dcl-events.github.io/rankings/tiktok-{ym}-rise.html")
 
 def err(*a): print(*a, file=sys.stderr)
 def toint(v):
@@ -67,7 +73,10 @@ def fan_bonus(fans, base_pt):
 
 def main():
     args = sys.argv[1:]
-    month = "2026-08"; floor = 1; date = ""; dry = False; bare = False
+    # 既定の対象月 = 「today − 2日」が属する月（Backstageの2日遅れに自動追従）。
+    # 通常は run-daily-tiktok-rankings.sh が実TSVから求めた --month で上書きされる。
+    month = (datetime.now(JST) - timedelta(days=2)).strftime("%Y-%m")
+    floor = 1; date = ""; dry = False; bare = False
     i = 0
     while i < len(args):
         if args[i] == "--month": month = args[i+1]; i += 2
@@ -76,6 +85,7 @@ def main():
         elif args[i] == "--dry-run": dry = True; i += 1
         elif args[i] == "--bare": bare = True; i += 1
         else: i += 1
+    CSV_OUT, URL = paths_for(month)
 
     cands = sorted(glob.glob(os.path.join(TSV_DIR, "creator_data_*.tsv")))
     if not cands:
@@ -122,7 +132,10 @@ def main():
     # 前回スナップショットと比較（cid基準）
     prev = {}
     if os.path.exists(SNAP):
-        try: prev = json.load(open(SNAP))
+        try:
+            snap = json.load(open(SNAP))
+            # {"month": YYYY-MM, "ranks": {...}}。月が変わった初日は比較しない（＝初回更新扱い）
+            if snap.get("month") == month: prev = snap.get("ranks", {})
         except Exception: prev = {}
     climbers = []
     newcomers = []
@@ -161,8 +174,9 @@ def main():
     # スナップショット更新
     if dry:
         err("[dry-run] snapshotは未更新"); return
-    json.dump({b["cid"]: {"rank": i + 1, "name": b["name"], "pt": b["pt"]}
-               for i, b in enumerate(rise)},
+    json.dump({"month": month,
+               "ranks": {b["cid"]: {"rank": i + 1, "name": b["name"], "pt": b["pt"]}
+                         for i, b in enumerate(rise)}},
               open(SNAP, "w"), ensure_ascii=False, indent=0)
     err("snapshot updated")
 

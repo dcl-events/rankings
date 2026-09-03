@@ -21,17 +21,24 @@ trap 'rmdir "$LOCK" 2>/dev/null' EXIT
 # データ期間末 = 実際に読むTSVのDL日 - 2日（Backstageの反映遅れ。tools/data_asof.py 参照）
 DATE="$(python3 tools/data_asof.py --fmt md 2>>"$LOG")"
 [ -n "$DATE" ] || fail "データ期間末の判定に失敗（TSVが見つからない等）"
+# 対象月 = そのデータ期間末が属する月。9/1・9/2は8月を締め続け、9/3から9月へ自動で切り替わる。
+# 前月のイベント/CSVはそのまま残る（＝最終状態で凍結アーカイブ）。
+MONTH="$(python3 tools/data_asof.py --fmt month 2>>"$LOG")"
+[ -n "$MONTH" ] || fail "対象月の判定に失敗（TSVが見つからない等）"
+YM="${MONTH/-/}"
+# 対象月のイベントがevents.jsonに無ければ前月から複製して用意する
+python3 tools/ensure_month_events.py --month "$MONTH" 2>>"$LOG" || fail "対象月イベントの用意に失敗"
 # サイト側の表示期間(period_end)も同じ日付に揃える
-python3 tools/data_asof.py --set-events tiktok-202608-newcomer,tiktok-202608-rise \
+python3 tools/data_asof.py --set-events "tiktok-${YM}-newcomer,tiktok-${YM}-rise" \
   >/dev/null 2>>"$LOG" || fail "period_end の更新に失敗"
-say "===== 開始 (date=$DATE) ====="
+say "===== 開始 (month=$MONTH date=$DATE) ====="
 
 # 1. ビギナー（当月10万pt到達で卒業→7日猶予後に自動で掲載終了）
-BEG="$(python3 tools/daily_beginner.py --month 2026-08 --floor 1000 --date "$DATE" --bare 2>>"$LOG")"
+BEG="$(python3 tools/daily_beginner.py --month "$MONTH" --floor 1000 --date "$DATE" --bare 2>>"$LOG")"
 [ -n "$BEG" ] || fail "ビギナー生成失敗（データTSVが見つからない等）"
 
 # 2. ⚡️DCL RISE⚡️（中間層＋当月10万pt超えは即時ピック）
-RISE="$(python3 tools/daily_rise.py --month 2026-08 --floor 1 --date "$DATE" --bare 2>>"$LOG")"
+RISE="$(python3 tools/daily_rise.py --month "$MONTH" --floor 1 --date "$DATE" --bare 2>>"$LOG")"
 [ -n "$RISE" ] || fail "RISE生成失敗（データTSVが見つからない等）"
 
 # 3. サイト再生成（両ランキングまとめて1回）
@@ -39,7 +46,7 @@ python3 build.py >>"$LOG" 2>&1 || fail "build失敗"
 
 # 4. 変更があれば push（1回）
 if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git status --porcelain)" ]; then
-  if git add -A && git commit -q -m "daily: ビギナー＋RISE ランキング更新 ($DATE)" && git push -q >>"$LOG" 2>&1; then
+  if git add -A && git commit -q -m "daily: ビギナー＋RISE ランキング更新 ($MONTH / $DATE)" && git push -q >>"$LOG" 2>&1; then
     say "push完了"
   else
     fail "git push失敗（ローカルは更新済み）"

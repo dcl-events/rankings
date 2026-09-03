@@ -298,12 +298,9 @@ li .unit{{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--muted
 
 footer{{text-align:center;font-size:12px;color:var(--muted);margin-top:44px;
   font-family:'Jost',sans-serif;letter-spacing:.04em}}
-a.back{{display:inline-block;margin-bottom:14px;color:var(--muted);text-decoration:none;
-  font-size:14px;font-weight:600}}
-a.back:hover{{color:var(--brand-orange)}}
 {dark_css}
 </style></head><body><div class="wrap">
-<div class="brandbar"><a href="index.html"><img src="{brandlogo}" alt="DeNA Creator Links"></a></div>
+<div class="brandbar"><img src="{brandlogo}" alt="DeNA Creator Links"></div>
 {body}
 <footer>DeNA Creator Links — Event Rankings</footer>
 </div></body></html>"""
@@ -406,8 +403,7 @@ def build_event(ev_cfg, report):
                 + (f'<div class="herosub">{sub}</div>' if sub else ""))
     else:
         head = f"<h1>{html.escape(meta['title']).replace(chr(10), '<br>')}</h1>"
-    body = f"""<a class="back" href="index.html">← イベント一覧</a>
-<header class="hero">
+    body = f"""<header class="hero">
   <div class="chip">{html.escape(theme['label'])}</div>
   {head}
   <div class="meta">{period}　{cap}</div>

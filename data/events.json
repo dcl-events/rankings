@@ -172,6 +172,117 @@
           "url": "https://dcl-event.github.io/dcl-tiktok-event-calendar/"
         }
       ]
+    },
+    {
+      "id": "tiktok-202609-newcomer",
+      "platform": "TikTok LIVE",
+      "source": "csv",
+      "data_file": "tiktok-202609-newcomer.csv",
+      "title": "🌱DCLビギナーランキング\n🎁 9月累計 point",
+      "period_start": "2026-09-01",
+      "period_end": "2026-09-01",
+      "score_field": "point",
+      "score_label": "🎁point",
+      "time_field": "livetime",
+      "format": "int",
+      "display": "value",
+      "show_gap": true,
+      "top_n": 500,
+      "rules": [
+        {
+          "h": "参加ルール",
+          "items": [
+            "前月ダイヤ1万未満、または当月デビューのライバー",
+            "当月に獲得ポイントがあれば掲載（1,000pt以上）"
+          ]
+        },
+        {
+          "h": "卒業ルール",
+          "items": [
+            "当月30万pt到達で卒業",
+            "達成の7日後にビギナー掲載終了 → ⚡️DCL RISE⚡️へ移行"
+          ]
+        },
+        {
+          "h": "ポイントルール",
+          "items": [
+            "通常ダイヤポイント：ダイヤ数 × 10pt",
+            "バトルダイヤポイント：ダイヤ数 × 5pt（通常ポイントに上乗せ）",
+            "バトル回数ポイント：1000pt（バトル回数分、繰り返し加算）",
+            "継続ボーナス：有効LIVE日数18日以上 かつ LIVE時間70時間以上で 50,000pt（月間・1回）",
+            "ファンクラブボーナス：アクティブファン10人ごとに合計ポイント+1%（計算上限200人＝最大+20%）"
+          ]
+        }
+      ],
+      "days_field": "days",
+      "fans_field": "fans",
+      "bonus_field": "bonus",
+      "links": [
+        {
+          "label": "⚡ TikTok LIVE 公式イベントはこちら",
+          "url": "https://dcl-event.github.io/dcl-tiktok-event-calendar/"
+        }
+      ]
+    },
+    {
+      "id": "tiktok-202609-rise",
+      "platform": "TikTok LIVE",
+      "source": "csv",
+      "data_file": "tiktok-202609-rise.csv",
+      "title": "⚡️DCL RISE⚡️\n🎁 9月累計 point",
+      "period_start": "2026-09-01",
+      "period_end": "2026-09-01",
+      "score_field": "point",
+      "score_label": "🎁point",
+      "time_field": "livetime",
+      "format": "int",
+      "display": "value",
+      "show_gap": true,
+      "top_n": 500,
+      "rules": [
+        {
+          "h": "参加ルール",
+          "items": [
+            "前月の獲得ダイヤが20万ダイヤ以下のライバー",
+            "前月の獲得ポイントが30万pt以上のライバー（上とあわせて両方を満たす方）",
+            "ビギナーを卒業（当月30万pt到達）したライバー（達成日から即エントリー）"
+          ]
+        },
+        {
+          "h": "卒業ルール",
+          "items": [
+            "当月300万pt到達で卒業",
+            "卒業後は翌月から⚡️DCL RISE⚡️の対象外（さらに上のステージへ）"
+          ]
+        },
+        {
+          "h": "ポイントルール",
+          "items": [
+            "通常ダイヤポイント：ダイヤ数 × 10pt",
+            "バトルダイヤポイント：ダイヤ数 × 5pt（通常ポイントに上乗せ）",
+            "バトル回数ポイント：1000pt（バトル回数分、繰り返し加算）",
+            "継続ボーナス：有効LIVE日数18日以上 かつ LIVE時間70時間以上で 50,000pt（月間・1回）",
+            "ファンクラブボーナス：アクティブファン10人ごとに合計ポイント+1%（計算上限200人＝最大+20%）"
+          ]
+        }
+      ],
+      "days_field": "days",
+      "fans_field": "fans",
+      "bonus_field": "bonus",
+      "theme": {
+        "accent": "#ffa32e",
+        "accent2": "#ff2f7b",
+        "hero": "linear-gradient(135deg,#17171a 0%,#33333a 30%,#0c0c0e 62%,#1f1f24 100%)",
+        "dark": true,
+        "favicon": "assets/rise_mark.png",
+        "logo": "assets/rise_logo.png"
+      },
+      "links": [
+        {
+          "label": "⚡ TikTok LIVE 公式イベントはこちら",
+          "url": "https://dcl-event.github.io/dcl-tiktok-event-calendar/"
+        }
+      ]
     }
   ]
 }

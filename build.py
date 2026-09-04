@@ -452,6 +452,14 @@ def main():
     report = load_pococha_report()
     cards_meta = []
     for ev_cfg in cfg["events"]:
+        if ev_cfg.get("static"):
+            # 手作りの静的ページ（docs/<id>.html を直接置く）。ページは生成せず一覧カードだけ出す
+            meta = {"title": ev_cfg["title"],
+                    "period_start": ev_cfg.get("period_start", ""),
+                    "period_end": ev_cfg.get("period_end", "")}
+            cards_meta.append((ev_cfg, meta))
+            print(f"  静的: {ev_cfg['id']}.html  [{ev_cfg['platform']}] {meta['title']}（一覧カードのみ）")
+            continue
         meta = build_event(ev_cfg, report)
         cards_meta.append((ev_cfg, meta))
         print(f"  生成: {ev_cfg['id']}.html  [{ev_cfg['platform']}] {meta['title']} ({ev_cfg.get('display','value')})")

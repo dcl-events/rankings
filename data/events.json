@@ -2,6 +2,19 @@
   "_comment": "公開するイベントだけをここに列挙する。source=pococha_report は ../pococha/data/event_report.csv から event_identifier で抽出。source=csv は data/<data_file> を読む(TikTok貼り付け用)。score_field=応援ptなど集計列。display: value(金額表示) / rank(順位のみ) / bar(1位を100%とした相対バー)。",
   "events": [
     {
+      "id": "tiktok-202609-sengoku",
+      "platform": "TikTok LIVE",
+      "static": true,
+      "title": "⚔️ DCL天下戦国 ／ ライバーの野望",
+      "period_start": "2026-09-01",
+      "period_end": "2026-09-30",
+      "theme": {
+        "accent": "#d4af37",
+        "accent2": "#b3202a",
+        "label": "TikTok LIVE"
+      }
+    },
+    {
       "id": "pococha-202607-growthbattle",
       "platform": "Pococha",
       "source": "csv",

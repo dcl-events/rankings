@@ -56,8 +56,26 @@ else
 fi
 
 say "===== 完了 ====="
-# 5. まとめSlack本文（これをスケジュールタスクがそのまま投稿する）
+# 5. Slack本文を「親」と「スレッド返信」の2つに分けて出力する。
+#    区切りは ===THREAD=== の1行。タスク側は
+#      親  = マーカーより前  → conversations_add_message（thread_ts なし）
+#      詳細 = マーカーより後 → 同ツールに親の ts を thread_ts で指定
+#    で2回投稿する。--bare 出力は「1行目=見出し / 2行目=URL / 3行目=空 / 4行目以降=詳細」。
+beg_head="$(printf '%s\n' "$BEG" | head -2)"   # 🌱見出し＋URL
+beg_body="$(printf '%s\n' "$BEG" | tail -n +4)" # 順位変動・卒業・掲載終了
+rise_head="$(printf '%s\n' "$RISE" | head -2)"  # ⚡️見出し＋URL
+rise_body="$(printf '%s\n' "$RISE" | tail -n +4)" # 順位変動・新規RISE入り
+
+# --- 親メッセージ（短く：見出し＋メンション＋2つのURLだけ） ---
 printf '%s\n' "📊 TikTok LIVE ランキング更新（${DATE}時点）"
 printf '%s\n\n' "<@U0A6WU3P3LL>"
-printf '%s\n\n' "$BEG"
-printf '%s\n' "$RISE"
+printf '%s\n\n' "$beg_head"
+printf '%s\n' "$rise_head"
+
+printf '\n%s\n' "===THREAD==="
+
+# --- スレッド返信（詳細：メンションは付けない） ---
+printf '%s\n' "🌱 DCLビギナーランキング"
+printf '%s\n\n' "$beg_body"
+printf '%s\n' "⚡️DCL RISE⚡️"
+printf '%s\n' "$rise_body"

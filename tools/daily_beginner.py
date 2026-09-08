@@ -99,6 +99,23 @@ def main():
         except Exception: pass
     glivers = gstate["livers"]
 
+    # 参加判定：前月ポイント<30万（前月最終TSVから事前生成した prev_month_points_<前月>.json）。
+    # ＝参加上限を卒業ライン(30万)と同じに揃える。未生成なら旧ルール(先月ダイヤ<1万)へフォールバック。
+    PART_PT = GRAD_PT
+    prevmonth = (datetime.strptime(month + "-01", "%Y-%m-%d") - timedelta(days=1)).strftime("%Y%m")
+    PREVPT = os.path.join(REPO, "data", f"prev_month_points_{prevmonth}.json")
+    prev_pt = {}
+    if os.path.exists(PREVPT):
+        try: prev_pt = json.load(open(PREVPT))
+        except Exception: prev_pt = {}
+    # 前回ビギナー掲載者(cid集合)。既に当月30万超で"初登場"＝RISE勢を卒業猶予の対象から外すのに使う。
+    prev_beg = set()
+    if os.path.exists(SNAP):
+        try:
+            _s = json.load(open(SNAP))
+            if _s.get("month") == month: prev_beg = set(_s.get("ranks", {}).keys())
+        except Exception: pass
+
     cands = sorted(glob.glob(os.path.join(TSV_DIR, "creator_data_*.tsv")))
     if not cands:
         err("TSVなし:", TSV_DIR); sys.exit(1)
@@ -116,20 +133,28 @@ def main():
         cur = toint(r[D]); ah = toint(r[AH]); ag = toint(r[AG])
         last_raw = r[LAST].strip(); last_i = toint(last_raw)
         join = r[J][:10]; is_new = join.startswith(month)
+        cid = str(r[ID]).strip()
         if cur < 1: continue
-        if not ((last_i < 10000) or is_new): continue
+        # 参加判定：前月ポイント<30万 or 当月デビュー（前月pt未生成時は先月ダイヤ<1万にフォールバック）
+        if prev_pt:
+            if not ((prev_pt.get(cid, 0) < PART_PT) or is_new): continue
+        else:
+            if not ((last_i < 10000) or is_new): continue
         days = toint(r[DAYS]); bonus = keizoku_bonus(days, r[L])
         base = cur * 10 + ah * 5 + ag * 1000 + bonus
         fans = toint(r[FANS]); fanpct, fanbonus = fan_bonus(fans, base)
         pt = base + fanbonus
         if pt < floor: continue
-        cid = str(r[ID]).strip(); name = r[N].strip()
+        name = r[N].strip()
 
-        # 卒業判定：当月pt>=10万で卒業。初回検知日を記録し、猶予明けで掲載終了
+        # 卒業判定：当月pt>=30万で卒業。初回検知日を記録し、猶予明けで掲載終了
         g = glivers.get(cid)
         if g and pt < GRAD_PT:      # 卒業ライン変更で条件を満たさなくなった人は卒業を取り消す
             del glivers[cid]; g = None
         if pt >= GRAD_PT and not g:
+            if cid not in prev_beg:
+                # 既に当月30万pt超で初登場＝RISE在籍/卒業済み。ビギナー猶予の対象にせず非掲載
+                continue
             g = {"name": name, "graduated_on": today,
                  "drop_on": (datetime.strptime(today, "%Y-%m-%d")
                              + timedelta(days=GRACE_DAYS)).strftime("%Y-%m-%d")}

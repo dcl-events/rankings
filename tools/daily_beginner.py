@@ -134,6 +134,7 @@ def main():
         last_raw = r[LAST].strip(); last_i = toint(last_raw)
         join = r[J][:10]; is_new = join.startswith(month)
         cid = str(r[ID]).strip()
+        if not cid.isdigit(): continue   # 退会ライバー（IDが「クリエイターがエージェンシーを退会しました」等）は除外
         if cur < 1: continue
         # 参加判定：前月ポイント<30万 or 当月デビュー（前月pt未生成時は先月ダイヤ<1万にフォールバック）
         if prev_pt:

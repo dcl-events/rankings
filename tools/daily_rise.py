@@ -101,6 +101,7 @@ def main():
     rise = []
     for r in rows[1:]:
         if len(r) <= max(ID, N, D, L, LAST, AG, AH): continue
+        if not str(r[ID]).strip().isdigit(): continue   # 退会ライバー（IDが「…退会しました」等）は除外
         cur = toint(r[D]); ah = toint(r[AH]); ag = toint(r[AG])
         last_i = toint(r[LAST])
         if last_i > LAST_MAX: continue          # 上位層は対象外

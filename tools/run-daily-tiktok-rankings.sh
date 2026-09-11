@@ -92,3 +92,7 @@ printf '%s\n' "🌱 DCLビギナーランキング"
 printf '%s\n\n' "$beg_body"
 printf '%s\n' "⚡️DCL RISE⚡️"
 printf '%s\n' "$rise_body"
+
+# 課題申告シート（自己申告制・マネージャー入力用）のリンクを添える
+printf '\n%s\n' "📋 課題申告シート（自己申告制）"
+printf '%s\n' "https://docs.google.com/spreadsheets/d/1A-WSX4mteR-E5kY8V82dTUqoTcD0GDLA0Uq0qiDTzh4/edit?gid=1676003252"

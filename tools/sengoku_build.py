@@ -19,10 +19,16 @@ KASSEN_HTML = DOCS / "tiktok-202609-sengoku-kassencho.html"
 
 RANK_TITLE = {"A": "大名", "B": "侍大将", "C": "若武者"}   # 称号＝入会時リーグ
 MEDAL = {1: "🥇", 2: "🥈", 3: "🥉"}
+ROSTER = {}   # 表示名(#番号) → TikTokアカウント名（参加者マスタ由来）
 
 
 def yen(n):
     return f"{int(n):,}"
+
+
+def disp(name):
+    """表示名(#番号) を TikTokアカウント名 に解決。無ければそのまま。"""
+    return ROSTER.get(name, name)
 
 
 def build_rank_list(ranking):
@@ -49,7 +55,7 @@ def build_rank_list(ranking):
         tm = f'<div class="tm"><span>🎖 {lg}リーグ</span><span>🏯 支配 {share}%</span></div>'
         items.append(
             f'  <li{liclass}>\n    {num}\n    <div class="body">\n'
-            f'      <div class="nm">{r["表示名"]}</div>\n'
+            f'      <div class="nm">{disp(r["表示名"])}</div>\n'
             f'      {gap}\n      {tm}\n'
             f'      <div class="bar"><i style="width:{bar}%"></i></div>\n'
             f'    </div>\n    <div class="sc">{yen(hei)}<span class="unit">兵</span></div>\n  </li>')
@@ -82,8 +88,8 @@ def build_kassen(kassen):
             f'    <div class="top"><span class="no">#{int(r["No"]):03d}</span>'
             f'<span class="badge {b}">{r["判定"]}</span>'
             f'<span class="date">{r.get("日時","")}</span></div>\n'
-            f'    <div class="vs"><span class="win">{r["勝者"]}</span>'
-            f'<span class="x">⚔</span><span class="lose">{r["敗者"]}</span></div>\n'
+            f'    <div class="vs"><span class="win">{disp(r["勝者"])}</span>'
+            f'<span class="x">⚔</span><span class="lose">{disp(r["敗者"])}</span></div>\n'
             f'    <div class="plunder">🔥 略奪 +{yen(r["移動兵力"])}兵</div>\n'
             f'    <div class="result">{r.get("結果","")}</div>\n  </li>')
     return '<ul class="log">\n' + "\n".join(lis) + '\n</ul>'
@@ -113,7 +119,7 @@ def build_overlord(ranking, kassen):
             '  <div class="row">\n'
             '    <div class="crest">🏯</div>\n'
             '    <div class="who">\n'
-            f'      <div class="nm">{top["表示名"]}</div>\n'
+            f'      <div class="nm">{disp(top["表示名"])}</div>\n'
             f'      <div class="sub">{sub}</div>\n'
             '    </div>\n'
             f'    <div class="koku"><b>{yen(hei)}</b><span>兵力</span></div>\n'
@@ -127,6 +133,8 @@ def replace_updated(html, updated):
 
 def main():
     d = json.loads(DATA.read_text(encoding="utf-8"))
+    global ROSTER
+    ROSTER = d.get("roster", {})
     updated = d.get("updated", "")
     ranking = d.get("ranking", [])
     kassen = d.get("kassen", [])

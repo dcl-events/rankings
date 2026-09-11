@@ -49,6 +49,10 @@ if ! "$HOME/Claude/stamp-rally/tools/run-daily.sh" >>"$LOG" 2>&1; then
 else
   say "スタンプラリー更新OK（合算用 _manifest 最新化）"
 fi
+# 合算用のスタンプptを repo内 data/stamp_points.json へ同梱（GitHub Actionsのランナーでも読めるように）。
+# 失敗しても非致命（前回の stamp_points.json で build 続行）。
+python3 tools/make_stamp_points.py >>"$LOG" 2>&1 && say "stamp_points.json 更新OK" \
+  || say "⚠️ stamp_points.json 生成に失敗（前回値のまま build 続行）"
 
 # 3. サイト再生成（両ランキングまとめて1回。スタンプpt合算を含む）
 python3 build.py >>"$LOG" 2>&1 || fail "build失敗"

@@ -369,6 +369,21 @@ def links_html(ev_cfg):
     return f'<div class="linkbox">{items}</div>'
 
 
+def _load_stamp_pts(ev_cfg, tier):
+    """スタンプラリー獲得pt(id→pt)を返す。無ければ None。
+    優先: repo内 data/stamp_points.json（{"pts":{id:{beginner,rise}}}）＝GitHub Actionsのランナーでも読める。
+    フォールバック: 隣の stamp-rally リポジトリの _manifest.json（ローカル実行時のみ存在）。
+    """
+    p = DATA / ev_cfg.get("stamp_points", "stamp_points.json")
+    if p.exists():
+        d = json.load(open(p, encoding="utf-8"))
+        return {cid: int((v or {}).get(tier, 0) or 0) for cid, v in (d.get("pts") or {}).items()}
+    if STAMP_MANIFEST.exists():
+        m = json.load(open(STAMP_MANIFEST, encoding="utf-8"))
+        return {x["id"]: int((x.get("pts") or {}).get(tier, 0) or 0) for x in m.get("livers", [])}
+    return None
+
+
 def apply_stamp(rows, ev_cfg):
     """スタンプラリー獲得ptを各行の score に合算する（再ランキングは後段の score ソートで自動）。
     ev_cfg に stamp_tier があるときだけ動く＝未設定イベントは無挙動（元表示のまま）。
@@ -381,9 +396,9 @@ def apply_stamp(rows, ev_cfg):
     if not (tier and snap_name):
         return
     snap_path = DATA / snap_name
-    man_path = Path(ev_cfg["stamp_manifest"]) if ev_cfg.get("stamp_manifest") else STAMP_MANIFEST
-    if not (snap_path.exists() and man_path.exists()):
-        print(f"  ! stamp: データ未検出（{snap_path.name} / {man_path}）→ 合算スキップ")
+    pts_by_id = _load_stamp_pts(ev_cfg, tier)   # id→pt（repo内 data/stamp_points.json 優先／無ければstamp-rally直読み）
+    if not (snap_path.exists() and pts_by_id is not None):
+        print(f"  ! stamp: データ未検出（{snap_path.name} / stamp_points）→ 合算スキップ")
         return
     snap = json.load(open(snap_path, encoding="utf-8"))
     ranks = snap.get("ranks", snap) if isinstance(snap, dict) else {}
@@ -394,8 +409,6 @@ def apply_stamp(rows, ev_cfg):
     for cid, v in ranks.items():
         name_ids.setdefault(str(v.get("name", "")).strip(), []).append(cid)
     id_by_name = {nm: ids[0] for nm, ids in name_ids.items() if len(ids) == 1}
-    man = json.load(open(man_path, encoding="utf-8"))
-    pts_by_id = {m["id"]: int((m.get("pts") or {}).get(tier, 0) or 0) for m in man.get("livers", [])}
     hit = 0
     for r in rows:
         cid = id_by.get((r["name"], int(r["score"]))) or id_by_name.get(r["name"])

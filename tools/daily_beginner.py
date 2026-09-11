@@ -29,7 +29,7 @@ TSV_DIR = os.path.expanduser("~/Claude/tiktok-automation/out")
 MENTION = "<@U0A6WU3P3LL>"   # ito_sukeaki
 GRAD = os.path.join(REPO, "data", "beginner_graduated.json")
 GRAD_PT = 300000    # この当月ptに達したらビギナー卒業（⚡️DCL RISE⚡️の対象）
-GRACE_DAYS = 7      # 卒業検知日からこの日数だけビギナーにも残す猶予
+GRACE_DAYS = 1      # 卒業検知日からこの日数だけビギナーにも残す猶予（1=検知日のみ表示・翌日に掲載終了）
 JST = timezone(timedelta(hours=9))
 
 BONUS_PT = 50000    # 継続ボーナス

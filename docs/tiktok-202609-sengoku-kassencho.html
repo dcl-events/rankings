@@ -23,9 +23,51 @@ body{
     radial-gradient(900px 460px at 8% 6%, rgba(179,32,42,.24) 0%, rgba(179,32,42,0) 52%),
     radial-gradient(900px 460px at 100% 8%, rgba(179,32,42,.20) 0%, rgba(179,32,42,0) 52%),
     linear-gradient(180deg,#0e0b09 0%, #080605 100%);
-  background-attachment:fixed;
+  background-attachment:fixed;position:relative;overflow-x:hidden;
 }
-.wrap{max-width:720px;margin:0 auto;padding:18px 15px 80px}
+/* ───── 戦国絵の背景 ───── */
+.scene{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.scene svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+.scene .moon{transform-origin:center;animation:moonpulse 5.5s ease-in-out infinite}
+@keyframes moonpulse{0%,100%{opacity:.5}50%{opacity:.72}}
+.scene .clouds{animation:drift 70s linear infinite}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-160px)}}
+.scene .clouds2{animation:drift2 110s linear infinite}
+@keyframes drift2{from{transform:translateX(0)}to{transform:translateX(-220px)}}
+.scene .army{transform-origin:50% 100%;animation:march 6s ease-in-out infinite}
+@keyframes march{0%,100%{transform:rotate(-.5deg)}50%{transform:rotate(.5deg)}}
+/* 読みやすさ用の暗幕 */
+.scrim{position:fixed;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,
+    rgba(8,6,5,.22) 0%, rgba(8,6,5,.45) 30%, rgba(8,6,5,.70) 60%, rgba(8,6,5,.80) 100%)}
+
+/* 舞い散る桜 */
+.sakura{position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden}
+.sakura i{position:absolute;top:-16px;width:13px;height:13px;opacity:0;
+  background:radial-gradient(circle at 50% 15%,#ffe1ec 0%,#f7aecb 55%,#e77ea8 100%);
+  border-radius:13px 2px 13px 2px;box-shadow:0 0 6px rgba(247,168,200,.4);
+  animation:fall linear infinite}
+@keyframes fall{
+  0%{opacity:0;transform:translateY(0) translateX(0) rotate(0)}
+  12%{opacity:.9}
+  80%{opacity:.75}
+  100%{opacity:0;transform:translateY(104vh) translateX(48px) rotate(460deg)}}
+
+/* 立ち上る火の粉 */
+.embers{position:fixed;inset:0;pointer-events:none;z-index:2;overflow:hidden}
+.embers i{position:absolute;bottom:-12px;width:4px;height:4px;border-radius:50%;
+  background:radial-gradient(circle,#ffcf6e 0%,var(--ember) 55%,rgba(255,80,0,0) 72%);
+  opacity:0;animation:rise linear infinite}
+@keyframes rise{
+  0%{transform:translateY(0) scale(1);opacity:0}
+  12%{opacity:.9}
+  70%{opacity:.65}
+  100%{transform:translateY(-104vh) scale(.4);opacity:0}}
+.maku{height:16px;width:100%;opacity:.95;
+  background:repeating-linear-gradient(90deg,
+    var(--shu) 0 44px, #0d0a08 44px 52px, var(--gold-dk) 52px 60px, #0d0a08 60px 68px)}
+.hero-in{position:relative;padding:22px 20px;text-align:center}
+.wrap{position:relative;z-index:3;max-width:720px;margin:0 auto;padding:18px 15px 80px}
 .brandbar{display:flex;justify-content:center;margin:6px 0 12px}
 .brandbar img{height:28px;width:auto;opacity:.9}
 a.back{display:inline-block;margin-bottom:12px;color:var(--muted);text-decoration:none;
@@ -35,7 +77,7 @@ a.back::before{content:"← ";color:var(--gold-dk)}
 
 /* ヒーロー */
 header.hero{position:relative;overflow:hidden;border-radius:10px;margin-bottom:16px;
-  border:2px solid var(--gold-dk);text-align:center;padding:22px 20px;
+  border:2px solid var(--gold-dk);text-align:center;padding:0;
   background:linear-gradient(180deg,#1c1411 0%, #0c0908 100%);
   box-shadow:0 16px 38px rgba(0,0,0,.55), inset 0 0 0 3px rgba(0,0,0,.5), inset 0 0 0 4px rgba(212,175,55,.3)}
 .chip{display:inline-block;background:linear-gradient(180deg,var(--shu-lt),var(--shu));
@@ -105,16 +147,126 @@ ul.log li::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;b
 .linkbox a::after{content:"›";color:var(--gold-lt);font-size:18px;line-height:1}
 footer{text-align:center;font-size:11.5px;color:var(--muted);margin-top:44px;
   font-family:'Shippori Mincho B1',serif;letter-spacing:.14em}
-</style></head><body><div class="wrap">
+</style></head><body>
+<div class="scene" aria-hidden="true">
+<svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMax slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#140a14"/>
+      <stop offset="45" stop-color="#1a0c10"/>
+      <stop offset="100%" stop-color="#0a0707"/>
+    </linearGradient>
+    <radialGradient id="moon" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffe0a0"/>
+      <stop offset="34%" stop-color="#f2a23a"/>
+      <stop offset="62%" stop-color="#c23a2a"/>
+      <stop offset="82%" stop-color="#7a1620"/>
+      <stop offset="100%" stop-color="rgba(122,22,32,0)"/>
+    </radialGradient>
+    <radialGradient id="disc" cx="42%" cy="38%" r="62%">
+      <stop offset="0%" stop-color="#ffdf95"/>
+      <stop offset="60%" stop-color="#e9a83e"/>
+      <stop offset="100%" stop-color="#c4762a"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 空 -->
+  <rect x="0" y="0" width="1440" height="900" fill="url(#sky)"/>
+
+  <!-- 陣月（血染めの月） -->
+  <circle class="moon" cx="1070" cy="250" r="300" fill="url(#moon)"/>
+  <circle cx="1070" cy="250" r="118" fill="url(#disc)" opacity=".95"/>
+
+  <!-- 流れ雲 -->
+  <g class="clouds2" opacity=".28" fill="#0d0709">
+    <path d="M120,300 q60,-26 150,-6 q70,-30 170,-2 q80,-8 120,14 q-260,26 -440,-6z"/>
+    <path d="M760,180 q70,-24 170,-4 q90,-24 190,2 q-180,30 -360,2z"/>
+  </g>
+  <g class="clouds" opacity=".35" fill="#160b0d">
+    <path d="M-40,360 q80,-28 200,-8 q90,-26 200,0 q80,-6 130,16 q-330,30 -530,-8z"/>
+    <path d="M900,330 q70,-22 160,-6 q80,-20 170,2 q-170,28 -330,4z"/>
+  </g>
+
+  <!-- 遠景の山並み -->
+  <path d="M0,560 L200,470 L360,540 L560,430 L760,545 L980,455 L1200,545 L1440,470 L1440,900 L0,900 Z" fill="#160a0e" opacity=".9"/>
+  <path d="M0,640 L260,540 L470,620 L700,520 L940,630 L1180,540 L1440,625 L1440,900 L0,900 Z" fill="#100809"/>
+
+  <!-- 城のある丘 -->
+  <path d="M600,660 Q820,560 1040,655 L1040,900 L600,900 Z" fill="#0b0607"/>
+
+  <!-- 天守閣 -->
+  <g transform="translate(760,470)" fill="#080505" stroke="#1c1210" stroke-width="2">
+    <!-- 石垣 -->
+    <path d="M-70,210 L-52,150 L60,150 L78,210 Z" fill="#0d0808"/>
+    <!-- 一層 -->
+    <rect x="-52" y="120" width="112" height="34"/>
+    <path d="M-66,120 L-40,100 L48,100 L74,120 Z" fill="#0a0606"/>
+    <!-- 二層 -->
+    <rect x="-40" y="80" width="88" height="26"/>
+    <path d="M-54,80 L-30,62 L38,62 L62,80 Z" fill="#0a0606"/>
+    <!-- 三層 -->
+    <rect x="-28" y="46" width="64" height="20"/>
+    <path d="M-40,46 L-20,30 L28,30 L48,46 Z" fill="#0a0606"/>
+    <!-- 天守（最上） -->
+    <rect x="-18" y="16" width="44" height="18"/>
+    <path d="M-30,16 L4,-4 L38,16 Z" fill="#0a0606"/>
+    <!-- 金の鯱・窓灯り -->
+    <rect x="-8" y="20" width="9" height="9" fill="#e9a83e" opacity=".85"/>
+    <rect x="8" y="20" width="9" height="9" fill="#e9a83e" opacity=".85"/>
+    <rect x="-20" y="86" width="8" height="12" fill="#d4af37" opacity=".6"/>
+    <rect x="12" y="86" width="8" height="12" fill="#d4af37" opacity=".6"/>
+    <rect x="-34" y="128" width="9" height="16" fill="#d4af37" opacity=".5"/>
+    <rect x="26" y="128" width="9" height="16" fill="#d4af37" opacity=".5"/>
+  </g>
+
+  <!-- 手前の丘 -->
+  <path d="M0,770 Q380,700 760,760 T1440,770 L1440,900 L0,900 Z" fill="#070405"/>
+
+  <!-- 幟旗の軍勢（手前シルエット） -->
+  <g class="army" opacity=".92">
+    <g fill="#0a0506">
+      <!-- 槍衾 -->
+      <g stroke="#0a0506" stroke-width="3">
+        <line x1="70" y1="900" x2="70" y2="740"/><line x1="150" y1="900" x2="150" y2="720"/>
+        <line x1="240" y1="900" x2="240" y2="745"/><line x1="330" y1="900" x2="330" y2="712"/>
+        <line x1="1120" y1="900" x2="1120" y2="735"/><line x1="1210" y1="900" x2="1210" y2="716"/>
+        <line x1="1300" y1="900" x2="1300" y2="742"/><line x1="1380" y1="900" x2="1380" y2="720"/>
+      </g>
+      <!-- 槍先（金） -->
+      <g fill="#d4af37" opacity=".8">
+        <path d="M70,740 l4,10 l-8,0 z"/><path d="M150,720 l4,10 l-8,0 z"/>
+        <path d="M240,745 l4,10 l-8,0 z"/><path d="M330,712 l4,10 l-8,0 z"/>
+        <path d="M1120,735 l4,10 l-8,0 z"/><path d="M1210,716 l4,10 l-8,0 z"/>
+        <path d="M1300,742 l4,10 l-8,0 z"/><path d="M1380,720 l4,10 l-8,0 z"/>
+      </g>
+    </g>
+    <!-- 幟旗 -->
+    <g>
+      <g transform="translate(110,900)"><rect x="-2" y="-190" width="4" height="190" fill="#080405"/><path d="M2,-186 h34 l-8,12 l8,12 h-34 z" fill="#5a1018"/></g>
+      <g transform="translate(300,900)"><rect x="-2" y="-172" width="4" height="172" fill="#080405"/><path d="M2,-168 h32 l-8,11 l8,11 h-32 z" fill="#3a2410"/></g>
+      <g transform="translate(1160,900)"><rect x="-2" y="-184" width="4" height="184" fill="#080405"/><path d="M2,-180 h34 l-8,12 l8,12 h-34 z" fill="#5a1018"/></g>
+      <g transform="translate(1350,900)"><rect x="-2" y="-166" width="4" height="166" fill="#080405"/><path d="M2,-162 h30 l-7,11 l7,11 h-30 z" fill="#3a2410"/></g>
+    </g>
+  </g>
+</svg>
+</div>
+<div class="scrim"></div>
+<div class="embers" id="embers"></div>
+<div class="sakura" id="sakura"></div>
+<div class="wrap">
 
 <div class="brandbar"><img src="assets/dcl_logo_dark.png" alt="DeNA Creator Links"></div>
 <a class="back" href="tiktok-202609-sengoku.html">ランキングへ戻る</a>
 
 <header class="hero">
-  <div class="chip">TikTok LIVE</div>
-  <h1 class="title"><span class="sword">⚔</span>合戦帳<span class="sword">⚔</span></h1>
-  <div class="subttl">DCL⚔️戦国統一 ／ 全戦績ログ</div>
-  <div class="meta">1戦ごとの全記録（誰が誰から何兵を奪ったか）</div>
+  <div class="maku"></div>
+  <div class="hero-in">
+    <div class="chip">TikTok LIVE</div>
+    <h1 class="title"><span class="sword">⚔</span>合戦帳<span class="sword">⚔</span></h1>
+    <div class="subttl">DCL⚔️戦国統一 ／ 全戦績ログ</div>
+    <div class="meta">1戦ごとの全記録（誰が誰から何兵を奪ったか）</div>
+  </div>
+  <div class="maku"></div>
 </header>
 
 <div class="updated">最終更新: 2026-09-11 JST</div>
@@ -153,4 +305,39 @@ footer{text-align:center;font-size:11.5px;color:var(--muted);margin-top:44px;
 
 <footer>DeNA Creator Links — DCL⚔️戦国統一</footer>
 
-</div></body></html>
+</div>
+<script>
+// 火の粉を生成
+(function(){
+  var box=document.getElementById('embers'); if(!box) return;
+  var N=26;
+  for(var i=0;i<N;i++){
+    var e=document.createElement('i');
+    var dur=(6+Math.random()*7).toFixed(2);
+    var delay=(-Math.random()*13).toFixed(2);
+    var size=(3+Math.random()*4).toFixed(1);
+    e.style.left=(Math.random()*100).toFixed(2)+'%';
+    e.style.width=size+'px'; e.style.height=size+'px';
+    e.style.animationDuration=dur+'s';
+    e.style.animationDelay=delay+'s';
+    box.appendChild(e);
+  }
+})();
+// 桜の花びらを生成
+(function(){
+  var box=document.getElementById('sakura'); if(!box) return;
+  var N=16;
+  for(var i=0;i<N;i++){
+    var p=document.createElement('i');
+    var dur=(9+Math.random()*8).toFixed(2);
+    var delay=(-Math.random()*17).toFixed(2);
+    var size=(9+Math.random()*8).toFixed(1);
+    p.style.left=(Math.random()*100).toFixed(2)+'%';
+    p.style.width=size+'px'; p.style.height=size+'px';
+    p.style.animationDuration=dur+'s';
+    p.style.animationDelay=delay+'s';
+    box.appendChild(p);
+  }
+})();
+</script>
+</body></html>

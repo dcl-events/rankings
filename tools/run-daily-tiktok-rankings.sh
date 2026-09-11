@@ -41,7 +41,16 @@ BEG="$(python3 tools/daily_beginner.py --month "$MONTH" --floor 1000 --date "$DA
 RISE="$(python3 tools/daily_rise.py --month "$MONTH" --floor 1 --date "$DATE" --bare 2>>"$LOG")"
 [ -n "$RISE" ] || fail "RISE生成失敗（データTSVが見つからない等）"
 
-# 3. サイト再生成（両ランキングまとめて1回）
+# 2.5 スタンプラリー更新（snapshot確定後・build前）：名簿マージ→JSON再生成→_manifest.json最新化＋stamp Pages push。
+#     build.py はこの _manifest を読んで獲得ptをランキングに合算する。
+#     失敗しても非致命（前回の _manifest で build を続行＝ランキング公開は止めない）。
+if ! "$HOME/Claude/stamp-rally/tools/run-daily.sh" >>"$LOG" 2>&1; then
+  say "⚠️ スタンプラリー更新に失敗（合算は前回値のまま build を続行）"
+else
+  say "スタンプラリー更新OK（合算用 _manifest 最新化）"
+fi
+
+# 3. サイト再生成（両ランキングまとめて1回。スタンプpt合算を含む）
 python3 build.py >>"$LOG" 2>&1 || fail "build失敗"
 
 # 4. 変更があれば push（1回）

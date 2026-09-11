@@ -19,6 +19,8 @@ ROOT = Path(__file__).parent
 DATA = ROOT / "data"
 DOCS = ROOT / "docs"
 POCOCHA_REPORT = ROOT.parent / "pococha" / "data" / "event_report.csv"
+# スタンプラリー獲得pt（stamp-rally/gen.py が書き出す _manifest.json。id→pts{beginner,rise}）
+STAMP_MANIFEST = ROOT.parent / "stamp-rally" / "docs" / "data" / "_manifest.json"
 JST = timezone(timedelta(hours=9))
 TOP_N = 20  # ランキング表示の既定上限（events.json の top_n で個別上書き可）
 
@@ -265,6 +267,7 @@ li .tm{{margin-top:3px;font-size:12px;font-weight:500;color:var(--muted);
   display:flex;flex-wrap:wrap;gap:1px 10px}}
 li .tm span{{white-space:nowrap}}
 li .tm .bns{{color:var(--brand-orange);font-weight:700}}
+li .tm .stmp{{color:#e0338c;font-weight:700}}
 li .bar{{height:7px;border-radius:4px;margin-top:7px;
   background:linear-gradient(90deg,var(--brand-orange),var(--brand-yellow))}}
 li .sc{{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;font-weight:700;
@@ -322,6 +325,8 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
     # ファンクラブボーナス(fanpct/fanbonus)は人数表記があれば足りるのでカードには出さない
     bn = r.get("bonus") or 0
     if bn: parts.append(f'<b class="bns">🔥 継続ボーナス +{bn:,}pt</b>')
+    st = r.get("stamp") or 0
+    if st: parts.append(f'<b class="stmp">🎯 スタンプ +{st:,}pt</b>')
     tline = ('<div class="tm">' + "".join(f"<span>{x}</span>" for x in parts) + "</div>") if parts else ""
     sub = gap + tline
     if display == "rank":
@@ -364,6 +369,44 @@ def links_html(ev_cfg):
     return f'<div class="linkbox">{items}</div>'
 
 
+def apply_stamp(rows, ev_cfg):
+    """スタンプラリー獲得ptを各行の score に合算する（再ランキングは後段の score ソートで自動）。
+    ev_cfg に stamp_tier があるときだけ動く＝未設定イベントは無挙動（元表示のまま）。
+      ・ティア別：ビギナーランキング=beginner / RISEランキング=rise（卒業者はビギナー分を引き継がない）
+      ・突合：公開CSVにIDは無いので、非公開の data/<stamp_snapshot>（id↔name↔基礎pt）で
+              (name, 基礎pt) → クリエイターID を引き、_manifest.json の pts[tier] を足す。
+    """
+    tier = ev_cfg.get("stamp_tier")
+    snap_name = ev_cfg.get("stamp_snapshot")
+    if not (tier and snap_name):
+        return
+    snap_path = DATA / snap_name
+    man_path = Path(ev_cfg["stamp_manifest"]) if ev_cfg.get("stamp_manifest") else STAMP_MANIFEST
+    if not (snap_path.exists() and man_path.exists()):
+        print(f"  ! stamp: データ未検出（{snap_path.name} / {man_path}）→ 合算スキップ")
+        return
+    snap = json.load(open(snap_path, encoding="utf-8"))
+    ranks = snap.get("ranks", snap) if isinstance(snap, dict) else {}
+    id_by = {(str(v.get("name", "")).strip(), int(v.get("pt", 0))): cid
+             for cid, v in ranks.items()}
+    # 名前フォールバック（同一snapshot内で一意な名前のみ。pt整形がずれても拾えるように）
+    name_ids = {}
+    for cid, v in ranks.items():
+        name_ids.setdefault(str(v.get("name", "")).strip(), []).append(cid)
+    id_by_name = {nm: ids[0] for nm, ids in name_ids.items() if len(ids) == 1}
+    man = json.load(open(man_path, encoding="utf-8"))
+    pts_by_id = {m["id"]: int((m.get("pts") or {}).get(tier, 0) or 0) for m in man.get("livers", [])}
+    hit = 0
+    for r in rows:
+        cid = id_by.get((r["name"], int(r["score"]))) or id_by_name.get(r["name"])
+        stamp = pts_by_id.get(cid, 0) if cid else 0
+        if stamp > 0:
+            r["stamp"] = stamp
+            r["score"] += stamp
+            hit += 1
+    print(f"  ✓ stamp合算({tier}): {hit}名に加点")
+
+
 def build_event(ev_cfg, report):
     # プラットフォーム既定テーマに、events.json の theme(accent/accent2/hero/dark/favicon/logo)を上書き
     theme = dict(PF_THEME.get(ev_cfg["platform"], DEFAULT_THEME))
@@ -372,6 +415,7 @@ def build_event(ev_cfg, report):
         rows, meta = rows_from_pococha(ev_cfg, report)
     else:
         rows, meta = rows_from_csv(ev_cfg)
+    apply_stamp(rows, ev_cfg)   # スタンプラリー獲得ptを合算（stamp_tier設定時のみ）→ 直後のソートで再ランキング
     rows.sort(key=lambda r: r["score"], reverse=True)
     maxscore = rows[0]["score"] if rows else 0
     total = len(rows)

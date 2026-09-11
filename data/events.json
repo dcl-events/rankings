@@ -2,6 +2,20 @@
   "_comment": "公開するイベントだけをここに列挙する。source=pococha_report は ../pococha/data/event_report.csv から event_identifier で抽出。source=csv は data/<data_file> を読む(TikTok貼り付け用)。score_field=応援ptなど集計列。display: value(金額表示) / rank(順位のみ) / bar(1位を100%とした相対バー)。",
   "events": [
     {
+      "id": "tiktok-202609-pride2",
+      "platform": "TikTok LIVE",
+      "static": true,
+      "card_url": "https://dcl-event.github.io/dcl-tiktok-event-calendar/pride2.html",
+      "title": "🏆 第2回 DCLトーナメント PRIDE",
+      "period_start": "2026-09-01",
+      "period_end": "2026-09-30",
+      "theme": {
+        "accent": "#b3202a",
+        "accent2": "#d4af37",
+        "label": "TikTok LIVE"
+      }
+    },
+    {
       "id": "tiktok-202609-sengoku",
       "platform": "TikTok LIVE",
       "static": true,

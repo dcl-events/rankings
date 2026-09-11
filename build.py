@@ -429,8 +429,11 @@ def build_index(cards_meta):
         theme = dict(PF_THEME.get(ev_cfg["platform"], DEFAULT_THEME))
         theme.update(ev_cfg.get("theme", {}))   # 個別テーマ（RISEの黒×オレンジ等）を一覧カードにも反映
         period = f"{meta['period_start']} 〜 {meta['period_end']}" if meta["period_start"] else ""
+        # card_url があれば外部ページへ直接リンク（別タブ）。無ければ通常どおり <id>.html へ
+        href = html.escape(ev_cfg["card_url"]) if ev_cfg.get("card_url") else f'{ev_cfg["id"]}.html'
+        target = ' target="_blank" rel="noopener"' if ev_cfg.get("card_url") else ''
         cards.append(
-            f'<a href="{ev_cfg["id"]}.html"><div class="card" style="--c:{theme["accent"]};--c2:{theme.get("accent2", theme["accent"])}">'
+            f'<a href="{href}"{target}><div class="card" style="--c:{theme["accent"]};--c2:{theme.get("accent2", theme["accent"])}">'
             f'<span class="arrow">›</span>'
             f'<div class="pf">{html.escape(theme["label"])}</div>'
             f'<h2>{html.escape(meta["title"])}</h2>'

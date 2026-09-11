@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ja"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>合戦帳 ／ DCL⚔️戦国統一</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700;800&family=Noto+Serif+JP:wght@500;600;700;900&family=Jost:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --gold:#d4af37; --gold-lt:#f7e08a; --gold-dk:#8a6d1f;
+  --shu:#b3202a; --shu-lt:#e24a35; --ember:#ff7a1a;
+  --ink:#f4ecdc; --muted:#b9a888; --line:#3a2e22;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:'Noto Serif JP','Hiragino Mincho ProN',serif;
+  color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;
+  background:
+    radial-gradient(1100px 480px at 50% -8%, rgba(255,122,26,.14) 0%, rgba(255,122,26,0) 55%),
+    radial-gradient(900px 460px at 8% 6%, rgba(179,32,42,.24) 0%, rgba(179,32,42,0) 52%),
+    radial-gradient(900px 460px at 100% 8%, rgba(179,32,42,.20) 0%, rgba(179,32,42,0) 52%),
+    linear-gradient(180deg,#0e0b09 0%, #080605 100%);
+  background-attachment:fixed;
+}
+.wrap{max-width:720px;margin:0 auto;padding:18px 15px 80px}
+.brandbar{display:flex;justify-content:center;margin:6px 0 12px}
+.brandbar img{height:28px;width:auto;opacity:.9}
+a.back{display:inline-block;margin-bottom:12px;color:var(--muted);text-decoration:none;
+  font-size:13px;font-weight:600;letter-spacing:.04em}
+a.back:hover{color:var(--gold-lt)}
+a.back::before{content:"← ";color:var(--gold-dk)}
+
+/* ヒーロー */
+header.hero{position:relative;overflow:hidden;border-radius:10px;margin-bottom:16px;
+  border:2px solid var(--gold-dk);text-align:center;padding:22px 20px;
+  background:linear-gradient(180deg,#1c1411 0%, #0c0908 100%);
+  box-shadow:0 16px 38px rgba(0,0,0,.55), inset 0 0 0 3px rgba(0,0,0,.5), inset 0 0 0 4px rgba(212,175,55,.3)}
+.chip{display:inline-block;background:linear-gradient(180deg,var(--shu-lt),var(--shu));
+  color:#fff;border-radius:3px;padding:3px 13px;font-size:11px;font-weight:700;
+  letter-spacing:.18em;margin-bottom:10px;box-shadow:0 2px 8px rgba(179,32,42,.5)}
+h1.title{margin:2px 0 6px;font-family:'Shippori Mincho B1',serif;font-weight:800;
+  font-size:clamp(34px,10vw,52px);letter-spacing:.14em;line-height:1.05;color:var(--gold-lt);
+  text-shadow:0 2px 0 #000, 0 0 22px rgba(255,150,40,.4)}
+h1.title .sword{color:var(--shu-lt)}
+.subttl{font-family:'Shippori Mincho B1',serif;font-size:14px;font-weight:700;
+  letter-spacing:.16em;color:var(--ink);margin:2px 0}
+.meta{font-size:12.5px;color:var(--muted);font-weight:500;margin-top:10px;letter-spacing:.03em}
+.updated{font-size:11.5px;color:var(--muted);text-align:right;margin:-2px 2px 16px;letter-spacing:.03em}
+
+/* 集計 */
+.summary{display:flex;gap:10px;margin-bottom:16px}
+.summary .box{flex:1;background:linear-gradient(180deg,#17120e,#120e0b);border:1px solid var(--line);
+  border-radius:8px;padding:12px 10px;text-align:center;box-shadow:0 6px 16px rgba(0,0,0,.4)}
+.summary .box b{display:block;font-family:'Shippori Mincho B1',serif;font-size:22px;color:var(--gold-lt);
+  font-variant-numeric:tabular-nums}
+.summary .box span{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:.06em}
+
+.sec-head{font-family:'Shippori Mincho B1',serif;font-weight:800;font-size:16px;letter-spacing:.24em;
+  color:var(--gold);text-align:center;margin:22px 0 14px;position:relative}
+.sec-head::before,.sec-head::after{content:"";position:absolute;top:50%;width:24%;height:1px;
+  background:linear-gradient(90deg,transparent,var(--gold-dk))}
+.sec-head::before{left:0}.sec-head::after{right:0;background:linear-gradient(270deg,transparent,var(--gold-dk))}
+
+/* 合戦ログ */
+ul.log{list-style:none;margin:0;padding:0}
+ul.log li{position:relative;background:linear-gradient(180deg,#171310,#100c0a);border-radius:8px;
+  padding:14px 16px 14px 18px;margin-bottom:11px;border:1px solid var(--line);
+  box-shadow:0 6px 16px rgba(0,0,0,.42)}
+ul.log li::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:8px 0 0 8px;
+  background:linear-gradient(180deg,var(--shu),var(--gold-dk))}
+.log .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.log .no{font-family:'Jost',sans-serif;font-weight:700;color:var(--muted);font-size:13px}
+.log .date{margin-left:auto;font-size:11.5px;color:var(--muted)}
+.badge{display:inline-block;font-family:'Shippori Mincho B1',serif;font-weight:800;font-size:11px;
+  letter-spacing:.06em;padding:3px 9px;border-radius:3px;color:#fff}
+.badge.b1{background:linear-gradient(180deg,#3a6ea5,#20364f)}      /* 防衛成功 */
+.badge.b2{background:linear-gradient(180deg,var(--shu-lt),var(--shu))} /* 下剋上成功 */
+.badge.b3{background:linear-gradient(180deg,#f0a53a,#b3202a)}       /* 大下剋上成功 */
+.log .vs{margin-top:9px;font-family:'Shippori Mincho B1',serif;font-size:16px;font-weight:800;color:var(--ink)}
+.log .vs .win{color:var(--gold-lt)}
+.log .vs .lose{color:var(--muted)}
+.log .vs .x{color:var(--shu-lt);margin:0 8px;font-size:13px}
+.log .plunder{margin-top:5px;font-size:13px;font-weight:700;color:var(--ember);
+  font-family:'Shippori Mincho B1',serif}
+.log .result{margin-top:5px;font-size:12px;color:var(--muted)}
+
+/* 空状態 */
+.empty{background:linear-gradient(180deg,#17120e,#120e0b);border:1px dashed rgba(212,175,55,.4);
+  border-radius:10px;padding:34px 20px;text-align:center;box-shadow:0 8px 22px rgba(0,0,0,.4)}
+.empty .em{font-size:40px}
+.empty h3{font-family:'Shippori Mincho B1',serif;font-weight:800;font-size:18px;letter-spacing:.1em;
+  color:var(--gold-lt);margin:10px 0 6px}
+.empty p{font-size:13px;color:var(--muted);margin:0;line-height:1.9}
+
+.linkbox{margin:20px 0 4px}
+.linkbox a{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:linear-gradient(180deg,#17120e,#120e0b);border:1px solid var(--line);border-radius:7px;
+  padding:15px 18px;text-decoration:none;color:var(--ink);font-family:'Shippori Mincho B1',serif;
+  font-weight:700;font-size:14px;letter-spacing:.06em;box-shadow:0 6px 16px rgba(0,0,0,.4);
+  transition:transform .15s ease,box-shadow .15s ease}
+.linkbox a:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(0,0,0,.5)}
+.linkbox a::after{content:"›";color:var(--gold-lt);font-size:18px;line-height:1}
+footer{text-align:center;font-size:11.5px;color:var(--muted);margin-top:44px;
+  font-family:'Shippori Mincho B1',serif;letter-spacing:.14em}
+</style></head><body><div class="wrap">
+
+<div class="brandbar"><img src="assets/dcl_logo_dark.png" alt="DeNA Creator Links"></div>
+<a class="back" href="tiktok-202609-sengoku.html">ランキングへ戻る</a>
+
+<header class="hero">
+  <div class="chip">TikTok LIVE</div>
+  <h1 class="title"><span class="sword">⚔</span>合戦帳<span class="sword">⚔</span></h1>
+  <div class="subttl">DCL⚔️戦国統一 ／ 全戦績ログ</div>
+  <div class="meta">1戦ごとの全記録（誰が誰から何兵を奪ったか）</div>
+</header>
+
+<div class="updated">最終更新: 2026-09-11 JST</div>
+
+<div class="summary">
+  <div class="box"><b>0</b><span>総合戦数</span></div>
+  <div class="box"><b>0</b><span>下剋上</span></div>
+  <div class="box"><b>0</b><span>大下剋上</span></div>
+</div>
+
+<div class="sec-head">合 戦 の 記 録</div>
+
+<!-- 合戦ログ（データが溜まったらここに1戦ずつ表示） -->
+<div class="empty">
+  <div class="em">🏯⚔️🏯</div>
+  <h3>いざ、開戦を待て</h3>
+  <p>まだ合戦の記録はありません。<br>
+  一騎討ちの結果が申請されると、ここに1戦ずつ刻まれます。<br>
+  「誰が誰から何兵を奪ったか」を全員が確認できます。</p>
+</div>
+
+<!-- データ例（レイアウト確認用テンプレ・非表示）
+<ul class="log">
+  <li>
+    <div class="top"><span class="no">#001</span><span class="badge b3">大下剋上成功</span><span class="date">9/18(木) 21:40</span></div>
+    <div class="vs"><span class="win">ツチノト #12</span><span class="x">⚔</span><span class="lose">まろん #01</span></div>
+    <div class="plunder">🔥 略奪 +35,000兵</div>
+    <div class="result">ツチノト 10,000 → 45,000兵（12位 → 3位） ／ まろん 70,000 → 35,000兵（1位 → 4位）</div>
+  </li>
+</ul>
+-->
+
+<div class="linkbox">
+  <a href="tiktok-202609-sengoku.html"><span>🏯 ランキングを見る</span></a>
+</div>
+
+<footer>DeNA Creator Links — DCL⚔️戦国統一</footer>
+
+</div></body></html>

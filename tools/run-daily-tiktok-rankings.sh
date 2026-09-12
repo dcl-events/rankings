@@ -18,6 +18,30 @@ LOCK="$REPO/tools/.rankings.lock"
 if ! mkdir "$LOCK" 2>/dev/null; then say "既に実行中のため中止"; echo "（既に実行中のためスキップ）"; exit 0; fi
 trap 'rmdir "$LOCK" 2>/dev/null' EXIT
 
+# 0. 当日分TSVの到着を待つ
+#    tiktok-creator-data-daily(通常10:06)が遅れると前日TSVを読んでしまい、期間ラベルが
+#    1日古いランキングを公開してしまう（2026-09-12に発生：取得が11:56完了で10:30の更新に間に合わず）。
+#    当日DL分が出るまで最大 WAIT_MAX_MIN 分だけ待ち、それでも来なければ警告を添えて前日分で続行する。
+WAIT_MAX_MIN="${RANKINGS_WAIT_MAX_MIN:-90}"
+WAIT_INTERVAL=120
+TSV_DIR="$HOME/Claude/tiktok-automation/out"
+latest_tsv_date(){ ls "$TSV_DIR"/creator_data_*.tsv 2>/dev/null | sort | tail -1 \
+  | sed -n 's/.*creator_data_\([0-9-]\{10\}\)_.*/\1/p'; }
+TODAY="$(date '+%Y-%m-%d')"
+STALE_NOTE=""
+waited=0
+while [ "$(latest_tsv_date)" != "$TODAY" ] && [ "$waited" -lt $((WAIT_MAX_MIN * 60)) ]; do
+  say "当日分TSV待ち（最新=$(latest_tsv_date) / 経過 $((waited / 60))分）"
+  sleep "$WAIT_INTERVAL"
+  waited=$((waited + WAIT_INTERVAL))
+done
+if [ "$(latest_tsv_date)" = "$TODAY" ]; then
+  [ "$waited" -gt 0 ] && say "当日分TSVを検知（$((waited / 60))分待機）"
+else
+  STALE_NOTE="⚠️ 本日のクリエイターデータ取得が${WAIT_MAX_MIN}分待っても届かなかったため、前日DL分（$(latest_tsv_date)）で更新しています。"
+  say "$STALE_NOTE"
+fi
+
 # データ期間末 = 実際に読むTSVのDL日 - 2日（Backstageの反映遅れ。tools/data_asof.py 参照）
 DATE="$(python3 tools/data_asof.py --fmt md 2>>"$LOG")"
 [ -n "$DATE" ] || fail "データ期間末の判定に失敗（TSVが見つからない等）"
@@ -81,7 +105,9 @@ rise_body="$(printf '%s\n' "$RISE" | tail -n +4)" # 順位変動・新規RISE入
 
 # --- 親メッセージ（短く：見出し＋メンション＋2つのURLだけ） ---
 printf '%s\n' "📊 TikTok LIVE ランキング更新（${DATE}時点）"
-printf '%s\n\n' "<@U0A6WU3P3LL>"
+printf '%s\n' "<@U0A6WU3P3LL>"
+[ -n "$STALE_NOTE" ] && printf '%s\n' "$STALE_NOTE"
+printf '\n'
 printf '%s\n\n' "$beg_head"
 printf '%s\n' "$rise_head"
 

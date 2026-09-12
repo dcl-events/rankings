@@ -1,7 +1,7 @@
 #!/bin/bash
 # TikTok LIVE ランキング 日次更新（ビギナー＋⚡️DCL RISE⚡️を1本のSlack投稿にまとめる）
-#   スケジュールタスク tiktok-beginner-ranking-daily から呼ばれる。
-#   最新TSV(=tiktok-creator-data-daily 10:06の成果物)を読む → 両ランキングのCSV生成＋順位差分
+#   通常は tiktok-creator-data-daily の完了直後に、その手順5から呼ばれる（取りこぼし時のみ 15:00 の tiktok-beginner-rise-ranking-daily）。
+#   最新TSV(=tiktok-creator-data-daily の成果物)を読む → 両ランキングのCSV生成＋順位差分
 #   → build 1回 → git push 1回 → 最後に「まとめSlack投稿本文」だけを標準出力に出す。
 #   実際の投稿はタスク側が MCP(conversations_add_message) で ito_sukeaki名義で行う。
 #   診断ログは tools/daily-rankings.log と標準エラーへ。標準出力はSlack本文のみ。
@@ -22,7 +22,7 @@ trap 'rmdir "$LOCK" 2>/dev/null' EXIT
 #    tiktok-creator-data-daily(通常10:06)が遅れると前日TSVを読んでしまい、期間ラベルが
 #    1日古いランキングを公開してしまう（2026-09-12に発生：取得が11:56完了で10:30の更新に間に合わず）。
 #    当日DL分が出るまで最大 WAIT_MAX_MIN 分だけ待ち、それでも来なければ警告を添えて前日分で続行する。
-WAIT_MAX_MIN="${RANKINGS_WAIT_MAX_MIN:-90}"
+WAIT_MAX_MIN="${RANKINGS_WAIT_MAX_MIN:-20}"
 WAIT_INTERVAL=120
 TSV_DIR="$HOME/Claude/tiktok-automation/out"
 latest_tsv_date(){ ls "$TSV_DIR"/creator_data_*.tsv 2>/dev/null | sort | tail -1 \

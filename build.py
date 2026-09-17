@@ -268,8 +268,8 @@ li .tm{{margin-top:3px;font-size:12px;font-weight:500;color:var(--muted);
 li .tm span{{white-space:nowrap}}
 li .tm .bns{{color:var(--brand-orange);font-weight:700}}
 li .tm .stmp{{color:#e0338c;font-weight:700}}
-li .nm .gradtag{{display:inline-block;vertical-align:middle;margin-left:8px;
-  color:#fff;background:linear-gradient(90deg,#f0a500,#ff6a00);
+li .scwrap{{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}}
+li .scwrap .gradtop{{color:#fff;background:linear-gradient(90deg,#f0a500,#ff6a00);
   border-radius:999px;padding:2px 10px;font-size:11px;font-weight:800;
   white-space:nowrap;box-shadow:0 2px 6px rgba(240,120,0,.35)}}
 li .bar{{height:7px;border-radius:4px;margin-top:7px;
@@ -336,7 +336,7 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
     tline = ('<div class="tm">' + "".join(f"<span>{x}</span>" for x in parts) + "</div>") if parts else ""
     sub = gap + tline
     if display == "rank":
-        body = f'<div class="nm">{name}{gtag}</div>{sub}'
+        body = f'<div class="nm">{name}</div>{sub}'
         sc = ""
     elif display == "bar":
         pct = int(r["score"] / maxscore * 100) if maxscore else 0
@@ -344,8 +344,10 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
         sc = ""
     else:  # value
         val, unit = fmt_score(r["score"], ev_cfg)
-        body = f'<div class="nm">{name}{gtag}</div>{sub}'
-        sc = f'<div class="sc">{val}<span class="unit">{html.escape(unit)}</span></div>'
+        body = f'<div class="nm">{name}</div>{sub}'
+        gtop = f'<div class="gradtop">🎓 {html.escape(gd)}</div>' if gd else ""
+        sc = (f'<div class="scwrap">{gtop}'
+              f'<div class="sc">{val}<span class="unit">{html.escape(unit)}</span></div></div>')
     return (f'<li class="{top}"><div class="num">{num}</div>'
             f'<div class="body">{body}</div>{sc}</li>')
 

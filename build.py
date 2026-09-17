@@ -246,7 +246,7 @@ details.rules[open]>summary::after{{transform:rotate(180deg)}}
 
 /* ランキング */
 ul.rank{{list-style:none;margin:0;padding:0}}
-ul.rank li{{display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;
+ul.rank li{{position:relative;display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;
   padding:14px 16px;margin-bottom:10px;border:1px solid var(--line);
   box-shadow:0 4px 14px rgba(120,80,20,.05)}}
 li .num{{font-family:'Jost',sans-serif;font-size:20px;font-weight:700;min-width:46px;
@@ -268,10 +268,10 @@ li .tm{{margin-top:3px;font-size:12px;font-weight:500;color:var(--muted);
 li .tm span{{white-space:nowrap}}
 li .tm .bns{{color:var(--brand-orange);font-weight:700}}
 li .tm .stmp{{color:#e0338c;font-weight:700}}
-li .scwrap{{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}}
-li .scwrap .gradtop{{color:#fff;background:linear-gradient(90deg,#f0a500,#ff6a00);
-  border-radius:999px;padding:2px 10px;font-size:11px;font-weight:800;
-  white-space:nowrap;box-shadow:0 2px 6px rgba(240,120,0,.35)}}
+li .gradcorner{{position:absolute;top:14px;right:16px;color:#fff;
+  background:linear-gradient(90deg,#f0a500,#ff6a00);border-radius:999px;
+  padding:2px 10px;font-size:11px;font-weight:800;white-space:nowrap;
+  box-shadow:0 2px 6px rgba(240,120,0,.35)}}
 li .bar{{height:7px;border-radius:4px;margin-top:7px;
   background:linear-gradient(90deg,var(--brand-orange),var(--brand-yellow))}}
 li .sc{{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;font-weight:700;
@@ -345,10 +345,10 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
     else:  # value
         val, unit = fmt_score(r["score"], ev_cfg)
         body = f'<div class="nm">{name}</div>{sub}'
-        gtop = f'<div class="gradtop">🎓 {html.escape(gd)}</div>' if gd else ""
-        sc = (f'<div class="scwrap">{gtop}'
-              f'<div class="sc">{val}<span class="unit">{html.escape(unit)}</span></div></div>')
-    return (f'<li class="{top}"><div class="num">{num}</div>'
+        sc = f'<div class="sc">{val}<span class="unit">{html.escape(unit)}</span></div>'
+    # 卒業フラグは名前と同じ高さ（カード右上）に固定配置
+    corner = f'<div class="gradcorner">🎓 {html.escape(gd)}</div>' if gd else ""
+    return (f'<li class="{top}">{corner}<div class="num">{num}</div>'
             f'<div class="body">{body}</div>{sc}</li>')
 
 

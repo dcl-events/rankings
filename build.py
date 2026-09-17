@@ -431,7 +431,8 @@ def apply_stamp(rows, ev_cfg):
             r["stamp"] = stamp
             r["score"] += stamp
             hit += 1
-        gv = grad.get(cid) if cid else None
+        # 卒業フラグは「ビギナーを卒業」の意味なのでビギナーページのみ表示（RISE側には出さない）
+        gv = grad.get(cid) if (cid and tier == "beginner") else None
         if gv:
             md = gv.get("grad_md")
             if not md and gv.get("graduated_on"):

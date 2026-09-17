@@ -98,6 +98,24 @@ def main():
     L = c["LIVE時間"]; LAST = c["先月のダイヤモンド数"]; DAYS = c["有効LIVE日数"]; FANS = c["ファンクラブのアクティブなファン"]
     AG = c["LIVE Match数"]; AH = c["LIVE Matchで獲得したダイヤモンド数"]
 
+    # スタンプラリー獲得pt（tier=rise）。卒業ピックの30万判定を base＋stamp の合算で行う。
+    STAMPF = os.path.join(REPO, "data", "stamp_points.json")
+    stamp_r = {}
+    if os.path.exists(STAMPF):
+        try:
+            stamp_r = {k: int((v or {}).get("rise", 0) or 0)
+                       for k, v in (json.load(open(STAMPF)).get("pts") or {}).items()}
+        except Exception: stamp_r = {}
+    # ビギナー卒業者(=beginner_graduated.json、当月)は確実にRISEへ引き継ぐ（スタンプはtier別で
+    # 差があり得るため、卒業判定はビギナー側の記録を正とする）。
+    grad_set = set()
+    GF = os.path.join(REPO, "data", "beginner_graduated.json")
+    if os.path.exists(GF):
+        try:
+            _g = json.load(open(GF))
+            if _g.get("month") == month: grad_set = set((_g.get("livers") or {}).keys())
+        except Exception: grad_set = set()
+
     rise = []
     for r in rows[1:]:
         if len(r) <= max(ID, N, D, L, LAST, AG, AH): continue
@@ -109,8 +127,11 @@ def main():
         base = cur * 10 + ah * 5 + ag * 1000 + bonus
         fans = toint(r[FANS]); fanpct, fanbonus = fan_bonus(fans, base)
         pt = base + fanbonus
+        rid = str(r[ID]).strip()
+        tot = pt + stamp_r.get(rid, 0)          # 合算ポイント（卒業ピック判定用）
         mid  = LAST_MIN <= last_i <= LAST_MAX   # 前月10万pt以上（近似）
-        grad = last_i < LAST_MIN and pt >= GRAD_PT   # ビギナー卒業ピック
+        # ビギナー卒業ピック：正はビギナー卒業記録。無い環境向けに合算ptのフォールバックも残す。
+        grad = (rid in grad_set) or (last_i < LAST_MIN and tot >= GRAD_PT)
         if not (mid or grad): continue
         if pt < floor: continue
         rise.append({"cid": str(r[ID]).strip(), "name": r[N].strip(), "pt": pt,

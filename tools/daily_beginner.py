@@ -127,6 +127,15 @@ def main():
     L = c["LIVE時間"]; LAST = c["先月のダイヤモンド数"]; DAYS = c["有効LIVE日数"]; FANS = c["ファンクラブのアクティブなファン"]
     AG = c["LIVE Match数"]; AH = c["LIVE Matchで獲得したダイヤモンド数"]
 
+    # スタンプラリー獲得pt（tier=beginner）。卒業ライン30万は base＋stamp の合算で判定する。
+    STAMPF = os.path.join(REPO, "data", "stamp_points.json")
+    stamp_b = {}
+    if os.path.exists(STAMPF):
+        try:
+            stamp_b = {k: int((v or {}).get("beginner", 0) or 0)
+                       for k, v in (json.load(open(STAMPF)).get("pts") or {}).items()}
+        except Exception: stamp_b = {}
+
     beg = []; newgrads = []; dropped = []
     for r in rows[1:]:
         if len(r) <= max(ID, N, J, D, L, LAST, AG, AH): continue
@@ -148,19 +157,21 @@ def main():
         if pt < floor: continue
         name = r[N].strip()
 
-        # 卒業判定：当月pt>=30万で卒業。初回検知日を記録し、猶予明けで掲載終了
+        # 卒業判定：当月pt＋スタンプ獲得pt(合算)>=30万で卒業。初回検知日を記録し、猶予明けで掲載終了
+        tot = pt + stamp_b.get(cid, 0)     # 合算ポイント（卒業ライン判定用）
         g = glivers.get(cid)
-        if g and pt < GRAD_PT:      # 卒業ライン変更で条件を満たさなくなった人は卒業を取り消す
+        if g and tot < GRAD_PT:      # 卒業ライン変更で条件を満たさなくなった人は卒業を取り消す
             del glivers[cid]; g = None
-        if pt >= GRAD_PT and not g:
+        if tot >= GRAD_PT and not g:
             if cid not in prev_beg:
                 # 既に当月30万pt超で初登場＝RISE在籍/卒業済み。ビギナー猶予の対象にせず非掲載
                 continue
             g = {"name": name, "graduated_on": today,
+                 "grad_md": f"{int(today[5:7])}/{int(today[8:10])}",  # 卒業フラグ表示用 M/D
                  "drop_on": (datetime.strptime(today, "%Y-%m-%d")
                              + timedelta(days=GRACE_DAYS)).strftime("%Y-%m-%d")}
             glivers[cid] = g
-            newgrads.append((name, g["drop_on"]))
+            newgrads.append((cid, name, g["drop_on"]))
         if g and today >= g["drop_on"]:
             dropped.append((cid, name, g["graduated_on"]))
             continue          # 猶予明け → ビギナーからは自動で消える
@@ -169,6 +180,11 @@ def main():
                     "cur": cur, "ag": ag, "live": hm(r[L]), "days": days, "fans": fans, "bonus": bonus, "fanpct": fanpct, "fanbonus": fanbonus,
                     "grace_until": g["drop_on"] if g else ""})
     beg.sort(key=lambda x: -x["pt"])
+    # 卒業フラグ用：新規卒業者の「卒業時の順位」を記録（猶予明けで消えても値は固定で残す）
+    rank_of = {b["cid"]: i + 1 for i, b in enumerate(beg)}
+    for cid_g, _n, _d in newgrads:
+        if cid_g in glivers and "grad_rank" not in glivers[cid_g]:
+            glivers[cid_g]["grad_rank"] = rank_of.get(cid_g)
 
     # CSV書き出し
     if dry:
@@ -223,9 +239,11 @@ def main():
     if newgrads:
         msg.append("")
         msg.append(f"🎓 ビギナー卒業（⚡️DCL RISE⚡️へ）")
-        for name, drop in newgrads:
+        for cid_g, name, drop in newgrads:
             m, d = drop[5:7].lstrip("0"), drop[8:10].lstrip("0")
-            msg.append(f"・{name}：ビギナー掲載は {m}/{d} まで")
+            gr = glivers.get(cid_g, {}).get("grad_rank")
+            pos = f"{gr}位で" if gr else ""
+            msg.append(f"・{name}：{pos}卒業（ビギナー掲載は {m}/{d} まで）")
         if not bare: msg.append(RISE_URL)
     if dropped:
         msg.append("")

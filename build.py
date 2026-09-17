@@ -268,6 +268,8 @@ li .tm{{margin-top:3px;font-size:12px;font-weight:500;color:var(--muted);
 li .tm span{{white-space:nowrap}}
 li .tm .bns{{color:var(--brand-orange);font-weight:700}}
 li .tm .stmp{{color:#e0338c;font-weight:700}}
+li .tm .grad{{color:#fff;background:linear-gradient(90deg,#f0a500,#ff6a00);
+  border-radius:999px;padding:1px 9px;font-weight:800}}
 li .bar{{height:7px;border-radius:4px;margin-top:7px;
   background:linear-gradient(90deg,var(--brand-orange),var(--brand-yellow))}}
 li .sc{{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;font-weight:700;
@@ -327,6 +329,8 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
     if bn: parts.append(f'<b class="bns">🔥 継続ボーナス +{bn:,}pt</b>')
     st = r.get("stamp") or 0
     if st: parts.append(f'<b class="stmp">🎯 スタンプ +{st:,}pt</b>')
+    gd = r.get("grad")
+    if gd: parts.append(f'<b class="grad">🎓 {html.escape(gd)}</b>')
     tline = ('<div class="tm">' + "".join(f"<span>{x}</span>" for x in parts) + "</div>") if parts else ""
     sub = gap + tline
     if display == "rank":
@@ -409,6 +413,12 @@ def apply_stamp(rows, ev_cfg):
     for cid, v in ranks.items():
         name_ids.setdefault(str(v.get("name", "")).strip(), []).append(cid)
     id_by_name = {nm: ids[0] for nm, ids in name_ids.items() if len(ids) == 1}
+    # 卒業フラグ（🎓 M/D ◯位 卒業）用に卒業記録を読む（cid→卒業日/順位）
+    grad = {}
+    gf = DATA / "beginner_graduated.json"
+    if gf.exists():
+        try: grad = (json.load(open(gf, encoding="utf-8")) or {}).get("livers", {}) or {}
+        except Exception: grad = {}
     hit = 0
     for r in rows:
         cid = id_by.get((r["name"], int(r["score"]))) or id_by_name.get(r["name"])
@@ -417,6 +427,14 @@ def apply_stamp(rows, ev_cfg):
             r["stamp"] = stamp
             r["score"] += stamp
             hit += 1
+        gv = grad.get(cid) if cid else None
+        if gv:
+            md = gv.get("grad_md")
+            if not md and gv.get("graduated_on"):
+                go = gv["graduated_on"]; md = f"{int(go[5:7])}/{int(go[8:10])}"
+            gr = gv.get("grad_rank")
+            if md:
+                r["grad"] = f"{md} {gr}位 卒業" if gr else f"{md} 卒業"
     print(f"  ✓ stamp合算({tier}): {hit}名に加点")
 
 

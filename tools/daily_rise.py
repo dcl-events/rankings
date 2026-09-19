@@ -86,6 +86,18 @@ def main():
         elif args[i] == "--bare": bare = True; i += 1
         else: i += 1
     CSV_OUT, URL = paths_for(month)
+    today = datetime.now(JST).strftime("%Y-%m-%d")
+
+    # RISE達成フラグ：当月「base＋stampの合算」が MILESTONE_PT(300万) 到達で「◯/◯ 300万pt達成！」を記録。
+    MILESTONE_PT = 3000000
+    MSTONE = os.path.join(REPO, "data", "rise_milestone.json")
+    mstate = {"month": month, "livers": {}}
+    if os.path.exists(MSTONE):
+        try:
+            _m = json.load(open(MSTONE))
+            if _m.get("month") == month: mstate = _m
+        except Exception: pass
+    mlivers = mstate["livers"]
 
     cands = sorted(glob.glob(os.path.join(TSV_DIR, "creator_data_*.tsv")))
     if not cands:
@@ -134,6 +146,10 @@ def main():
         grad = (rid in grad_set) or (last_i < LAST_MIN and tot >= GRAD_PT)
         if not (mid or grad): continue
         if pt < floor: continue
+        # RISE達成フラグ：合算300万pt到達を初回検知日で記録（達成日は固定）
+        if tot >= MILESTONE_PT and rid not in mlivers:
+            mlivers[rid] = {"name": r[N].strip(), "achieved_on": today,
+                            "achieved_md": f"{int(today[5:7])}/{int(today[8:10])}"}
         rise.append({"cid": str(r[ID]).strip(), "name": r[N].strip(), "pt": pt,
                      "cur": cur, "ag": ag, "live": hm(r[L]), "days": days, "fans": fans, "bonus": bonus, "fanpct": fanpct, "fanbonus": fanbonus,
                      "route": "卒業" if grad else "中間層"})
@@ -200,7 +216,9 @@ def main():
                "ranks": {b["cid"]: {"rank": i + 1, "name": b["name"], "pt": b["pt"]}
                          for i, b in enumerate(rise)}},
               open(SNAP, "w"), ensure_ascii=False, indent=0)
-    err("snapshot updated")
+    mstate["month"] = month; mstate["livers"] = mlivers
+    json.dump(mstate, open(MSTONE, "w"), ensure_ascii=False, indent=1)
+    err("snapshot / 達成フラグ updated")
 
 if __name__ == "__main__":
     main()

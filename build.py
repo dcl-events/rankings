@@ -346,8 +346,8 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
         val, unit = fmt_score(r["score"], ev_cfg)
         body = f'<div class="nm">{name}</div>{sub}'
         sc = f'<div class="sc">{val}<span class="unit">{html.escape(unit)}</span></div>'
-    # 卒業フラグは名前と同じ高さ（カード右上）に固定配置
-    corner = f'<div class="gradcorner">🎓 {html.escape(gd)}</div>' if gd else ""
+    # 達成/卒業フラグは名前と同じ高さ（カード右上）に固定配置（絵文字は本文に含める）
+    corner = f'<div class="gradcorner">{html.escape(gd)}</div>' if gd else ""
     return (f'<li class="{top}">{corner}<div class="num">{num}</div>'
             f'<div class="body">{body}</div>{sc}</li>')
 
@@ -417,12 +417,19 @@ def apply_stamp(rows, ev_cfg):
     for cid, v in ranks.items():
         name_ids.setdefault(str(v.get("name", "")).strip(), []).append(cid)
     id_by_name = {nm: ids[0] for nm, ids in name_ids.items() if len(ids) == 1}
-    # 卒業フラグ（🎓 M/D ◯位 卒業）用に卒業記録を読む（cid→卒業日/順位）
+    # フラグ用の記録を読む：ビギナー=卒業記録(🎓)、RISE=300万pt達成記録(🏆)
     grad = {}
-    gf = DATA / "beginner_graduated.json"
-    if gf.exists():
-        try: grad = (json.load(open(gf, encoding="utf-8")) or {}).get("livers", {}) or {}
-        except Exception: grad = {}
+    if tier == "beginner":
+        gf = DATA / "beginner_graduated.json"
+        if gf.exists():
+            try: grad = (json.load(open(gf, encoding="utf-8")) or {}).get("livers", {}) or {}
+            except Exception: grad = {}
+    mstone = {}
+    if tier == "rise":
+        mf = DATA / "rise_milestone.json"
+        if mf.exists():
+            try: mstone = (json.load(open(mf, encoding="utf-8")) or {}).get("livers", {}) or {}
+            except Exception: mstone = {}
     hit = 0
     for r in rows:
         cid = id_by.get((r["name"], int(r["score"]))) or id_by_name.get(r["name"])
@@ -431,7 +438,7 @@ def apply_stamp(rows, ev_cfg):
             r["stamp"] = stamp
             r["score"] += stamp
             hit += 1
-        # 卒業フラグは「ビギナーを卒業」の意味なのでビギナーページのみ表示（RISE側には出さない）
+        # ビギナー：🎓 卒業フラグ（M/D ◯位 卒業）
         gv = grad.get(cid) if (cid and tier == "beginner") else None
         if gv:
             md = gv.get("grad_md")
@@ -439,7 +446,15 @@ def apply_stamp(rows, ev_cfg):
                 go = gv["graduated_on"]; md = f"{int(go[5:7])}/{int(go[8:10])}"
             gr = gv.get("grad_rank")
             if md:
-                r["grad"] = f"{md} {gr}位 卒業" if gr else f"{md} 卒業"
+                r["grad"] = f"🎓 {md} {gr}位 卒業" if gr else f"🎓 {md} 卒業"
+        # RISE：🏆 300万pt達成フラグ（M/D 300万pt達成！）
+        mv = mstone.get(cid) if (cid and tier == "rise") else None
+        if mv:
+            md = mv.get("achieved_md")
+            if not md and mv.get("achieved_on"):
+                ao = mv["achieved_on"]; md = f"{int(ao[5:7])}/{int(ao[8:10])}"
+            if md:
+                r["grad"] = f"🏆 {md} 300万pt達成！"
     print(f"  ✓ stamp合算({tier}): {hit}名に加点")
 
 

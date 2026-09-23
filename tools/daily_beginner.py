@@ -176,10 +176,11 @@ def main():
             dropped.append((cid, name, g["graduated_on"]))
             continue          # 猶予明け → ビギナーからは自動で消える
 
-        beg.append({"cid": cid, "name": name, "pt": pt,
+        beg.append({"cid": cid, "name": name, "pt": pt, "tot": tot,
                     "cur": cur, "ag": ag, "live": hm(r[L]), "days": days, "fans": fans, "bonus": bonus, "fanpct": fanpct, "fanbonus": fanbonus,
                     "grace_until": g["drop_on"] if g else ""})
-    beg.sort(key=lambda x: -x["pt"])
+    # スタンプ合算後(tot)で並べる＝web表示(build.pyの合算後ソート)と順位・順位差分を一致させる
+    beg.sort(key=lambda x: -x["tot"])
     # 卒業フラグ用：新規卒業者の「卒業時の順位」を記録（猶予明けで消えても値は固定で残す）
     rank_of = {b["cid"]: i + 1 for i, b in enumerate(beg)}
     for cid_g, _n, _d in newgrads:

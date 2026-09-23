@@ -150,10 +150,11 @@ def main():
         if tot >= MILESTONE_PT and rid not in mlivers:
             mlivers[rid] = {"name": r[N].strip(), "achieved_on": today,
                             "achieved_md": f"{int(today[5:7])}/{int(today[8:10])}"}
-        rise.append({"cid": str(r[ID]).strip(), "name": r[N].strip(), "pt": pt,
+        rise.append({"cid": str(r[ID]).strip(), "name": r[N].strip(), "pt": pt, "tot": tot,
                      "cur": cur, "ag": ag, "live": hm(r[L]), "days": days, "fans": fans, "bonus": bonus, "fanpct": fanpct, "fanbonus": fanbonus,
                      "route": "卒業" if grad else "中間層"})
-    rise.sort(key=lambda x: -x["pt"])
+    # スタンプ合算後(tot)で並べる＝web表示(build.pyの合算後ソート)と順位を一致させる
+    rise.sort(key=lambda x: -x["tot"])
 
     # CSV書き出し（ビギナーと同じ3列）
     if dry:

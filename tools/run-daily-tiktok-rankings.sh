@@ -119,6 +119,12 @@ printf '%s\n\n' "$beg_body"
 printf '%s\n' "⚡️DCL RISE⚡️"
 printf '%s\n' "$rise_body"
 
-# 課題申告シート（自己申告制・マネージャー入力用）のリンクを添える
-printf '\n%s\n' "📋 課題申告シート（自己申告制）"
+# 課題申告シート（自己申告制・マネージャー入力用）の加点状況＋リンクを添える。
+# 誰がオールクリア＝加点されたか / 申告が進んだかを前回との差分で出す（状態は stamp-rally 側に保存）。
+# 失敗しても非致命：見出しとリンクだけ出して続行する。
+printf '\n'
+if ! python3 "$HOME/Claude/stamp-rally/tools/task_report.py" 2>>"$LOG"; then
+  say "⚠️ 課題申告レポートの生成に失敗（リンクのみ掲載）"
+  printf '%s\n' "📋 課題申告シート_Claude（自己申告制）"
+fi
 printf '%s\n' "https://docs.google.com/spreadsheets/d/1A-WSX4mteR-E5kY8V82dTUqoTcD0GDLA0Uq0qiDTzh4/edit?gid=1676003252"

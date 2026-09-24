@@ -173,8 +173,9 @@ def main():
             glivers[cid] = g
             newgrads.append((cid, name, g["drop_on"]))
         if g and today >= g["drop_on"]:
-            dropped.append((cid, name, g["graduated_on"]))
-            continue          # 猶予明け → ビギナーからは自動で消える
+            if today == g["drop_on"]:      # 「本日掲載終了」の報告は猶予明け当日だけ（過去卒業者を毎日再掲しない）
+                dropped.append((cid, name, g["graduated_on"]))
+            continue          # 猶予明け以降はビギナーから常に除外（報告はしない）
 
         beg.append({"cid": cid, "name": name, "pt": pt, "tot": tot,
                     "cur": cur, "ag": ag, "live": hm(r[L]), "days": days, "fans": fans, "bonus": bonus, "fanpct": fanpct, "fanbonus": fanbonus,

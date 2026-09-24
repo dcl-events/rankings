@@ -57,28 +57,28 @@ python3 tools/data_asof.py --set-events "tiktok-${YM}-newcomer,tiktok-${YM}-rise
   >/dev/null 2>>"$LOG" || fail "period_end の更新に失敗"
 say "===== 開始 (month=$MONTH date=$DATE) ====="
 
-# 1. ビギナー（当月10万pt到達で卒業→7日猶予後に自動で掲載終了）
-BEG="$(python3 tools/daily_beginner.py --month "$MONTH" --floor 1000 --date "$DATE" --bare 2>>"$LOG")"
-[ -n "$BEG" ] || fail "ビギナー生成失敗（データTSVが見つからない等）"
-
-# 2. ⚡️DCL RISE⚡️（中間層＋当月10万pt超えは即時ピック）
-RISE="$(python3 tools/daily_rise.py --month "$MONTH" --floor 1 --date "$DATE" --bare 2>>"$LOG")"
-[ -n "$RISE" ] || fail "RISE生成失敗（データTSVが見つからない等）"
-
-# 2.5 スタンプラリー更新（snapshot確定後・build前）：名簿マージ→JSON再生成→_manifest.json最新化＋stamp Pages push。
-#     build.py はこの _manifest を読んで獲得ptをランキングに合算する。
-#     失敗しても非致命（前回の _manifest で build を続行＝ランキング公開は止めない）。
+# 0. スタンプラリー更新（★日次の合算順位計算より前に実行）：名簿マージ→JSON再生成→_manifest最新化。
+#    ここで data/stamp_points.json を最新化してから daily_* が読むことで、
+#    「日次の合算順(Slack)」と「build.pyの合算順(web)」を必ず一致させる（stamp-rallyは
+#    クリエイターデータ_Claude/課題申告シートが入力で、ランキングsnapshotには依存しない）。
+#    失敗しても非致命（前回値のまま続行＝ランキング公開は止めない）。
 if ! "$HOME/Claude/stamp-rally/tools/run-daily.sh" >>"$LOG" 2>&1; then
-  say "⚠️ スタンプラリー更新に失敗（合算は前回値のまま build を続行）"
+  say "⚠️ スタンプラリー更新に失敗（合算は前回値のまま続行）"
 else
   say "スタンプラリー更新OK（合算用 _manifest 最新化）"
 fi
-# 合算用のスタンプptを repo内 data/stamp_points.json へ同梱（GitHub Actionsのランナーでも読めるように）。
-# 失敗しても非致命（前回の stamp_points.json で build 続行）。
 python3 tools/make_stamp_points.py >>"$LOG" 2>&1 && say "stamp_points.json 更新OK" \
-  || say "⚠️ stamp_points.json 生成に失敗（前回値のまま build 続行）"
+  || say "⚠️ stamp_points.json 生成に失敗（前回値のまま続行）"
 
-# 3. サイト再生成（両ランキングまとめて1回。スタンプpt合算を含む）
+# 1. ビギナー（当月10万pt到達で卒業→7日猶予後に自動で掲載終了）※最新stampで合算順を計算
+BEG="$(python3 tools/daily_beginner.py --month "$MONTH" --floor 1000 --date "$DATE" --bare 2>>"$LOG")"
+[ -n "$BEG" ] || fail "ビギナー生成失敗（データTSVが見つからない等）"
+
+# 2. ⚡️DCL RISE⚡️（中間層＋当月10万pt超えは即時ピック）※最新stampで合算順を計算
+RISE="$(python3 tools/daily_rise.py --month "$MONTH" --floor 1 --date "$DATE" --bare 2>>"$LOG")"
+[ -n "$RISE" ] || fail "RISE生成失敗（データTSVが見つからない等）"
+
+# 3. サイト再生成（両ランキングまとめて1回。日次と同じ最新stampで合算）
 python3 build.py >>"$LOG" 2>&1 || fail "build失敗"
 
 # 4. 変更があれば push（1回）

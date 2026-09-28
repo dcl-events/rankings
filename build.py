@@ -447,14 +447,15 @@ def apply_stamp(rows, ev_cfg):
             gr = gv.get("grad_rank")
             if md:
                 r["grad"] = f"🎓 {md} {gr}位 卒業" if gr else f"🎓 {md} 卒業"
-        # RISE：🏆 300万pt達成フラグ（M/D 300万pt達成！）
+        # RISE：🏆 達成フラグ（M/D ◯万pt達成！）※達成ラインは月別 events.json の milestone_pt
         mv = mstone.get(cid) if (cid and tier == "rise") else None
         if mv:
             md = mv.get("achieved_md")
             if not md and mv.get("achieved_on"):
                 ao = mv["achieved_on"]; md = f"{int(ao[5:7])}/{int(ao[8:10])}"
             if md:
-                r["grad"] = f"🏆 {md} 300万pt達成！"
+                man = int(ev_cfg.get("milestone_pt", 3000000)) // 10000
+                r["grad"] = f"🏆 {md} {man}万pt達成！"
     print(f"  ✓ stamp合算({tier}): {hit}名に加点")
 
 

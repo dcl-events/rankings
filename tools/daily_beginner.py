@@ -28,7 +28,7 @@ SNAP = os.path.join(REPO, "data", "beginner_snapshot.json")
 TSV_DIR = os.path.expanduser("~/Claude/tiktok-automation/out")
 MENTION = "<@U0A6WU3P3LL>"   # ito_sukeaki
 GRAD = os.path.join(REPO, "data", "beginner_graduated.json")
-GRAD_PT = 300000    # この当月ptに達したらビギナー卒業（⚡️DCL RISE⚡️の対象）
+GRAD_PT_DEFAULT = 300000    # ビギナー卒業ラインの既定（events.jsonの当月grad_ptで月別上書き可）
 GRACE_DAYS = 1      # 卒業検知日からこの日数だけビギナーにも残す猶予（1=検知日のみ表示・翌日に掲載終了）
 JST = timezone(timedelta(hours=9))
 
@@ -43,6 +43,18 @@ def paths_for(month):
     return (os.path.join(REPO, "data", f"tiktok-{ym}-newcomer.csv"),
             f"https://dcl-events.github.io/rankings/tiktok-{ym}-newcomer.html",
             f"https://dcl-events.github.io/rankings/tiktok-{ym}-rise.html")
+
+
+def event_num(event_id, field, default):
+    """events.json の指定イベントの数値設定を返す（無ければ default）。月別の卒業ライン等に使う。"""
+    try:
+        doc = json.load(open(os.path.join(REPO, "data", "events.json"), encoding="utf-8"))
+        for ev in doc.get("events", []):
+            if ev.get("id") == event_id:
+                return int(ev.get(field, default))
+    except Exception:
+        pass
+    return default
 
 def err(*a): print(*a, file=sys.stderr)
 def toint(v):
@@ -89,6 +101,8 @@ def main():
         else: i += 1
     today = asof or datetime.now(JST).strftime("%Y-%m-%d")
     CSV_OUT, URL, RISE_URL = paths_for(month)
+    # 卒業ライン（月別）：events.json の当月ビギナーイベント grad_pt（無ければ既定30万）
+    GRAD_PT = event_num(f"tiktok-{month.replace('-','')}-newcomer", "grad_pt", GRAD_PT_DEFAULT)
 
     # 卒業状態（月が変わったらリセット）
     gstate = {"month": month, "livers": {}}

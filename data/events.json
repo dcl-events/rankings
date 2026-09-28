@@ -369,7 +369,8 @@
         }
       ],
       "stamp_tier": "beginner",
-      "stamp_snapshot": "beginner_snapshot.json"
+      "stamp_snapshot": "beginner_snapshot.json",
+      "grad_pt": 2000000
     },
     {
       "id": "tiktok-202610-rise",
@@ -432,7 +433,8 @@
         }
       ],
       "stamp_tier": "rise",
-      "stamp_snapshot": "rise_snapshot.json"
+      "stamp_snapshot": "rise_snapshot.json",
+      "milestone_pt": 4000000
     }
   ]
 }

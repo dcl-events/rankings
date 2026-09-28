@@ -143,23 +143,40 @@ def main():
             if _g.get("month") == month: grad_set = set((_g.get("livers") or {}).keys())
         except Exception: grad_set = set()
 
+    # 参加モデル（月別）：events.jsonの当月RISEに entry_min_prev_pt があれば新モデル
+    #  ＝「前月ポイント≥entry_min or ビギナー卒業」で判定し、先月ダイヤの中間層レンジ/上限(LAST_MIN/MAX)は使わない。
+    #    前月ポイントは prev_month_points_<前月>.json（build_prev_month_points.pyが生成）。未生成なら従来モデルにフォールバック。
+    ENTRY_MIN = event_num(f"tiktok-{ym}-rise", "entry_min_prev_pt", 0)
+    prev_pt = {}
+    if ENTRY_MIN > 0:
+        prevmonth = (datetime.strptime(month + "-01", "%Y-%m-%d") - timedelta(days=1)).strftime("%Y%m")
+        PPT = os.path.join(REPO, "data", f"prev_month_points_{prevmonth}.json")
+        if os.path.exists(PPT):
+            try: prev_pt = json.load(open(PPT))
+            except Exception: prev_pt = {}
+    new_model = ENTRY_MIN > 0 and bool(prev_pt)
+
     rise = []
     for r in rows[1:]:
         if len(r) <= max(ID, N, D, L, LAST, AG, AH): continue
         if not str(r[ID]).strip().isdigit(): continue   # 退会ライバー（IDが「…退会しました」等）は除外
         cur = toint(r[D]); ah = toint(r[AH]); ag = toint(r[AG])
         last_i = toint(r[LAST])
-        if last_i > LAST_MAX: continue          # 上位層は対象外
+        if not new_model and last_i > LAST_MAX: continue   # 旧モデルのみ上位層(先月20万ダイヤ超)を除外
         days = toint(r[DAYS]); bonus = keizoku_bonus(days, r[L])
         base = cur * 10 + ah * 5 + ag * 1000 + bonus
         fans = toint(r[FANS]); fanpct, fanbonus = fan_bonus(fans, base)
         pt = base + fanbonus
         rid = str(r[ID]).strip()
-        tot = pt + stamp_r.get(rid, 0)          # 合算ポイント（卒業ピック判定用）
-        mid  = LAST_MIN <= last_i <= LAST_MAX   # 前月10万pt以上（近似）
-        # ビギナー卒業ピック：正はビギナー卒業記録。無い環境向けに合算ptのフォールバックも残す。
-        grad = (rid in grad_set) or (last_i < LAST_MIN and tot >= GRAD_PT)
-        if not (mid or grad): continue
+        tot = pt + stamp_r.get(rid, 0)          # 合算ポイント
+        if new_model:
+            grad = (rid in grad_set)                        # 当月ビギナー卒業（達成日から即エントリー）
+            include = (prev_pt.get(rid, 0) >= ENTRY_MIN) or grad   # 前月pt≥閾値 or 卒業
+        else:
+            mid  = LAST_MIN <= last_i <= LAST_MAX           # 先月ダイヤの中間層レンジ
+            grad = (rid in grad_set) or (last_i < LAST_MIN and tot >= GRAD_PT)
+            include = mid or grad
+        if not include: continue
         if pt < floor: continue
         # RISE達成フラグ：合算300万pt到達を初回検知日で記録（達成日は固定）
         if tot >= MILESTONE_PT and rid not in mlivers:

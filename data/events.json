@@ -376,7 +376,8 @@
         "accent2": "#ff2f7b",
         "hero": "linear-gradient(135deg,#17171a 0%,#33333a 30%,#0c0c0e 62%,#1f1f24 100%)",
         "dark": true,
-        "favicon": "assets/rise_mark.png"
+        "favicon": "assets/rise_mark.png",
+        "logo": "assets/rise2_logo.png"
       }
     },
     {
@@ -429,7 +430,8 @@
         "accent2": "#ff2f7b",
         "hero": "linear-gradient(135deg,#17171a 0%,#33333a 30%,#0c0c0e 62%,#1f1f24 100%)",
         "dark": true,
-        "favicon": "assets/rise_mark.png"
+        "favicon": "assets/rise_mark.png",
+        "logo": "assets/rise1_logo.png"
       },
       "links": [
         {

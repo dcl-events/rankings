@@ -372,12 +372,11 @@
       "stamp_snapshot": "beginner_snapshot.json",
       "grad_pt": 2000000,
       "theme": {
-        "accent": "#ffa32e",
-        "accent2": "#ff2f7b",
-        "hero": "linear-gradient(135deg,#17171a 0%,#33333a 30%,#0c0c0e 62%,#1f1f24 100%)",
-        "dark": true,
-        "favicon": "assets/rise_mark.png",
-        "logo": "assets/rise2_logo.png"
+        "accent": "#eb5000",
+        "accent2": "#facd00",
+        "hero": "linear-gradient(120deg,#7c3aed 0%,#f062b0 30%,#f2600f 66%,#ffc400 100%)",
+        "logo": "assets/rise2_logo.png",
+        "favicon": "assets/dcl_mark.png"
       }
     },
     {

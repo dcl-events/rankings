@@ -164,6 +164,22 @@ def page_shell(title, body, theme):
     dark = theme.get("dark")
     ink, muted, line = ("#f1f1f4", "#9a9aa4", "#26262d") if dark else ("#333", "#9a8f86", "#f0e7dd")
     dark_css = DARK_CSS if dark else ""
+    # 個別ダークパレット（events.json の theme.darkbg / surface / line2）。
+    # 無指定なら共通 DARK_CSS のチャコールのまま＝既存イベントは不変。
+    if dark:
+        db = theme.get("darkbg"); sf = theme.get("surface"); l2 = theme.get("line2")
+        ov = ""
+        if db:
+            ov += f"body{{background:{db};color:var(--ink)}}\n"
+        if sf:
+            ov += f"details.rules,ul.rank li,.linkbox a,.note{{background:{sf}}}\n"
+            ov += (f"li.g1{{background:linear-gradient(100deg,#3a2a12,{sf})}}"
+                   f"li.g2{{background:linear-gradient(100deg,#2c2026,{sf})}}"
+                   f"li.g3{{background:linear-gradient(100deg,#34211a,{sf})}}\n")
+        if l2:
+            ov += f"details.rules,ul.rank li,.linkbox a,.note{{border-color:{l2}}}\n"
+        if ov:
+            dark_css += "\n/* per-event dark palette */\n" + ov
     brandlogo = theme.get("brandlogo") or ("assets/dcl_logo_dark.png" if dark else "assets/dcl_logo.png")
     return f"""<!doctype html>
 <html lang="ja"><head>

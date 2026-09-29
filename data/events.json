@@ -372,11 +372,15 @@
       "stamp_snapshot": "beginner_snapshot.json",
       "grad_pt": 2000000,
       "theme": {
-        "accent": "#eb5000",
+        "accent": "#ff7a3c",
         "accent2": "#facd00",
         "hero": "linear-gradient(135deg,#1a1013 0%,#3a1f24 42%,#5e2a2f 74%,#26161a 100%)",
         "logo": "assets/rise2_logo.png",
-        "favicon": "assets/dcl_mark.png"
+        "favicon": "assets/dcl_mark.png",
+        "dark": true,
+        "darkbg": "radial-gradient(1100px 420px at 10% -10%, #3a2026 0%, rgba(58,32,38,0) 62%),radial-gradient(900px 380px at 100% 2%, #5e2a2f 0%, rgba(94,42,47,0) 58%),#120a0d",
+        "surface": "#1d1216",
+        "line2": "#3a2329"
       }
     },
     {

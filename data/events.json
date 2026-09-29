@@ -374,7 +374,7 @@
       "theme": {
         "accent": "#eb5000",
         "accent2": "#facd00",
-        "hero": "linear-gradient(120deg,#f2600f 0%,#ff8a2b 48%,#facd00 100%)",
+        "hero": "linear-gradient(135deg,#1a1013 0%,#3a1f24 42%,#5e2a2f 74%,#26161a 100%)",
         "logo": "assets/rise2_logo.png",
         "favicon": "assets/dcl_mark.png"
       }

@@ -171,7 +171,11 @@ def main():
         tot = pt + stamp_r.get(rid, 0)          # 合算ポイント
         if new_model:
             grad = (rid in grad_set)                        # 当月ビギナー卒業（達成日から即エントリー）
-            include = (prev_pt.get(rid, 0) >= ENTRY_MIN) or grad   # 前月pt≥閾値 or 卒業
+            ppt = prev_pt.get(rid, 0)
+            # 前月に卒業ライン(MILESTONE_PT＝RISE1は400万)以上＝既にRISE1を卒業（さらに上のステージへ）→対象外。
+            # ∴ RISE1の前月ポイント帯は「entry_min ≤ 前月pt < 卒業ライン」。卒業ラインが未設定/閾値以下なら上限なし。
+            upper_ok = (MILESTONE_PT <= ENTRY_MIN) or (ppt < MILESTONE_PT)
+            include = ((ppt >= ENTRY_MIN) and upper_ok) or grad   # 帯内(前月200万〜400万未満) or 当月ビギナー卒業
         else:
             mid  = LAST_MIN <= last_i <= LAST_MAX           # 先月ダイヤの中間層レンジ
             grad = (rid in grad_set) or (last_i < LAST_MIN and tot >= GRAD_PT)

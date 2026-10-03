@@ -128,3 +128,10 @@ if ! python3 "$HOME/Claude/stamp-rally/tools/task_report.py" 2>>"$LOG"; then
   printf '%s\n' "📋 課題申告シート_Claude（自己申告制）"
 fi
 printf '%s\n' "https://docs.google.com/spreadsheets/d/1A-WSX4mteR-E5kY8V82dTUqoTcD0GDLA0Uq0qiDTzh4/edit?gid=1676003252"
+
+# 参加状況の見方（🔵は取り込み条件つき）。ラリー列でRISE1/RISE2を区別。
+printf '\n%s\n' "🔖 参加状況の見方"
+printf '%s\n' "🟢 参加中：ランキング掲載中"
+printf '%s\n' "🟡 参加中（反映待ち）：先月在籍・当月ランキング未反映（戻る見込み）"
+printf '%s\n' "🔵 スタンプラリーのみ：ランキング未掲載の新人（1000pt未満・当月に配信・入会8月以降）"
+printf '%s\n' "🔴 対象外：離脱　／　RISE1・RISE2はラリー列で区別"

@@ -114,9 +114,9 @@ printf '%s\n' "$rise_head"
 printf '\n%s\n' "===THREAD==="
 
 # --- スレッド返信（詳細：メンションは付けない） ---
-printf '%s\n' "🌱 DCLビギナーランキング"
+printf '%s\n' "⚡️DCL RISE2⚡️"
 printf '%s\n\n' "$beg_body"
-printf '%s\n' "⚡️DCL RISE⚡️"
+printf '%s\n' "⚡️DCL RISE1⚡️"
 printf '%s\n' "$rise_body"
 
 # 課題申告シート（自己申告制・マネージャー入力用）の加点状況＋リンクを添える。

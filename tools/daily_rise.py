@@ -225,9 +225,9 @@ def main():
 
     # Slackメッセージ
     if bare:
-        msg = ["⚡️DCL RISE⚡️", URL, ""]
+        msg = ["⚡️DCL RISE1⚡️", URL, ""]
     else:
-        head = f"⚡️DCL RISE⚡️ 更新（{date}時点）" if date else "⚡️DCL RISE⚡️ 更新"
+        head = f"⚡️DCL RISE1⚡️ 更新（{date}時点）" if date else "⚡️DCL RISE1⚡️ 更新"
         msg = [head, MENTION, URL, ""]
     if not prev:
         msg.append("（初回更新。順位変動の比較は次回から）")
@@ -240,9 +240,9 @@ def main():
             msg.append("📊 上位を抜いた人はいませんでした（順位変動なし）")
         if newcomers:
             msg.append("")
-            msg.append("🆙 新しくRISE入り")
+            msg.append("🆙 新しくRISE1入り")
             for name, r, route in newcomers:
-                tag = "ビギナー卒業" if route == "卒業" else "中間層"
+                tag = "RISE2卒業" if route == "卒業" else "中間層"
                 msg.append(f"・{name}：{r}位（{tag}）")
     print("\n".join(msg))
 

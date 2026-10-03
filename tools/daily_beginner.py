@@ -240,9 +240,9 @@ def main():
 
     # Slackメッセージ
     if bare:   # まとめ投稿に埋め込む用（メンション・「更新」表記は親側が持つ）
-        msg = ["🌱 DCLビギナーランキング", URL, ""]
+        msg = ["⚡️DCL RISE2⚡️", URL, ""]
     else:
-        head = f"🌱 DCLビギナーランキング 更新（{date}時点）" if date else "🌱 DCLビギナーランキング 更新"
+        head = f"⚡️DCL RISE2⚡️ 更新（{date}時点）" if date else "⚡️DCL RISE2⚡️ 更新"
         msg = [head, MENTION, URL, ""]
     if not prev:
         msg.append("（初回更新。順位変動の比較は次回から）")
@@ -254,16 +254,16 @@ def main():
         msg.append("📊 上位を抜いた人はいませんでした（順位変動なし）")
     if newgrads:
         msg.append("")
-        msg.append(f"🎓 ビギナー卒業（⚡️DCL RISE⚡️へ）")
+        msg.append(f"🎓 RISE2卒業（⚡️DCL RISE1⚡️へ）")
         for cid_g, name, drop in newgrads:
             m, d = drop[5:7].lstrip("0"), drop[8:10].lstrip("0")
             gr = glivers.get(cid_g, {}).get("grad_rank")
             pos = f"{gr}位で" if gr else ""
-            msg.append(f"・{name}：{pos}卒業（ビギナー掲載は {m}/{d} まで）")
+            msg.append(f"・{name}：{pos}卒業（RISE2掲載は {m}/{d} まで）")
         if not bare: msg.append(RISE_URL)
     if dropped:
         msg.append("")
-        msg.append("🏁 本日ビギナー掲載終了（⚡️DCL RISE⚡️で継続）")
+        msg.append("🏁 本日RISE2掲載終了（⚡️DCL RISE1⚡️で継続）")
         for _cid, name, _gon in dropped:
             msg.append(f"・{name}")
         if not bare: msg.append(RISE_URL)

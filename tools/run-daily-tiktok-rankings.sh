@@ -108,16 +108,16 @@ printf '%s\n' "📊 TikTok LIVE ランキング更新（${DATE}時点）"
 printf '%s\n' "<@U0A6WU3P3LL>"
 [ -n "$STALE_NOTE" ] && printf '%s\n' "$STALE_NOTE"
 printf '\n'
-printf '%s\n\n' "$beg_head"
-printf '%s\n' "$rise_head"
+printf '%s\n\n' "$rise_head"
+printf '%s\n' "$beg_head"
 
 printf '\n%s\n' "===THREAD==="
 
 # --- スレッド返信（詳細：メンションは付けない） ---
-printf '%s\n' "⚡️DCL RISE2⚡️"
-printf '%s\n\n' "$beg_body"
 printf '%s\n' "⚡️DCL RISE1⚡️"
-printf '%s\n' "$rise_body"
+printf '%s\n\n' "$rise_body"
+printf '%s\n' "⚡️DCL RISE2⚡️"
+printf '%s\n' "$beg_body"
 
 # 課題申告シート（自己申告制・マネージャー入力用）の加点状況＋リンクを添える。
 # 誰がオールクリア＝加点されたか / 申告が進んだかを前回との差分で出す（状態は stamp-rally 側に保存）。

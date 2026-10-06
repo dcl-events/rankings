@@ -490,6 +490,7 @@ def apply_stamp(rows, ev_cfg):
             gr = gv.get("grad_rank")
             if md:
                 r["grad"] = f"🎓 {md} {gr}位 卒業" if gr else f"🎓 {md} 卒業"
+                r["grad_on"] = gv.get("graduated_on") or ""
         # RISE：🏆 達成フラグ（M/D ◯万pt達成！）※達成ラインは月別 events.json の milestone_pt
         mv = mstone.get(cid) if (cid and tier == "rise") else None
         if mv:
@@ -499,7 +500,20 @@ def apply_stamp(rows, ev_cfg):
             if md:
                 man = int(ev_cfg.get("milestone_pt", 3000000)) // 10000
                 r["grad"] = f"🏆 {md} {man}万pt達成！"
+                r["grad_on"] = mv.get("achieved_on") or ""
     print(f"  ✓ stamp合算({tier}): {hit}名に加点")
+
+
+def grad_sort_key(r, ev_cfg):
+    """達成日の並べ替えキー。achieved_on(YYYY-MM-DD)優先、無ければ表示の M/D から組む。"""
+    iso = r.get("grad_on") or ""
+    if len(iso) >= 10:
+        return iso
+    md = re.search(r"(\d+)/(\d+)", r.get("grad") or "")
+    if md:
+        year = (ev_cfg.get("period_start") or "2026-01-01")[:4]
+        return f"{year}-{int(md.group(1)):02d}-{int(md.group(2)):02d}"
+    return "9999-99-99"
 
 
 def graduates_html(grads, ev_cfg):
@@ -545,6 +559,7 @@ def build_event(ev_cfg, report):
     grads = []
     if ev_cfg.get("graduate_showcase"):
         grads = [r for r in rows if r.get("grad")]
+        grads.sort(key=lambda r: (grad_sort_key(r, ev_cfg), -r["score"]))
         if grads:
             rows = [r for r in rows if not r.get("grad")]
     maxscore = rows[0]["score"] if rows else 0

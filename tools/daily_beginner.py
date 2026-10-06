@@ -103,6 +103,8 @@ def main():
     CSV_OUT, URL, RISE_URL = paths_for(month)
     # 卒業ライン（月別）：events.json の当月ビギナーイベント grad_pt（無ければ既定30万）
     GRAD_PT = event_num(f"tiktok-{month.replace('-','')}-newcomer", "grad_pt", GRAD_PT_DEFAULT)
+    # 掲載ライン：当月ダイヤが list_min_dia 以上で掲載（2026-10〜。pt floorは使わない＝バトルptだけの掲載を防ぐ）
+    LIST_MIN_DIA = event_num(f"tiktok-{month.replace('-','')}-newcomer", "list_min_dia", 100)
 
     # 卒業状態（月が変わったらリセット）
     gstate = {"month": month, "livers": {}}
@@ -168,7 +170,7 @@ def main():
         base = cur * 10 + ah * 5 + ag * 1000 + bonus
         fans = toint(r[FANS]); fanpct, fanbonus = fan_bonus(fans, base)
         pt = base + fanbonus
-        if pt < floor: continue
+        if cur < LIST_MIN_DIA: continue   # 掲載＝当月100ダイヤ以上（旧:pt>=floor。バトルptのみでの掲載を防ぐ）
         name = r[N].strip()
 
         # 卒業判定：当月pt＋スタンプ獲得pt(合算)>=30万で卒業。初回検知日を記録し、猶予明けで掲載終了

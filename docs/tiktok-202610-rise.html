@@ -14,7 +14,7 @@
 :root {
   --accent:#ffa32e; --accent2:#ff2f7b; --hero:linear-gradient(135deg,#17171a 0%,#33333a 30%,#0c0c0e 62%,#1f1f24 100%);
   --brand-orange:#eb5000; --brand-yellow:#facd00; --brand-pink:#f177c4;
-  --ink:#f1f1f4; --muted:#9a9aa4; --cream:#fff9ef; --line:#26262d;
+  --ink:#f1f1f4; --muted:#9a9aa4; --cream:#fff9ef; --line:#26262d; --cardbg:#141418;
   --gold:#f6b400; --silver:#b9b3ac; --bronze:#d08a4e;
 }
 *{box-sizing:border-box}
@@ -113,6 +113,31 @@ li .sc{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;font-weig
 li .unit{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--muted);
   margin-left:3px;font-weight:500}
 
+/* 🏆 達成者・卒業ショーケース（graduate_showcase:true のとき） */
+.gradbox{margin:0 0 16px;border-radius:20px;padding:2px;
+  background:linear-gradient(120deg,#f6c445,#ff6a00 48%,#ff2f7b);
+  box-shadow:0 10px 26px rgba(240,120,0,.22)}
+.gradbox .inner{background:var(--cardbg);border-radius:18px;padding:14px 16px 12px}
+.gradbox .ghead{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;
+  font-weight:800;font-size:15px;margin-bottom:10px}
+.gradbox .ghead .gsub{font-size:11.5px;font-weight:700;color:#fff;
+  background:linear-gradient(90deg,#f0a500,#ff6a00);border-radius:999px;padding:2px 10px}
+.gradbox ul{list-style:none;margin:0;padding:0}
+.gradbox li{display:flex;align-items:center;gap:12px;padding:10px 2px;
+  border-top:1px dashed var(--line)}
+.gradbox li:first-child{border-top:none}
+.gradbox .gmedal{font-size:20px;min-width:30px;text-align:center}
+.gradbox .gbody{flex:1;min-width:0}
+.gradbox .gnm{font-weight:700;font-size:15px;word-break:break-word}
+.gradbox .gmeta{margin-top:2px;font-size:11.5px;color:var(--muted);
+  display:flex;flex-wrap:wrap;gap:1px 10px}
+.gradbox .gmeta span{white-space:nowrap}
+.gradbox .gmeta .gday{color:var(--accent);font-weight:700}
+.gradbox .gsc{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;
+  font-weight:700;font-size:16px;white-space:nowrap}
+.gradbox .gnote{margin-top:9px;font-size:11.5px;color:var(--muted);line-height:1.6}
+.ranklead{font-size:12px;font-weight:700;color:var(--muted);margin:0 2px 8px}
+
 /* ランキング下部のリンク */
 .linkbox{margin:18px 0 4px}
 .linkbox a{display:flex;align-items:center;justify-content:space-between;gap:10px;
@@ -168,8 +193,10 @@ footer{color:#6f6f78}
   <img class="herologo" src="assets/rise1_logo.png" alt="⚡️DCL RISE1⚡️"><div class="herosub">🎁 10月累計 point</div>
   <div class="meta">2026-10-01 〜 2026-10-04　／ 参加 8 名</div>
 </header>
-<div class="updated">最終更新: 2026-10-06 12:01 JST</div>
+<div class="updated">最終更新: 2026-10-06 12:19 JST</div>
 <details class="rules"><summary>📖 ランキングのルール</summary><div class="rbody"><div class="rsec"><div class="rh">参加ルール</div><ul><li>前月の獲得ポイントが200万pt以上のライバー</li><li>RISE2を卒業（当月200万pt到達）したライバー（達成日から即エントリー）</li></ul></div><div class="rsec"><div class="rh">卒業ルール</div><ul><li>当月400万pt到達で卒業</li><li>卒業後は翌月から⚡️DCL RISE1⚡️の対象外（さらに上のステージへ）</li></ul></div><div class="rsec"><div class="rh">ポイントルール</div><ul><li>通常ダイヤポイント：ダイヤ数 × 10pt</li><li>バトルダイヤポイント：ダイヤ数 × 5pt（通常ポイントに上乗せ）</li><li>バトル回数ポイント：1000pt（バトル回数分、繰り返し加算）</li><li>継続ボーナス：有効LIVE日数18日以上 かつ LIVE時間70時間以上で 50,000pt（月間・1回）</li><li>ファンクラブボーナス：アクティブファン10人ごとに合計ポイント+1%（計算上限200人＝最大+20%）</li><li>スタンプラリー：スタンプラリーの獲得ポイントを合算（成果＋課題の達成状況で加算）</li></ul></div></div></details>
+
+
 <ul class="rank"><li class="top g1"><div class="num"><span class="m">🥇</span><br>1</div><div class="body"><div class="nm">おどぎ</div><div class="gap">首位</div><div class="tm"><span>⏱ 配信 15h4m</span><span>📅 有効LIVE 3日</span><span>💛 アクティブファン 130人</span><span><b class="stmp">🎯 スタンプ +5,000pt</b></span></div></div><div class="sc">776,976<span class="unit">🎁point</span></div></li><li class="top g2"><div class="num"><span class="m">🥈</span><br>2</div><div class="body"><div class="nm">元カフェ店員 ☕️ミオ🌿</div><div class="gap">あと 67,436🎁point で1人抜き</div><div class="tm"><span>⏱ 配信 5h36m</span><span>📅 有効LIVE 3日</span><span>💛 アクティブファン 71人</span><span><b class="stmp">🎯 スタンプ +5,000pt</b></span></div></div><div class="sc">709,541<span class="unit">🎁point</span></div></li><li class="top g3"><div class="num"><span class="m">🥉</span><br>3</div><div class="body"><div class="nm">はなぼう🌸✉️</div><div class="gap">あと 44,503🎁point で1人抜き</div><div class="tm"><span>⏱ 配信 13h41m</span><span>📅 有効LIVE 4日</span><span>💛 アクティブファン 111人</span></div></div><div class="sc">665,039<span class="unit">🎁point</span></div></li><li class=""><div class="num">4</div><div class="body"><div class="nm">10/3🎂🎉ぷるに可愛く美味しい🍮食べさして🫧🥹</div><div class="gap">あと 4,171🎁point で1人抜き</div><div class="tm"><span>⏱ 配信 14h37m</span><span>📅 有効LIVE 4日</span><span>💛 アクティブファン 70人</span></div></div><div class="sc">660,869<span class="unit">🎁point</span></div></li><li class=""><div class="num">5</div><div class="body"><div class="nm">nunu🍫🩵ギフトスター🦭✩.*˚</div><div class="gap">あと 133,610🎁point で1人抜き</div><div class="tm"><span>⏱ 配信 20h1m</span><span>📅 有効LIVE 4日</span><span>💛 アクティブファン 96人</span></div></div><div class="sc">527,260<span class="unit">🎁point</span></div></li><li class=""><div class="num">6</div><div class="body"><div class="nm">ひろにゃん</div><div class="gap">あと 78,129🎁point で1人抜き</div><div class="tm"><span>⏱ 配信 14h39m</span><span>📅 有効LIVE 4日</span><span>💛 アクティブファン 52人</span></div></div><div class="sc">449,132<span class="unit">🎁point</span></div></li><li class=""><div class="num">7</div><div class="body"><div class="nm">🦄🥂クマ🐻🎰</div><div class="gap">あと 24,180🎁point で1人抜き</div><div class="tm"><span>⏱ 配信 16h28m</span><span>📅 有効LIVE 4日</span><span>💛 アクティブファン 81人</span></div></div><div class="sc">424,953<span class="unit">🎁point</span></div></li><li class=""><div class="num">8</div><div class="body"><div class="nm">ぼんじり🐥❤</div><div class="gap">あと 68,398🎁point で1人抜き</div><div class="tm"><span>⏱ 配信 6h50m</span><span>📅 有効LIVE 2日</span><span>💛 アクティブファン 84人</span></div></div><div class="sc">356,556<span class="unit">🎁point</span></div></li></ul>
 <div class="linkbox"><a href="https://dcl-event.github.io/dcl-tiktok-event-calendar/" target="_blank" rel="noopener"><span>⚡ TikTok LIVE 公式イベントはこちら</span></a></div>
 <footer>DeNA Creator Links — Event Rankings</footer>

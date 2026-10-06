@@ -446,7 +446,9 @@
       "stamp_tier": "rise",
       "stamp_snapshot": "rise_snapshot.json",
       "milestone_pt": 4000000,
-      "entry_min_prev_pt": 2000000
+      "entry_min_prev_pt": 2000000,
+      "graduate_showcase": true,
+      "graduate_label": "🏆 達成者・卒業"
     }
   ]
 }

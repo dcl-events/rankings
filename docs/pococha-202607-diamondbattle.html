@@ -13,7 +13,7 @@
 :root {
   --accent:#1668c9; --accent2:#7fc4f0; --hero:linear-gradient(120deg,#0d5bbf 0%,#2b8fe6 52%,#8fd0f5 100%);
   --brand-orange:#eb5000; --brand-yellow:#facd00; --brand-pink:#f177c4;
-  --ink:#333; --muted:#9a8f86; --cream:#fff9ef; --line:#f0e7dd;
+  --ink:#333; --muted:#9a8f86; --cream:#fff9ef; --line:#f0e7dd; --cardbg:#fff;
   --gold:#f6b400; --silver:#b9b3ac; --bronze:#d08a4e;
 }
 *{box-sizing:border-box}
@@ -112,6 +112,31 @@ li .sc{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;font-weig
 li .unit{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--muted);
   margin-left:3px;font-weight:500}
 
+/* 🏆 達成者・卒業ショーケース（graduate_showcase:true のとき） */
+.gradbox{margin:0 0 16px;border-radius:20px;padding:2px;
+  background:linear-gradient(120deg,#f6c445,#ff6a00 48%,#ff2f7b);
+  box-shadow:0 10px 26px rgba(240,120,0,.22)}
+.gradbox .inner{background:var(--cardbg);border-radius:18px;padding:14px 16px 12px}
+.gradbox .ghead{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;
+  font-weight:800;font-size:15px;margin-bottom:10px}
+.gradbox .ghead .gsub{font-size:11.5px;font-weight:700;color:#fff;
+  background:linear-gradient(90deg,#f0a500,#ff6a00);border-radius:999px;padding:2px 10px}
+.gradbox ul{list-style:none;margin:0;padding:0}
+.gradbox li{display:flex;align-items:center;gap:12px;padding:10px 2px;
+  border-top:1px dashed var(--line)}
+.gradbox li:first-child{border-top:none}
+.gradbox .gmedal{font-size:20px;min-width:30px;text-align:center}
+.gradbox .gbody{flex:1;min-width:0}
+.gradbox .gnm{font-weight:700;font-size:15px;word-break:break-word}
+.gradbox .gmeta{margin-top:2px;font-size:11.5px;color:var(--muted);
+  display:flex;flex-wrap:wrap;gap:1px 10px}
+.gradbox .gmeta span{white-space:nowrap}
+.gradbox .gmeta .gday{color:var(--accent);font-weight:700}
+.gradbox .gsc{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;
+  font-weight:700;font-size:16px;white-space:nowrap}
+.gradbox .gnote{margin-top:9px;font-size:11.5px;color:var(--muted);line-height:1.6}
+.ranklead{font-size:12px;font-weight:700;color:var(--muted);margin:0 2px 8px}
+
 /* ランキング下部のリンク */
 .linkbox{margin:18px 0 4px}
 .linkbox a{display:flex;align-items:center;justify-content:space-between;gap:10px;
@@ -146,7 +171,9 @@ footer{text-align:center;font-size:12px;color:var(--muted);margin-top:44px;
   <h1>ダイヤ獲得ランキングバトル</h1>
   <div class="meta">2026-07-22 〜 2026-07-26　／ 参加 15 名</div>
 </header>
-<div class="updated">最終更新: 2026-10-06 12:01 JST</div>
+<div class="updated">最終更新: 2026-10-06 12:19 JST</div>
+
+
 
 <ul class="rank"><li class="top g1"><div class="num"><span class="m">🥇</span><br>1</div><div class="body"><div class="nm">🕰️まる</div></div></li><li class="top g2"><div class="num"><span class="m">🥈</span><br>2</div><div class="body"><div class="nm">🥂まや🍾</div></div></li><li class="top g3"><div class="num"><span class="m">🥉</span><br>3</div><div class="body"><div class="nm">ゆきち🍷‎🤍飲み配信💕</div></div></li><li class=""><div class="num">4</div><div class="body"><div class="nm">🩷エリナ👾平川愛里菜</div></div></li><li class=""><div class="num">5</div><div class="body"><div class="nm">みすてぃ🍎🌸🚢</div></div></li><li class=""><div class="num">6</div><div class="body"><div class="nm">🎪歌うまイベ🎪💟ひえり✡️</div></div></li><li class=""><div class="num">7</div><div class="body"><div class="nm">なっちゃん💄💋</div></div></li><li class=""><div class="num">8</div><div class="body"><div class="nm">XeNo/ぜの 🖤🐍</div></div></li><li class=""><div class="num">9</div><div class="body"><div class="nm">ここみ⌘彫師目指し中</div></div></li><li class=""><div class="num">10</div><div class="body"><div class="nm">BOXどぞーかえるちゃん《箱開封》</div></div></li><li class=""><div class="num">11</div><div class="body"><div class="nm">すみれ⚾️💃</div></div></li><li class=""><div class="num">12</div><div class="body"><div class="nm">あかぎ🌋</div></div></li><li class=""><div class="num">13</div><div class="body"><div class="nm">歌うま🎤きゃしこ🌺肘神💪⛩️</div></div></li><li class=""><div class="num">14</div><div class="body"><div class="nm">sho ·̩͙꒰ঌ🎧໒꒱·̩͙</div></div></li><li class=""><div class="num">15</div><div class="body"><div class="nm">YUIKO🎻🎤歌うバイオリニスト</div></div></li></ul>
 

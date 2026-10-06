@@ -10,6 +10,7 @@ events.json で「公開するイベント」「ランキングのスコア列�
 出力先 docs/ をそのまま GitHub Pages で公開できる。
 """
 import csv
+import re
 import json
 import html
 from datetime import datetime, timezone, timedelta
@@ -163,6 +164,7 @@ def page_shell(title, body, theme):
     favicon = theme.get("favicon", "assets/dcl_mark.png")
     dark = theme.get("dark")
     ink, muted, line = ("#f1f1f4", "#9a9aa4", "#26262d") if dark else ("#333", "#9a8f86", "#f0e7dd")
+    cardbg = "#141418" if dark else "#fff"
     dark_css = DARK_CSS if dark else ""
     # 個別ダークパレット（events.json の theme.darkbg / surface / line2）。
     # 無指定なら共通 DARK_CSS のチャコールのまま＝既存イベントは不変。
@@ -196,7 +198,7 @@ def page_shell(title, body, theme):
 :root {{
   --accent:{accent}; --accent2:{accent2}; --hero:{hero};
   --brand-orange:#eb5000; --brand-yellow:#facd00; --brand-pink:#f177c4;
-  --ink:{ink}; --muted:{muted}; --cream:#fff9ef; --line:{line};
+  --ink:{ink}; --muted:{muted}; --cream:#fff9ef; --line:{line}; --cardbg:{cardbg};
   --gold:#f6b400; --silver:#b9b3ac; --bronze:#d08a4e;
 }}
 *{{box-sizing:border-box}}
@@ -294,6 +296,31 @@ li .sc{{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;font-wei
   font-size:18px;white-space:nowrap;color:var(--ink)}}
 li .unit{{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--muted);
   margin-left:3px;font-weight:500}}
+
+/* 🏆 達成者・卒業ショーケース（graduate_showcase:true のとき） */
+.gradbox{{margin:0 0 16px;border-radius:20px;padding:2px;
+  background:linear-gradient(120deg,#f6c445,#ff6a00 48%,#ff2f7b);
+  box-shadow:0 10px 26px rgba(240,120,0,.22)}}
+.gradbox .inner{{background:var(--cardbg);border-radius:18px;padding:14px 16px 12px}}
+.gradbox .ghead{{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;
+  font-weight:800;font-size:15px;margin-bottom:10px}}
+.gradbox .ghead .gsub{{font-size:11.5px;font-weight:700;color:#fff;
+  background:linear-gradient(90deg,#f0a500,#ff6a00);border-radius:999px;padding:2px 10px}}
+.gradbox ul{{list-style:none;margin:0;padding:0}}
+.gradbox li{{display:flex;align-items:center;gap:12px;padding:10px 2px;
+  border-top:1px dashed var(--line)}}
+.gradbox li:first-child{{border-top:none}}
+.gradbox .gmedal{{font-size:20px;min-width:30px;text-align:center}}
+.gradbox .gbody{{flex:1;min-width:0}}
+.gradbox .gnm{{font-weight:700;font-size:15px;word-break:break-word}}
+.gradbox .gmeta{{margin-top:2px;font-size:11.5px;color:var(--muted);
+  display:flex;flex-wrap:wrap;gap:1px 10px}}
+.gradbox .gmeta span{{white-space:nowrap}}
+.gradbox .gmeta .gday{{color:var(--accent);font-weight:700}}
+.gradbox .gsc{{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;
+  font-weight:700;font-size:16px;white-space:nowrap}}
+.gradbox .gnote{{margin-top:9px;font-size:11.5px;color:var(--muted);line-height:1.6}}
+.ranklead{{font-size:12px;font-weight:700;color:var(--muted);margin:0 2px 8px}}
 
 /* ランキング下部のリンク */
 .linkbox{{margin:18px 0 4px}}
@@ -475,6 +502,35 @@ def apply_stamp(rows, ev_cfg):
     print(f"  ✓ stamp合算({tier}): {hit}名に加点")
 
 
+def graduates_html(grads, ev_cfg):
+    """達成/卒業した人をランキングから外し、上部のショーケースに並べる。"""
+    if not grads:
+        return ""
+    label = ev_cfg.get("graduate_label") or "🏆 達成者・卒業"
+    mp = ev_cfg.get("milestone_pt")
+    sub = f'<span class="gsub">{int(mp)//10000:,}万pt達成</span>' if mp else ""
+    unit = html.escape(ev_cfg.get("score_label", ""))
+    lis = []
+    for i, r in enumerate(grads):
+        val, _ = fmt_score(r["score"], ev_cfg)
+        meta = []
+        gd = r.get("grad") or ""
+        md = re.search(r"(\d+/\d+)", gd)
+        if md: meta.append(f'<span class="gday">{md.group(1)} 達成</span>')
+        if r.get("time"): meta.append(f'<span>⏱ 配信 {html.escape(r["time"])}</span>')
+        if r.get("days"): meta.append(f'<span>📅 有効LIVE {html.escape(r["days"])}日</span>')
+        if r.get("fans"): meta.append(f'<span>💛 ファン {html.escape(r["fans"])}人</span>')
+        lis.append(f'<li><div class="gmedal">{"👑" if i == 0 else "🏆"}</div>'
+                   f'<div class="gbody"><div class="gnm">{html.escape(r["name"])}</div>'
+                   f'<div class="gmeta">{"".join(meta)}</div></div>'
+                   f'<div class="gsc">{val}<span class="unit">{unit}</span></div></li>')
+    note = ev_cfg.get("graduate_note") or "卒業した方はランキングから外れます（以降の順位は繰り上がります）"
+    return (f'<div class="gradbox"><div class="inner">'
+            f'<div class="ghead">{html.escape(label)}{sub}</div>'
+            f'<ul>{"".join(lis)}</ul>'
+            f'<div class="gnote">{html.escape(note)}</div></div></div>')
+
+
 def build_event(ev_cfg, report):
     # プラットフォーム既定テーマに、events.json の theme(accent/accent2/hero/dark/favicon/logo)を上書き
     theme = dict(PF_THEME.get(ev_cfg["platform"], DEFAULT_THEME))
@@ -485,6 +541,12 @@ def build_event(ev_cfg, report):
         rows, meta = rows_from_csv(ev_cfg)
     apply_stamp(rows, ev_cfg)   # スタンプラリー獲得ptを合算（stamp_tier設定時のみ）→ 直後のソートで再ランキング
     rows.sort(key=lambda r: r["score"], reverse=True)
+    # graduate_showcase:true なら達成/卒業フラグの付いた人をランキングから外し、上部の別枠へ
+    grads = []
+    if ev_cfg.get("graduate_showcase"):
+        grads = [r for r in rows if r.get("grad")]
+        if grads:
+            rows = [r for r in rows if not r.get("grad")]
     maxscore = rows[0]["score"] if rows else 0
     total = len(rows)
     top_n = ev_cfg.get("top_n", TOP_N)
@@ -505,6 +567,8 @@ def build_event(ev_cfg, report):
     # show_count:false で参加人数の表記を消せる（上位N位のみ表示中はその旨だけ出す）
     if ev_cfg.get("show_count", True):
         cap = f"（上位{top_n}位 / 参加 {total} 名）" if total > top_n else f"／ 参加 {total} 名"
+        if grads:
+            cap += f"／ 卒業 {len(grads)} 名"
     else:
         cap = f"（上位{top_n}位）" if total > top_n else ""
     # theme.logo があればタイトル1行目をロゴ画像に差し替え、2行目以降をサブタイトルにする
@@ -522,6 +586,8 @@ def build_event(ev_cfg, report):
 </header>
 <div class="updated">最終更新: {now} JST</div>
 {rules_html(ev_cfg)}
+{graduates_html(grads, ev_cfg)}
+{'<div class="ranklead">▼ 現在のランキング</div>' if grads else ''}
 <ul class="rank">{items}</ul>
 {links_html(ev_cfg)}"""
     (DOCS / f"{ev_cfg['id']}.html").write_text(

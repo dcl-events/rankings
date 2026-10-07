@@ -106,6 +106,8 @@ def rows_from_csv(ev_cfg):
             if fld:
                 try: row[key] = int(float(r.get(fld) or 0))
                 except ValueError: row[key] = 0
+        u = (r.get("user") or "").strip().lstrip("@")   # TikTokユーザー名（任意・プロフィールリンク用）
+        if u: row["user"] = u
         rows.append(row)
     meta = {
         "title": ev_cfg.get("title", ev_cfg["id"]),
@@ -153,6 +155,8 @@ li.top{border-color:rgba(255,255,255,.14)}
 li .sc{color:#fff}
 .linkbox a{background:#141418;border-color:#26262d;box-shadow:0 6px 18px rgba(0,0,0,.35)}
 li .gap{color:var(--accent)}
+ul.rank li .ttcorner,ul.rank li .ttinline{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16)}
+ul.rank li .ttcorner:hover{background:rgba(255,255,255,.15)}
 footer{color:#6f6f78}
 """
 
@@ -296,6 +300,16 @@ li .sc{{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;font-wei
   font-size:18px;white-space:nowrap;color:var(--ink)}}
 li .unit{{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--muted);
   margin-left:3px;font-weight:500}}
+/* TikTokプロフィールリンク（右上角／名前の右インライン） */
+li .ttcorner{{position:absolute;top:11px;right:12px;display:inline-flex;align-items:center;
+  justify-content:center;width:28px;height:28px;border-radius:9px;background:rgba(0,0,0,.05);
+  border:1px solid rgba(0,0,0,.10);text-decoration:none;z-index:3;transition:transform .12s ease}}
+li .ttcorner:hover{{transform:translateY(-1px)}}
+li .ttcorner svg{{width:16px;height:16px;display:block}}
+li .ttinline{{display:inline-flex;vertical-align:-4px;align-items:center;justify-content:center;
+  width:23px;height:23px;border-radius:7px;margin-left:7px;background:rgba(0,0,0,.05);
+  border:1px solid rgba(0,0,0,.10);text-decoration:none}}
+li .ttinline svg{{width:14px;height:14px;display:block}}
 
 /* 🏆 達成者・卒業ショーケース（graduate_showcase:true のとき） */
 .gradbox{{margin:0 0 16px;border-radius:20px;padding:2px;
@@ -350,10 +364,30 @@ footer{{text-align:center;font-size:12px;color:var(--muted);margin-top:44px;
   font-family:'Jost',sans-serif;letter-spacing:.04em}}
 {dark_css}
 </style></head><body><div class="wrap">
+{TT_SYMBOL}
 <div class="brandbar"><img src="{brandlogo}" alt="DeNA Creator Links"></div>
 {body}
 <footer>DeNA Creator Links — Event Rankings</footer>
 </div></body></html>"""
+
+
+# TikTok ロゴ（2トーン）。ページに1回だけ埋め込み、各カードから <use> で参照する。
+TT_SYMBOL = (
+    '<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="tt" viewBox="0 0 48 48">'
+    '<path fill="#25F4EE" transform="translate(-1.6,1.4)" d="M30 6h5c.4 4.9 3.4 8.8 8 9.6v5c-3-.1-5.8-1-8.2-2.6V30a11.5 11.5 0 1 1-11.5-11.5c.6 0 1.2 0 1.7.1v5.2a6.4 6.4 0 1 0 4.5 6.2V6z"/>'
+    '<path fill="#FE2C55" d="M30 6h5c.4 4.9 3.4 8.8 8 9.6v5c-3-.1-5.8-1-8.2-2.6V30a11.5 11.5 0 1 1-11.5-11.5c.6 0 1.2 0 1.7.1v5.2a6.4 6.4 0 1 0 4.5 6.2V6z"/>'
+    '<path fill="#fff" opacity=".9" d="M30 6h5c.4 4.9 3.4 8.8 8 9.6v5c-3-.1-5.8-1-8.2-2.6V30a11.5 11.5 0 1 1-11.5-11.5c.6 0 1.2 0 1.7.1v5.2a6.4 6.4 0 1 0 4.5 6.2V6z"/>'
+    '</symbol></svg>'
+)
+
+
+def tt_link(user, cls):
+    """TikTokプロフィールへのリンク（ロゴアイコン）。userが無ければ空。"""
+    if not user:
+        return ""
+    u = html.escape(str(user).lstrip("@"))
+    return (f'<a class="{cls}" href="https://www.tiktok.com/@{u}" target="_blank" '
+            f'rel="noopener nofollow" aria-label="{u} のTikTok"><svg><use href="#tt"/></svg></a>')
 
 
 def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
@@ -378,20 +412,25 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
     gtag = f'<span class="gradtag">🎓 {html.escape(gd)}</span>' if gd else ""
     tline = ('<div class="tm">' + "".join(f"<span>{x}</span>" for x in parts) + "</div>") if parts else ""
     sub = gap + tline
+    # TikTokリンク：通常はカード右上角。卒業/達成バッジが右上を占める時は名前の右へ（インライン）。
+    user = r.get("user")
+    tt_inline = tt_link(user, "ttinline") if (user and gd) else ""
+    tt_corner = tt_link(user, "ttcorner") if (user and not gd) else ""
+    nm = f'<div class="nm">{name}{tt_inline}</div>'
     if display == "rank":
-        body = f'<div class="nm">{name}</div>{sub}'
+        body = f'{nm}{sub}'
         sc = ""
     elif display == "bar":
         pct = int(r["score"] / maxscore * 100) if maxscore else 0
-        body = f'<div class="nm">{name}</div><div class="bar" style="width:{pct}%"></div>{sub}'
+        body = f'{nm}<div class="bar" style="width:{pct}%"></div>{sub}'
         sc = ""
     else:  # value
         val, unit = fmt_score(r["score"], ev_cfg)
-        body = f'<div class="nm">{name}</div>{sub}'
+        body = f'{nm}{sub}'
         sc = f'<div class="sc">{val}<span class="unit">{html.escape(unit)}</span></div>'
     # 達成/卒業フラグは名前と同じ高さ（カード右上）に固定配置（絵文字は本文に含める）
     corner = f'<div class="gradcorner">{html.escape(gd)}</div>' if gd else ""
-    return (f'<li class="{top}">{corner}<div class="num">{num}</div>'
+    return (f'<li class="{top}">{corner}{tt_corner}<div class="num">{num}</div>'
             f'<div class="body">{body}</div>{sc}</li>')
 
 

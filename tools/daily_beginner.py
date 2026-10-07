@@ -139,7 +139,7 @@ def main():
     err("source:", os.path.basename(tsv))
     rows = list(csv.reader(open(tsv, encoding="utf-8"), delimiter="\t"))
     hdr = rows[0]; c = {n: k for k, n in enumerate(hdr)}
-    ID = c["クリエイターID"]; N = c["ライバー名"]; J = c["入会日"]; D = c["ダイヤモンド"]
+    ID = c["クリエイターID"]; N = c["ライバー名"]; J = c["入会日"]; D = c["ダイヤモンド"]; U = c["クリエイターのユーザー名"]
     L = c["LIVE時間"]; LAST = c["先月のダイヤモンド数"]; DAYS = c["有効LIVE日数"]; FANS = c["ファンクラブのアクティブなファン"]
     AG = c["LIVE Match数"]; AH = c["LIVE Matchで獲得したダイヤモンド数"]
 
@@ -195,6 +195,7 @@ def main():
 
         beg.append({"cid": cid, "name": name, "pt": pt, "tot": tot,
                     "cur": cur, "ag": ag, "live": hm(r[L]), "days": days, "fans": fans, "bonus": bonus, "fanpct": fanpct, "fanbonus": fanbonus,
+                    "user": str(r[U]).strip(),
                     "grace_until": g["drop_on"] if g else ""})
     # スタンプ合算後(tot)で並べる＝web表示(build.pyの合算後ソート)と順位・順位差分を一致させる
     beg.sort(key=lambda x: -x["tot"])
@@ -209,10 +210,10 @@ def main():
         err(f"[dry-run] CSV未更新（掲載 {len(beg)}名の想定）")
     else:
         with open(CSV_OUT, "w", encoding="utf-8", newline="") as f:
-            w = csv.writer(f); w.writerow(["name", "point", "livetime", "days", "fans", "bonus", "fanpct", "fanbonus"])
+            w = csv.writer(f); w.writerow(["name", "point", "livetime", "days", "fans", "bonus", "fanpct", "fanbonus", "user"])
             for b in beg:
                 w.writerow([b["name"], b["pt"], b["live"], b["days"], b["fans"], b["bonus"],
-                            b["fanpct"], b["fanbonus"]])
+                            b["fanpct"], b["fanbonus"], b.get("user", "")])
         err(f"CSV {len(beg)}名")
     err(f"asof={today} 卒業猶予中={sum(1 for b in beg if b['grace_until'])}名 "
         f"新規卒業={len(newgrads)}名 掲載終了={len(dropped)}名")

@@ -112,6 +112,16 @@ li .sc{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;font-weig
   font-size:18px;white-space:nowrap;color:var(--ink)}
 li .unit{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--muted);
   margin-left:3px;font-weight:500}
+/* TikTokプロフィールリンク（右上角／名前の右インライン） */
+li .ttcorner{position:absolute;top:11px;right:12px;display:inline-flex;align-items:center;
+  justify-content:center;width:28px;height:28px;border-radius:9px;background:rgba(0,0,0,.05);
+  border:1px solid rgba(0,0,0,.10);text-decoration:none;z-index:3;transition:transform .12s ease}
+li .ttcorner:hover{transform:translateY(-1px)}
+li .ttcorner svg{width:16px;height:16px;display:block}
+li .ttinline{display:inline-flex;vertical-align:-4px;align-items:center;justify-content:center;
+  width:23px;height:23px;border-radius:7px;margin-left:7px;background:rgba(0,0,0,.05);
+  border:1px solid rgba(0,0,0,.10);text-decoration:none}
+li .ttinline svg{width:14px;height:14px;display:block}
 
 /* 🏆 達成者・卒業ショーケース（graduate_showcase:true のとき） */
 .gradbox{margin:0 0 16px;border-radius:20px;padding:2px;
@@ -184,16 +194,19 @@ li.top{border-color:rgba(255,255,255,.14)}
 li .sc{color:#fff}
 .linkbox a{background:#141418;border-color:#26262d;box-shadow:0 6px 18px rgba(0,0,0,.35)}
 li .gap{color:var(--accent)}
+ul.rank li .ttcorner,ul.rank li .ttinline{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16)}
+ul.rank li .ttcorner:hover{background:rgba(255,255,255,.15)}
 footer{color:#6f6f78}
 
 </style></head><body><div class="wrap">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="tt" viewBox="0 0 48 48"><path fill="#25F4EE" transform="translate(-1.6,1.4)" d="M30 6h5c.4 4.9 3.4 8.8 8 9.6v5c-3-.1-5.8-1-8.2-2.6V30a11.5 11.5 0 1 1-11.5-11.5c.6 0 1.2 0 1.7.1v5.2a6.4 6.4 0 1 0 4.5 6.2V6z"/><path fill="#FE2C55" d="M30 6h5c.4 4.9 3.4 8.8 8 9.6v5c-3-.1-5.8-1-8.2-2.6V30a11.5 11.5 0 1 1-11.5-11.5c.6 0 1.2 0 1.7.1v5.2a6.4 6.4 0 1 0 4.5 6.2V6z"/><path fill="#fff" opacity=".9" d="M30 6h5c.4 4.9 3.4 8.8 8 9.6v5c-3-.1-5.8-1-8.2-2.6V30a11.5 11.5 0 1 1-11.5-11.5c.6 0 1.2 0 1.7.1v5.2a6.4 6.4 0 1 0 4.5 6.2V6z"/></symbol></svg>
 <div class="brandbar"><img src="assets/dcl_logo_dark.png" alt="DeNA Creator Links"></div>
 <header class="hero">
   <div class="chip">TikTok LIVE</div>
   <img class="herologo" src="assets/rise_logo.png" alt="⚡️DCL RISE⚡️"><div class="herosub">🎁 9月累計 point</div>
   <div class="meta">2026-09-01 〜 2026-09-30　／ 参加 27 名</div>
 </header>
-<div class="updated">最終更新: 2026-10-07 10:20 JST</div>
+<div class="updated">最終更新: 2026-10-07 17:06 JST</div>
 <details class="rules"><summary>📖 ランキングのルール</summary><div class="rbody"><div class="rsec"><div class="rh">参加ルール</div><ul><li>前月の獲得ダイヤが20万ダイヤ以下のライバー</li><li>前月の獲得ポイントが30万pt以上のライバー（上とあわせて両方を満たす方）</li><li>ビギナーを卒業（当月30万pt到達）したライバー（達成日から即エントリー）</li></ul></div><div class="rsec"><div class="rh">卒業ルール</div><ul><li>当月300万pt到達で卒業</li><li>卒業後は翌月から⚡️DCL RISE⚡️の対象外（さらに上のステージへ）</li></ul></div><div class="rsec"><div class="rh">ポイントルール</div><ul><li>通常ダイヤポイント：ダイヤ数 × 10pt</li><li>バトルダイヤポイント：ダイヤ数 × 5pt（通常ポイントに上乗せ）</li><li>バトル回数ポイント：1000pt（バトル回数分、繰り返し加算）</li><li>継続ボーナス：有効LIVE日数18日以上 かつ LIVE時間70時間以上で 50,000pt（月間・1回）</li><li>ファンクラブボーナス：アクティブファン10人ごとに合計ポイント+1%（計算上限200人＝最大+20%）</li><li>スタンプラリー：スタンプラリーの獲得ポイントを合算（成果＋課題の達成状況で加算）</li></ul></div></div></details>
 
 

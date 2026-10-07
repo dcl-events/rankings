@@ -121,7 +121,7 @@ def main():
     err("source:", os.path.basename(tsv))
     rows = list(csv.reader(open(tsv, encoding="utf-8"), delimiter="\t"))
     hdr = rows[0]; c = {n: k for k, n in enumerate(hdr)}
-    ID = c["クリエイターID"]; N = c["ライバー名"]; D = c["ダイヤモンド"]
+    ID = c["クリエイターID"]; N = c["ライバー名"]; D = c["ダイヤモンド"]; U = c["クリエイターのユーザー名"]
     L = c["LIVE時間"]; LAST = c["先月のダイヤモンド数"]; DAYS = c["有効LIVE日数"]; FANS = c["ファンクラブのアクティブなファン"]
     AG = c["LIVE Match数"]; AH = c["LIVE Matchで獲得したダイヤモンド数"]
 
@@ -188,6 +188,7 @@ def main():
                             "achieved_md": f"{int(today[5:7])}/{int(today[8:10])}"}
         rise.append({"cid": str(r[ID]).strip(), "name": r[N].strip(), "pt": pt, "tot": tot,
                      "cur": cur, "ag": ag, "live": hm(r[L]), "days": days, "fans": fans, "bonus": bonus, "fanpct": fanpct, "fanbonus": fanbonus,
+                     "user": str(r[U]).strip(),
                      "route": "卒業" if grad else "中間層"})
     # スタンプ合算後(tot)で並べる＝web表示(build.pyの合算後ソート)と順位を一致させる
     rise.sort(key=lambda x: -x["tot"])
@@ -197,10 +198,10 @@ def main():
         err(f"[dry-run] CSV未更新（掲載 {len(rise)}名の想定）")
     else:
         with open(CSV_OUT, "w", encoding="utf-8", newline="") as f:
-            w = csv.writer(f); w.writerow(["name", "point", "livetime", "days", "fans", "bonus", "fanpct", "fanbonus"])
+            w = csv.writer(f); w.writerow(["name", "point", "livetime", "days", "fans", "bonus", "fanpct", "fanbonus", "user"])
             for b in rise:
                 w.writerow([b["name"], b["pt"], b["live"], b["days"], b["fans"], b["bonus"],
-                            b["fanpct"], b["fanbonus"]])
+                            b["fanpct"], b["fanbonus"], b.get("user", "")])
     err(f"CSV {len(rise)}名 (中間層 {sum(1 for b in rise if b['route']=='中間層')} / "
         f"卒業 {sum(1 for b in rise if b['route']=='卒業')})")
 

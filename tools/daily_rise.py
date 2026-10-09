@@ -243,7 +243,7 @@ def main():
             msg.append("")
             msg.append("🆙 新しくRISE1入り")
             for name, r, route in newcomers:
-                tag = "RISE2卒業" if route == "卒業" else "中間層"
+                tag = "RISE2昇格" if route == "卒業" else "中間層"
                 msg.append(f"・{name}：{r}位（{tag}）")
     print("\n".join(msg))
 

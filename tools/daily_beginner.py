@@ -257,12 +257,12 @@ def main():
         msg.append("📊 上位を抜いた人はいませんでした（順位変動なし）")
     if newgrads:
         msg.append("")
-        msg.append(f"🎓 RISE2卒業（⚡️DCL RISE1⚡️へ）")
+        msg.append(f"🎓 RISE2昇格（⚡️DCL RISE1⚡️へ）")
         for cid_g, name, drop in newgrads:
             m, d = drop[5:7].lstrip("0"), drop[8:10].lstrip("0")
             gr = glivers.get(cid_g, {}).get("grad_rank")
             pos = f"{gr}位で" if gr else ""
-            msg.append(f"・{name}：{pos}卒業（RISE2掲載は {m}/{d} まで）")
+            msg.append(f"・{name}：{pos}昇格（RISE2掲載は {m}/{d} まで）")
         if not bare: msg.append(RISE_URL)
     if dropped:
         msg.append("")

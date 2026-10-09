@@ -311,7 +311,7 @@ li .ttinline{{display:inline-flex;vertical-align:-4px;align-items:center;justify
   border:1px solid rgba(0,0,0,.10);text-decoration:none}}
 li .ttinline svg{{width:14px;height:14px;display:block}}
 
-/* 🏆 達成者・卒業ショーケース（graduate_showcase:true のとき） */
+/* 🏆 達成者・昇格ショーケース（graduate_showcase:true のとき） */
 .gradbox{{margin:0 0 16px;border-radius:20px;padding:2px;
   background:linear-gradient(120deg,#f6c445,#ff6a00 48%,#ff2f7b);
   box-shadow:0 10px 26px rgba(240,120,0,.22)}}
@@ -528,7 +528,7 @@ def apply_stamp(rows, ev_cfg):
                 go = gv["graduated_on"]; md = f"{int(go[5:7])}/{int(go[8:10])}"
             gr = gv.get("grad_rank")
             if md:
-                r["grad"] = f"🎓 {md} {gr}位 卒業" if gr else f"🎓 {md} 卒業"
+                r["grad"] = f"🎓 {md} {gr}位 昇格" if gr else f"🎓 {md} 昇格"
                 r["grad_on"] = gv.get("graduated_on") or ""
         # RISE：🏆 達成フラグ（M/D ◯万pt達成！）※達成ラインは月別 events.json の milestone_pt
         mv = mstone.get(cid) if (cid and tier == "rise") else None
@@ -559,7 +559,7 @@ def graduates_html(grads, ev_cfg):
     """達成/卒業した人をランキングから外し、上部のショーケースに並べる。"""
     if not grads:
         return ""
-    label = ev_cfg.get("graduate_label") or "🏆 達成者・卒業"
+    label = ev_cfg.get("graduate_label") or "🏆 達成者・昇格"
     mp = ev_cfg.get("milestone_pt")
     sub = f'<span class="gsub">{int(mp)//10000:,}万pt達成</span>' if mp else ""
     unit = html.escape(ev_cfg.get("score_label", ""))
@@ -577,7 +577,7 @@ def graduates_html(grads, ev_cfg):
                    f'<div class="gbody"><div class="gnm">{html.escape(r["name"])}</div>'
                    f'<div class="gmeta">{"".join(meta)}</div></div>'
                    f'<div class="gsc">{val}<span class="unit">{unit}</span></div></li>')
-    note = ev_cfg.get("graduate_note") or "卒業した方はランキングから外れます（以降の順位は繰り上がります）"
+    note = ev_cfg.get("graduate_note") or "昇格した方はランキングから外れます（以降の順位は繰り上がります）"
     return (f'<div class="gradbox"><div class="inner">'
             f'<div class="ghead">{html.escape(label)}{sub}</div>'
             f'<ul>{"".join(lis)}</ul>'
@@ -622,7 +622,7 @@ def build_event(ev_cfg, report):
     if ev_cfg.get("show_count", True):
         cap = f"（上位{top_n}位 / 参加 {total} 名）" if total > top_n else f"／ 参加 {total} 名"
         if grads:
-            cap += f"／ 卒業 {len(grads)} 名"
+            cap += f"／ 昇格 {len(grads)} 名"
     else:
         cap = f"（上位{top_n}位）" if total > top_n else ""
     # theme.logo があればタイトル1行目をロゴ画像に差し替え、2行目以降をサブタイトルにする

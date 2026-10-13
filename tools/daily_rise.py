@@ -218,11 +218,11 @@ def main():
     for i, b in enumerate(rise):
         r = i + 1; pv = prev.get(b["cid"]) if prev else None
         if prev and not pv:
-            newcomers.append((b["name"], r, b["route"]))
+            newcomers.append((b["name"], b["cid"], r, b["route"]))
         elif pv and r < pv.get("rank", 0):
-            climbers.append((b["name"], pv["rank"], r, pv["rank"] - r))
-    climbers.sort(key=lambda x: x[2])
-    newcomers.sort(key=lambda x: x[1])
+            climbers.append((b["name"], b["cid"], pv["rank"], r, pv["rank"] - r))
+    climbers.sort(key=lambda x: x[3])
+    newcomers.sort(key=lambda x: x[2])
 
     # Slackメッセージ
     if bare:
@@ -235,16 +235,16 @@ def main():
     else:
         if climbers:
             msg.append("📈 上のランクを抜いた人")
-            for name, pr, nr, n in climbers:
-                msg.append(f"・{name}：{pr}位→{nr}位（{n}人抜き）")
+            for name, cid, pr, nr, n in climbers:
+                msg.append(f"・{name}｜{cid}：{pr}位→{nr}位（{n}人抜き）")
         else:
             msg.append("📊 上位を抜いた人はいませんでした（順位変動なし）")
         if newcomers:
             msg.append("")
             msg.append("🆙 新しくRISE1入り")
-            for name, r, route in newcomers:
+            for name, cid, r, route in newcomers:
                 tag = "RISE2昇格" if route == "卒業" else "中間層"
-                msg.append(f"・{name}：{r}位（{tag}）")
+                msg.append(f"・{name}｜{cid}：{r}位（{tag}）")
     print("\n".join(msg))
 
     # スナップショット更新

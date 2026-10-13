@@ -238,8 +238,8 @@ def main():
     for i, b in enumerate(beg):
         r = i + 1; pr = adj.get(b["cid"]) if prev else None
         if pr and r < pr:
-            climbers.append((b["name"], pr, r, pr - r))
-    climbers.sort(key=lambda x: x[2])
+            climbers.append((b["name"], b["cid"], pr, r, pr - r))
+    climbers.sort(key=lambda x: x[3])
 
     # Slackメッセージ
     if bare:   # まとめ投稿に埋め込む用（メンション・「更新」表記は親側が持つ）
@@ -251,8 +251,8 @@ def main():
         msg.append("（初回更新。順位変動の比較は次回から）")
     elif climbers:
         msg.append("📈 上のランクを抜いた人")
-        for name, pr, nr, n in climbers:
-            msg.append(f"・{name}：{pr}位→{nr}位（{n}人抜き）")
+        for name, cid, pr, nr, n in climbers:
+            msg.append(f"・{name}｜{cid}：{pr}位→{nr}位（{n}人抜き）")
     else:
         msg.append("📊 上位を抜いた人はいませんでした（順位変動なし）")
     if newgrads:
@@ -262,13 +262,13 @@ def main():
             m, d = drop[5:7].lstrip("0"), drop[8:10].lstrip("0")
             gr = glivers.get(cid_g, {}).get("grad_rank")
             pos = f"{gr}位で" if gr else ""
-            msg.append(f"・{name}：{pos}昇格（RISE2掲載は {m}/{d} まで）")
+            msg.append(f"・{name}｜{cid_g}：{pos}昇格（RISE2掲載は {m}/{d} まで）")
         if not bare: msg.append(RISE_URL)
     if dropped:
         msg.append("")
         msg.append("🏁 本日RISE2掲載終了（⚡️DCL RISE1⚡️で継続）")
         for _cid, name, _gon in dropped:
-            msg.append(f"・{name}")
+            msg.append(f"・{name}｜{_cid}")
         if not bare: msg.append(RISE_URL)
     print("\n".join(msg))
 

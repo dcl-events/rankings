@@ -142,6 +142,11 @@ def main():
     ID = c["クリエイターID"]; N = c["ライバー名"]; J = c["入会日"]; D = c["ダイヤモンド"]; U = c["クリエイターのユーザー名"]
     L = c["LIVE時間"]; LAST = c["先月のダイヤモンド数"]; DAYS = c["有効LIVE日数"]; FANS = c["ファンクラブのアクティブなファン"]
     AG = c["LIVE Match数"]; AH = c["LIVE Matchで獲得したダイヤモンド数"]
+    # cid→ユーザー名（Slack表示で名前の後ろに ｜@ユーザー名 を付ける用）
+    user_by_cid = {str(r[ID]).strip(): str(r[U]).strip() for r in rows[1:] if len(r) > max(ID, U)}
+    def uh(cid):
+        u = user_by_cid.get(cid, "")
+        return f"｜@{u}" if u else ""
 
     # スタンプラリー獲得pt（tier=beginner）。卒業ライン30万は base＋stamp の合算で判定する。
     STAMPF = os.path.join(REPO, "data", "stamp_points.json")
@@ -252,7 +257,7 @@ def main():
     elif climbers:
         msg.append("📈 上のランクを抜いた人")
         for name, cid, pr, nr, n in climbers:
-            msg.append(f"・{name}｜{cid}：{pr}位→{nr}位（{n}人抜き）")
+            msg.append(f"・{name}{uh(cid)}：{pr}位→{nr}位（{n}人抜き）")
     else:
         msg.append("📊 上位を抜いた人はいませんでした（順位変動なし）")
     if newgrads:
@@ -262,13 +267,13 @@ def main():
             m, d = drop[5:7].lstrip("0"), drop[8:10].lstrip("0")
             gr = glivers.get(cid_g, {}).get("grad_rank")
             pos = f"{gr}位で" if gr else ""
-            msg.append(f"・{name}｜{cid_g}：{pos}昇格（RISE2掲載は {m}/{d} まで）")
+            msg.append(f"・{name}{uh(cid_g)}：{pos}昇格（RISE2掲載は {m}/{d} まで）")
         if not bare: msg.append(RISE_URL)
     if dropped:
         msg.append("")
         msg.append("🏁 本日RISE2掲載終了（⚡️DCL RISE1⚡️で継続）")
         for _cid, name, _gon in dropped:
-            msg.append(f"・{name}｜{_cid}")
+            msg.append(f"・{name}{uh(_cid)}")
         if not bare: msg.append(RISE_URL)
     print("\n".join(msg))
 

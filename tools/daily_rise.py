@@ -122,6 +122,11 @@ def main():
     rows = list(csv.reader(open(tsv, encoding="utf-8"), delimiter="\t"))
     hdr = rows[0]; c = {n: k for k, n in enumerate(hdr)}
     ID = c["クリエイターID"]; N = c["ライバー名"]; D = c["ダイヤモンド"]; U = c["クリエイターのユーザー名"]
+    # cid→ユーザー名（Slack表示で名前の後ろに ｜@ユーザー名 を付ける用）
+    user_by_cid = {str(r[ID]).strip(): str(r[U]).strip() for r in rows[1:] if len(r) > max(ID, U)}
+    def uh(cid):
+        u = user_by_cid.get(cid, "")
+        return f"｜@{u}" if u else ""
     L = c["LIVE時間"]; LAST = c["先月のダイヤモンド数"]; DAYS = c["有効LIVE日数"]; FANS = c["ファンクラブのアクティブなファン"]
     AG = c["LIVE Match数"]; AH = c["LIVE Matchで獲得したダイヤモンド数"]
 
@@ -236,7 +241,7 @@ def main():
         if climbers:
             msg.append("📈 上のランクを抜いた人")
             for name, cid, pr, nr, n in climbers:
-                msg.append(f"・{name}｜{cid}：{pr}位→{nr}位（{n}人抜き）")
+                msg.append(f"・{name}{uh(cid)}：{pr}位→{nr}位（{n}人抜き）")
         else:
             msg.append("📊 上位を抜いた人はいませんでした（順位変動なし）")
         if newcomers:
@@ -244,7 +249,7 @@ def main():
             msg.append("🆙 新しくRISE1入り")
             for name, cid, r, route in newcomers:
                 tag = "RISE2昇格" if route == "卒業" else "中間層"
-                msg.append(f"・{name}｜{cid}：{r}位（{tag}）")
+                msg.append(f"・{name}{uh(cid)}：{r}位（{tag}）")
     print("\n".join(msg))
 
     # スナップショット更新

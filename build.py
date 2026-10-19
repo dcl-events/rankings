@@ -155,7 +155,7 @@ li.top{border-color:rgba(255,255,255,.14)}
 li .sc{color:#fff}
 .linkbox a{background:#141418;border-color:#26262d;box-shadow:0 6px 18px rgba(0,0,0,.35)}
 li .gap{color:var(--accent)}
-ul.rank li .ttcorner,ul.rank li .ttinline{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16)}
+ul.rank li .ttcorner,ul.rank li .ttinline,.gradbox li .ttinline{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.16)}
 ul.rank li .ttcorner:hover{background:rgba(255,255,255,.15)}
 footer{color:#6f6f78}
 """
@@ -573,8 +573,9 @@ def graduates_html(grads, ev_cfg):
         if r.get("time"): meta.append(f'<span>⏱ 配信 {html.escape(r["time"])}</span>')
         if r.get("days"): meta.append(f'<span>📅 有効LIVE {html.escape(r["days"])}日</span>')
         if r.get("fans"): meta.append(f'<span>💛 ファン {html.escape(r["fans"])}人</span>')
+        tt = tt_link(r.get("user"), "ttinline")   # 昇格枠でもTikTokリンクを残す
         lis.append(f'<li><div class="gmedal">{"👑" if i == 0 else "🏆"}</div>'
-                   f'<div class="gbody"><div class="gnm">{html.escape(r["name"])}</div>'
+                   f'<div class="gbody"><div class="gnm">{html.escape(r["name"])}{tt}</div>'
                    f'<div class="gmeta">{"".join(meta)}</div></div>'
                    f'<div class="gsc">{val}<span class="unit">{unit}</span></div></li>')
     note = ev_cfg.get("graduate_note") or "昇格した方はランキングから外れます（以降の順位は繰り上がります）"

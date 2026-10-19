@@ -70,6 +70,11 @@ fi
 python3 tools/make_stamp_points.py >>"$LOG" 2>&1 && say "stamp_points.json 更新OK" \
   || say "⚠️ stamp_points.json 生成に失敗（前回値のまま続行）"
 
+# 0-2. 課題申告シート N列「バトルDM可」を取り込む（TikTokリンク左のバッジ用）。
+#      人が入力する列を読むだけ。失敗しても非致命（前回値のまま続行）。
+"$HOME/Claude/pococha/.venv/bin/python" tools/battle_dm.py >>"$LOG" 2>&1 \
+  && say "battle_dm.json 更新OK" || say "⚠️ バトルDM可の取り込みに失敗（前回値のまま続行）"
+
 # 1. ビギナー（当月10万pt到達で卒業→7日猶予後に自動で掲載終了）※最新stampで合算順を計算
 BEG="$(python3 tools/daily_beginner.py --month "$MONTH" --floor 1000 --date "$DATE" --bare 2>>"$LOG")"
 [ -n "$BEG" ] || fail "ビギナー生成失敗（データTSVが見つからない等）"

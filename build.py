@@ -300,6 +300,14 @@ li .sc{{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;font-wei
   font-size:18px;white-space:nowrap;color:var(--ink)}}
 li .unit{{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--muted);
   margin-left:3px;font-weight:500}}
+/* 右上角のまとまり（⚔バトルDM可バッジ ＋ TikTokリンク） */
+li .cnr{{position:absolute;top:11px;right:12px;display:flex;align-items:center;gap:6px;z-index:3}}
+li .cnr .ttcorner{{position:static;top:auto;right:auto}}
+li .bdm{{font-size:10.5px;font-weight:800;line-height:1;white-space:nowrap;
+  padding:6px 9px;border-radius:999px;color:#fff;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  box-shadow:0 2px 8px rgba(0,0,0,.18)}}
+
 /* TikTokプロフィールリンク（右上角／名前の右インライン） */
 li .ttcorner{{position:absolute;top:11px;right:12px;display:inline-flex;align-items:center;
   justify-content:center;width:28px;height:28px;border-radius:9px;background:rgba(0,0,0,.05);
@@ -324,7 +332,7 @@ li .ttinline svg{{width:14px;height:14px;display:block}}
 .gradbox li{{position:relative;display:flex;align-items:center;gap:12px;
   min-height:104px;padding:18px 2px 16px;border-top:1px dashed var(--line)}}
 /* TikTokは行の右上角（ランキングのカードと同じ位置）。ptはその下に来る */
-.gradbox li .ttcorner{{top:10px;right:2px}}
+.gradbox li .cnr{{top:10px;right:2px}}
 .gradbox li:first-child{{border-top:none}}
 .gradbox .gmedal{{font-size:20px;min-width:30px;text-align:center}}
 .gradbox .gbody{{flex:1;min-width:0}}
@@ -383,6 +391,26 @@ TT_SYMBOL = (
 )
 
 
+_BDM = None
+def battle_dm_set():
+    """data/battle_dm.json（課題申告シート N列「バトルDM可」の写し）。無ければ空。"""
+    global _BDM
+    if _BDM is None:
+        f = DATA / "battle_dm.json"
+        try:
+            d = json.load(open(f, encoding="utf-8")) if f.exists() else {}
+        except Exception:
+            d = {}
+        _BDM = {str(k).lstrip("@").lower() for k in (d.get("users") or {})}
+    return _BDM
+
+
+def bdm_badge(user):
+    """「⚔ バトルDM可」バッジ。TikTokリンクの左に置く。"""
+    u = str(user or "").lstrip("@").lower()
+    return '<span class="bdm">⚔ バトルDM可</span>' if (u and u in battle_dm_set()) else ""
+
+
 def tt_link(user, cls):
     """TikTokプロフィールへのリンク（ロゴアイコン）。userが無ければ空。"""
     if not user:
@@ -418,6 +446,9 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
     user = r.get("user")
     tt_inline = tt_link(user, "ttinline") if (user and gd) else ""
     tt_corner = tt_link(user, "ttcorner") if (user and not gd) else ""
+    bdm = bdm_badge(user)
+    if tt_corner or bdm:
+        tt_corner = f'<div class="cnr">{bdm}{tt_corner}</div>' 
     nm = f'<div class="nm">{name}{tt_inline}</div>'
     if display == "rank":
         body = f'{nm}{sub}'
@@ -575,7 +606,7 @@ def graduates_html(grads, ev_cfg):
         if r.get("time"): meta.append(f'<span>⏱ 配信 {html.escape(r["time"])}</span>')
         if r.get("days"): meta.append(f'<span>📅 有効LIVE {html.escape(r["days"])}日</span>')
         if r.get("fans"): meta.append(f'<span>💛 ファン {html.escape(r["fans"])}人</span>')
-        tt = tt_link(r.get("user"), "ttcorner")   # ランキングと同じ右上角に置く
+        tt = f'<div class="cnr">{bdm_badge(r.get("user"))}{tt_link(r.get("user"), "ttcorner")}</div>'  # ランキングと同じ右上角
         lis.append(f'<li>{tt}<div class="gmedal">{"👑" if i == 0 else "🏆"}</div>'
                    f'<div class="gbody"><div class="gnm">{html.escape(r["name"])}</div>'
                    f'<div class="gmeta">{"".join(meta)}</div></div>'

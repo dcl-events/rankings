@@ -290,10 +290,9 @@ li .tm{{margin-top:3px;font-size:12px;font-weight:500;color:var(--muted);
 li .tm span{{white-space:nowrap}}
 li .tm .bns{{color:var(--brand-orange);font-weight:700}}
 li .tm .stmp{{color:#e0338c;font-weight:700}}
-li .gradcorner{{position:absolute;top:14px;right:16px;display:inline-flex;align-items:center;
-  height:28px;padding:0 11px;box-sizing:border-box;color:#fff;
-  background:linear-gradient(90deg,#f0a500,#ff6a00);border-radius:9px;
-  font-size:11.5px;font-weight:800;white-space:nowrap;
+li .gradcorner{{position:absolute;top:14px;right:16px;color:#fff;
+  background:linear-gradient(90deg,#f0a500,#ff6a00);border-radius:999px;
+  padding:2px 10px;font-size:11px;font-weight:800;white-space:nowrap;
   box-shadow:0 2px 6px rgba(240,120,0,.35)}}
 li .bar{{height:7px;border-radius:4px;margin-top:7px;
   background:linear-gradient(90deg,var(--brand-orange),var(--brand-yellow))}}
@@ -316,7 +315,7 @@ li .bdm.narrow-only,li .gradcorner.narrow-only{{display:none}}
   li .nm .nmspace{{display:none}}
   li .bdm.wide-only,li .gradcorner.wide-only{{display:none}}
   li .bdm.narrow-only{{display:inline-flex;font-size:12px;height:28px;padding:0 10px}}
-  li .gradcorner.narrow-only{{display:inline-flex;position:static;font-size:11.5px;height:28px;padding:0 10px}}
+  li .gradcorner.narrow-only{{display:inline-flex;position:static;font-size:11px;padding:5px 8px}}
   li .scwrap{{margin-right:-4px}}   /* バッジの右端をTikTokロゴの右端に合わせる */
   .gradbox li .scwrap{{padding-top:30px}}   /* 昇格枠：バッジがTikTokロゴの下に来るように */
 }}

@@ -310,10 +310,8 @@ li .bdm.narrow-only{{display:none}}
     font-size:11.5px;padding:6px 9px}}
 }}
 li .bdm{{font-size:13px;font-weight:800;line-height:1;white-space:nowrap;
-  padding:8px 12px;border-radius:9px;color:#fff;
-  background:linear-gradient(135deg,#e8410a,#d6006b);
-  border:1px solid rgba(255,255,255,.22);
-  box-shadow:0 3px 10px rgba(0,0,0,.35)}}
+  padding:7px 11px;border-radius:9px;color:var(--accent);
+  background:#1b1b20;border:1.5px solid var(--accent)}}
 
 /* TikTokプロフィールリンク（右上角／名前の右インライン） */
 li .ttcorner{{position:absolute;top:11px;right:12px;display:inline-flex;align-items:center;
@@ -422,7 +420,7 @@ def bdm_badge(user, cls=""):
     if not bdm_on(user):
         return ""
     c = f"bdm {cls}".strip()
-    return f'<span class="{c}">\u2694\ufe0fバトルDM歓迎\u2694\ufe0f</span>' 
+    return f'<span class="{c}">\u2694\ufe0fバトルDM</span>' 
 
 
 def tt_link(user, cls):

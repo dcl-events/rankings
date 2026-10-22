@@ -300,18 +300,18 @@ li .sc{{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;font-wei
   font-size:18px;white-space:nowrap;color:var(--ink)}}
 li .unit{{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--muted);
   margin-left:3px;font-weight:500}}
-/* 右上角のまとまり（⚔バトルDM可バッジ ＋ TikTokリンク） */
+/* 右上角のまとまり（バトルDMバッジ ＋ 🎓達成/昇格バッジ ＋ TikTokリンク） */
 li .cnr{{position:absolute;top:11px;right:12px;display:flex;align-items:center;gap:6px;z-index:3}}
 li .cnr .ttcorner,li .cnr .gradcorner{{position:static;top:auto;right:auto}}
 li .cnr{{flex-wrap:wrap;justify-content:flex-end;max-width:74%}}
-li.cnr1 .nm{{padding-right:112px}}
-li.cnr2 .nm{{padding-right:210px}}
+/* バッジは右上角のまま。名前は最上段に置き、1行目だけバッジを回り込む */
+li .nm .nmspace{{float:right;height:1px}}
+li.cnr1 .nm .nmspace{{width:108px}}
+li.cnr2 .nm .nmspace{{width:196px}}
 @media (max-width:560px){{
-  /* 狭い画面は名前を細くせず、バッジ行のぶんだけ本文を下げる（1文字ずつ折り返す事故を防ぐ） */
   li .bdm,li .cnr .gradcorner{{font-size:11px;padding:5px 8px}}
-  li.cnr1 .nm,li.cnr2 .nm{{padding-right:0}}
-  li.cnr1 .body,li.cnr2 .body{{padding-top:34px}}
-  li.cnr1,li.cnr2{{align-items:flex-start}}
+  li.cnr1 .nm .nmspace{{width:92px}}
+  li.cnr2 .nm .nmspace{{width:172px}}
 }}
 li .bdm{{font-size:13px;font-weight:800;line-height:1;white-space:nowrap;
   padding:7px 11px;border-radius:9px;color:var(--accent);
@@ -420,11 +420,11 @@ def bdm_on(user):
 
 
 def bdm_badge(user, cls=""):
-    """「⚔️バトルDM歓迎⚔️」バッジ。広い画面はTikTokリンクの左、狭い画面は名前の下の行に出す。"""
+    """「バトルDM」バッジ。TikTokリンクの左（右上角）に置く。"""
     if not bdm_on(user):
         return ""
     c = f"bdm {cls}".strip()
-    return f'<span class="{c}">\u2694\ufe0fバトルDM</span>' 
+    return f'<span class="{c}">バトルDM</span>' 
 
 
 def tt_link(user, cls):
@@ -459,7 +459,7 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
     gtag = f'<span class="gradtag">🎓 {html.escape(gd)}</span>' if gd else ""
     tline = ('<div class="tm">' + "".join(f"<span>{x}</span>" for x in parts) + "</div>") if parts else ""
     sub = gap + tline
-    # 右上角の並び：[⚔️バトルDM] [🎓達成/昇格] [TikTok]。TikTokロゴは常にいちばん右で固定。
+    # 右上角の並び：[バトルDM] [🎓達成/昇格] [TikTok]。TikTokロゴは常にいちばん右で固定。
     tt_inline = ""
     tt_corner = tt_link(user, "ttcorner") if user else ""
     bdm = bdm_badge(user)
@@ -467,7 +467,8 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
     nbadge = (1 if bdm else 0) + (1 if gcorner else 0)
     if tt_corner or bdm or gcorner:
         tt_corner = f'<div class="cnr">{bdm}{gcorner}{tt_corner}</div>' 
-    nm = f'<div class="nm">{name}{tt_inline}</div>'
+    spacer = '<i class="nmspace"></i>' if nbadge else ""
+    nm = f'<div class="nm">{spacer}{name}{tt_inline}</div>'
     if display == "rank":
         body = f'{nm}{sub}'
         sc = ""

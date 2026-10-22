@@ -304,14 +304,18 @@ li .unit{{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--muted
 li .cnr{{position:absolute;top:11px;right:12px;display:flex;align-items:center;gap:6px;z-index:3}}
 li .cnr .ttcorner,li .cnr .gradcorner{{position:static;top:auto;right:auto}}
 li .cnr{{flex-wrap:wrap;justify-content:flex-end;max-width:74%}}
-/* バッジは右上角のまま。名前は最上段に置き、1行目だけバッジを回り込む */
+/* 広い画面：バッジは右上角（TikTokロゴの左）。名前は最上段で1行目だけ回り込む */
 li .nm .nmspace{{float:right;height:1px}}
 li.cnr1 .nm .nmspace{{width:108px}}
 li.cnr2 .nm .nmspace{{width:196px}}
+li .scwrap{{display:flex;flex-direction:column;align-items:flex-end;gap:7px}}
+li .bdm.narrow-only,li .gradcorner.narrow-only{{display:none}}
 @media (max-width:560px){{
-  li .bdm,li .cnr .gradcorner{{font-size:11px;padding:5px 8px}}
-  li.cnr1 .nm .nmspace{{width:92px}}
-  li.cnr2 .nm .nmspace{{width:172px}}
+  /* スマホ：名前は全幅（変な位置で改行しない）。バッジはTikTokロゴの下＝ポイントの上に置く */
+  li .nm .nmspace{{display:none}}
+  li .bdm.wide-only,li .gradcorner.wide-only{{display:none}}
+  li .bdm.narrow-only{{display:inline-flex;font-size:11px;padding:5px 8px}}
+  li .gradcorner.narrow-only{{display:inline-flex;position:static;font-size:11px;padding:5px 8px}}
 }}
 li .bdm{{font-size:13px;font-weight:800;line-height:1;white-space:nowrap;
   padding:7px 11px;border-radius:9px;color:var(--accent);
@@ -462,8 +466,8 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
     # 右上角の並び：[バトルDM] [🎓達成/昇格] [TikTok]。TikTokロゴは常にいちばん右で固定。
     tt_inline = ""
     tt_corner = tt_link(user, "ttcorner") if user else ""
-    bdm = bdm_badge(user)
-    gcorner = f'<span class="gradcorner">{html.escape(gd)}</span>' if gd else ""
+    bdm = bdm_badge(user, "wide-only")
+    gcorner = f'<span class="gradcorner wide-only">{html.escape(gd)}</span>' if gd else ""
     nbadge = (1 if bdm else 0) + (1 if gcorner else 0)
     if tt_corner or bdm or gcorner:
         tt_corner = f'<div class="cnr">{bdm}{gcorner}{tt_corner}</div>' 
@@ -480,6 +484,11 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
         val, unit = fmt_score(r["score"], ev_cfg)
         body = f'{nm}{sub}'
         sc = f'<div class="sc">{val}<span class="unit">{html.escape(unit)}</span></div>'
+        # スマホ：TikTokロゴの下（ポイントの上）にバッジを置く
+        stack = (f'<span class="gradcorner narrow-only">{html.escape(gd)}</span>' if gd else "") \
+                + bdm_badge(user, "narrow-only")
+        if stack:
+            sc = f'<div class="scwrap">{stack}{sc}</div>'
     return (f'<li class="{top} cnr{nbadge}">{tt_corner}<div class="num">{num}</div>'
             f'<div class="body">{body}</div>{sc}</li>')
 

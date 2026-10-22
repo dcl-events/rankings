@@ -302,12 +302,13 @@ li .unit{{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--muted
   margin-left:3px;font-weight:500}}
 /* 右上角のまとまり（⚔バトルDM可バッジ ＋ TikTokリンク） */
 li .cnr{{position:absolute;top:11px;right:12px;display:flex;align-items:center;gap:6px;z-index:3}}
-li .cnr .ttcorner{{position:static;top:auto;right:auto}}
-li .bdm.narrow-only{{display:none}}
+li .cnr .ttcorner,li .cnr .gradcorner{{position:static;top:auto;right:auto}}
+li .scwrap{{display:flex;flex-direction:column;align-items:flex-end;gap:7px}}
+li .bdm.narrow-only,li .gradcorner.narrow-only{{display:none}}
 @media (max-width:560px){{
-  li .bdm.wide-only{{display:none}}
-  li .bdm.narrow-only{{display:inline-flex;margin:3px 0 2px;
-    font-size:11.5px;padding:6px 9px}}
+  li .bdm.wide-only,li .gradcorner.wide-only{{display:none}}
+  li .gradcorner.narrow-only{{display:inline-flex;position:static;margin:0}}
+  li .bdm.narrow-only{{display:inline-flex;margin:0;font-size:11.5px;padding:6px 9px}}
 }}
 li .bdm{{font-size:13px;font-weight:800;line-height:1;white-space:nowrap;
   padding:7px 11px;border-radius:9px;color:var(--accent);
@@ -453,16 +454,15 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
     if st: parts.append(f'<b class="stmp">🎯 スタンプ +{st:,}pt</b>')
     gd = r.get("grad")
     gtag = f'<span class="gradtag">🎓 {html.escape(gd)}</span>' if gd else ""
-    if bdm_on(user):   # 狭い画面用（CSSで出し分け）
-        parts.insert(0, bdm_badge(user, "narrow-only"))
     tline = ('<div class="tm">' + "".join(f"<span>{x}</span>" for x in parts) + "</div>") if parts else ""
     sub = gap + tline
-    # TikTokリンク：通常はカード右上角。卒業/達成バッジが右上を占める時は名前の右へ（インライン）。
-    tt_inline = tt_link(user, "ttinline") if (user and gd) else ""
-    tt_corner = tt_link(user, "ttcorner") if (user and not gd) else ""
+    # 右上角の並び：[⚔️バトルDM] [🎓達成/昇格] [TikTok]。TikTokロゴは常にいちばん右で固定。
+    tt_inline = ""
+    tt_corner = tt_link(user, "ttcorner") if user else ""
     bdm = bdm_badge(user, "wide-only")
-    if tt_corner or bdm:
-        tt_corner = f'<div class="cnr">{bdm}{tt_corner}</div>' 
+    gcorner = f'<span class="gradcorner wide-only">{html.escape(gd)}</span>' if gd else ""
+    if tt_corner or bdm or gcorner:
+        tt_corner = f'<div class="cnr">{bdm}{gcorner}{tt_corner}</div>' 
     nm = f'<div class="nm">{name}{tt_inline}</div>'
     if display == "rank":
         body = f'{nm}{sub}'
@@ -475,9 +475,12 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
         val, unit = fmt_score(r["score"], ev_cfg)
         body = f'{nm}{sub}'
         sc = f'<div class="sc">{val}<span class="unit">{html.escape(unit)}</span></div>'
-    # 達成/卒業フラグは名前と同じ高さ（カード右上）に固定配置（絵文字は本文に含める）
-    corner = f'<div class="gradcorner">{html.escape(gd)}</div>' if gd else ""
-    return (f'<li class="{top}">{corner}{tt_corner}<div class="num">{num}</div>'
+        # 狭い画面：TikTokロゴ（右上角）とポイントの間にバッジを積む
+        stack = (f'<span class="gradcorner narrow-only">{html.escape(gd)}</span>' if gd else "") \
+                + bdm_badge(user, "narrow-only")
+        if stack:
+            sc = f'<div class="scwrap">{stack}{sc}</div>'
+    return (f'<li class="{top}">{tt_corner}<div class="num">{num}</div>'
             f'<div class="body">{body}</div>{sc}</li>')
 
 

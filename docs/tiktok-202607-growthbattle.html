@@ -113,12 +113,13 @@ li .unit{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--muted)
   margin-left:3px;font-weight:500}
 /* 右上角のまとまり（⚔バトルDM可バッジ ＋ TikTokリンク） */
 li .cnr{position:absolute;top:11px;right:12px;display:flex;align-items:center;gap:6px;z-index:3}
-li .cnr .ttcorner{position:static;top:auto;right:auto}
-li .bdm.narrow-only{display:none}
+li .cnr .ttcorner,li .cnr .gradcorner{position:static;top:auto;right:auto}
+li .scwrap{display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+li .bdm.narrow-only,li .gradcorner.narrow-only{display:none}
 @media (max-width:560px){
-  li .bdm.wide-only{display:none}
-  li .bdm.narrow-only{display:inline-flex;margin:3px 0 2px;
-    font-size:11.5px;padding:6px 9px}
+  li .bdm.wide-only,li .gradcorner.wide-only{display:none}
+  li .gradcorner.narrow-only{display:inline-flex;position:static;margin:0}
+  li .bdm.narrow-only{display:inline-flex;margin:0;font-size:11.5px;padding:6px 9px}
 }
 li .bdm{font-size:13px;font-weight:800;line-height:1;white-space:nowrap;
   padding:7px 11px;border-radius:9px;color:var(--accent);
@@ -197,7 +198,7 @@ footer{text-align:center;font-size:12px;color:var(--muted);margin-top:44px;
   <h1>🏆 7月成長率バトルランキング〈TikTok LIVE部門〉</h1>
   <div class="meta">2026-07-01 〜 2026-07-31　</div>
 </header>
-<div class="updated">最終更新: 2026-10-22 15:16 JST</div>
+<div class="updated">最終更新: 2026-10-22 15:22 JST</div>
 
 
 

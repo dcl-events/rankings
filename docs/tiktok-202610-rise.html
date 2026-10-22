@@ -114,12 +114,13 @@ li .unit{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--muted)
   margin-left:3px;font-weight:500}
 /* 右上角のまとまり（⚔バトルDM可バッジ ＋ TikTokリンク） */
 li .cnr{position:absolute;top:11px;right:12px;display:flex;align-items:center;gap:6px;z-index:3}
-li .cnr .ttcorner{position:static;top:auto;right:auto}
-li .bdm.narrow-only{display:none}
+li .cnr .ttcorner,li .cnr .gradcorner{position:static;top:auto;right:auto}
+li .scwrap{display:flex;flex-direction:column;align-items:flex-end;gap:7px}
+li .bdm.narrow-only,li .gradcorner.narrow-only{display:none}
 @media (max-width:560px){
-  li .bdm.wide-only{display:none}
-  li .bdm.narrow-only{display:inline-flex;margin:3px 0 2px;
-    font-size:11.5px;padding:6px 9px}
+  li .bdm.wide-only,li .gradcorner.wide-only{display:none}
+  li .gradcorner.narrow-only{display:inline-flex;position:static;margin:0}
+  li .bdm.narrow-only{display:inline-flex;margin:0;font-size:11.5px;padding:6px 9px}
 }
 li .bdm{font-size:13px;font-weight:800;line-height:1;white-space:nowrap;
   padding:7px 11px;border-radius:9px;color:var(--accent);
@@ -221,7 +222,7 @@ footer{color:#6f6f78}
   <img class="herologo" src="assets/rise1_logo.png" alt="⚡️DCL RISE1⚡️"><div class="herosub">🎁 10月累計 point</div>
   <div class="meta">2026-10-01 〜 2026-10-20　／ 参加 9 名／ 昇格 2 名</div>
 </header>
-<div class="updated">最終更新: 2026-10-22 15:16 JST</div>
+<div class="updated">最終更新: 2026-10-22 15:22 JST</div>
 <details class="rules"><summary>📖 ランキングのルール</summary><div class="rbody"><div class="rsec"><div class="rh">参加ルール</div><ul><li>前月の獲得ポイントが200万pt以上のライバー</li><li>RISE2から昇格（当月200万pt到達）したライバー（達成日から即エントリー）</li></ul></div><div class="rsec"><div class="rh">昇格ルール</div><ul><li>当月400万pt到達で昇格</li><li>昇格後は翌月から⚡️DCL RISE1⚡️の対象外（さらに上のステージへ）</li></ul></div><div class="rsec"><div class="rh">ポイントルール</div><ul><li>通常ダイヤポイント：ダイヤ数 × 10pt</li><li>バトルダイヤポイント：ダイヤ数 × 5pt（通常ポイントに上乗せ）</li><li>バトル回数ポイント：1000pt（バトル回数分、繰り返し加算）</li><li>継続ボーナス：有効LIVE日数18日以上 かつ LIVE時間70時間以上で 50,000pt（月間・1回）</li><li>ファンクラブボーナス：アクティブファン10人ごとに合計ポイント+1%（計算上限200人＝最大+20%）</li><li>スタンプラリー：スタンプラリーの獲得ポイントを合算（成果＋課題の達成状況で加算）</li></ul></div></div></details>
 <div class="gradbox"><div class="inner"><div class="ghead">🏆 達成者・昇格<span class="gsub">400万pt達成</span></div><ul><li><div class="cnr"><a class="ttcorner" href="https://www.tiktok.com/@purumii_purin" target="_blank" rel="noopener nofollow" aria-label="purumii_purin のTikTok"><svg><use href="#tt"/></svg></a></div><div class="gmedal">👑</div><div class="gbody"><div class="gnm">かまちょぷるみぃ🍮🫧</div><div class="gmeta"><span class="gday">10/19 達成</span><span>⏱ 配信 88h23m</span><span>📅 有効LIVE 20日</span><span>💛 ファン 63人</span></div></div><div class="gsc">5,638,597<span class="unit">🎁point</span></div></li><li><div class="cnr"><a class="ttcorner" href="https://www.tiktok.com/@nyonnyon0927" target="_blank" rel="noopener nofollow" aria-label="nyonnyon0927 のTikTok"><svg><use href="#tt"/></svg></a></div><div class="gmedal">🏆</div><div class="gbody"><div class="gnm">のん🤧🧂</div><div class="gmeta"><span class="gday">10/19 達成</span><span>⏱ 配信 50h59m</span><span>📅 有効LIVE 19日</span><span>💛 ファン 27人</span></div></div><div class="gsc">4,012,751<span class="unit">🎁point</span></div></li></ul><div class="gnote">昇格した方はランキングから外れます（以降の順位は繰り上がります）</div></div></div>
 <div class="ranklead">▼ 現在のランキング</div>

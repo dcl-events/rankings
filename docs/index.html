@@ -114,12 +114,15 @@ li .unit{font-family:'Noto Sans JP',sans-serif;font-size:11px;color:var(--muted)
 /* 右上角のまとまり（⚔バトルDM可バッジ ＋ TikTokリンク） */
 li .cnr{position:absolute;top:11px;right:12px;display:flex;align-items:center;gap:6px;z-index:3}
 li .cnr .ttcorner,li .cnr .gradcorner{position:static;top:auto;right:auto}
-li .scwrap{display:flex;flex-direction:column;align-items:flex-end;gap:7px}
-li .bdm.narrow-only,li .gradcorner.narrow-only{display:none}
+li .cnr{flex-wrap:wrap;justify-content:flex-end;max-width:74%}
+li.cnr1 .nm{padding-right:112px}
+li.cnr2 .nm{padding-right:210px}
 @media (max-width:560px){
-  li .bdm.wide-only,li .gradcorner.wide-only{display:none}
-  li .gradcorner.narrow-only{display:inline-flex;position:static;margin:0}
-  li .bdm.narrow-only{display:inline-flex;margin:0;font-size:11.5px;padding:6px 9px}
+  /* 狭い画面は名前を細くせず、バッジ行のぶんだけ本文を下げる（1文字ずつ折り返す事故を防ぐ） */
+  li .bdm,li .cnr .gradcorner{font-size:11px;padding:5px 8px}
+  li.cnr1 .nm,li.cnr2 .nm{padding-right:0}
+  li.cnr1 .body,li.cnr2 .body{padding-top:34px}
+  li.cnr1,li.cnr2{align-items:flex-start}
 }
 li .bdm{font-size:13px;font-weight:800;line-height:1;white-space:nowrap;
   padding:7px 11px;border-radius:9px;color:var(--accent);
@@ -198,7 +201,7 @@ footer{text-align:center;font-size:12px;color:var(--muted);margin-top:44px;
   <h1>事務所イベント</h1>
   <div class="meta">Pococha ／ TikTok LIVE</div>
 </header>
-<div class="updated">最終更新: 2026-10-22 15:22 JST</div>
+<div class="updated">最終更新: 2026-10-22 15:27 JST</div>
 <div class="card-list"><a href="tiktok-202610-newcomer.html"><div class="card" style="--c:#ff7a3c;--c2:#facd00"><span class="arrow">›</span><div class="pf">TikTok LIVE</div><h2>⚡️DCL RISE2⚡️
 🎁 10月累計 point</h2><div class="meta">2026-10-01 〜 2026-10-20</div></div></a><a href="tiktok-202610-rise.html"><div class="card" style="--c:#ffa32e;--c2:#ff2f7b"><span class="arrow">›</span><div class="pf">TikTok LIVE</div><h2>⚡️DCL RISE1⚡️
 🎁 10月累計 point</h2><div class="meta">2026-10-01 〜 2026-10-20</div></div></a><a href="https://dcl-event.github.io/dcl-tiktok-event-calendar/pride2.html" target="_blank" rel="noopener"><div class="card" style="--c:#b3202a;--c2:#d4af37"><span class="arrow">›</span><div class="pf">TikTok LIVE</div><h2>🏆 第2回 DCLトーナメント PRIDE</h2><div class="meta">2026-09-01 〜 2026-09-30</div></div></a><a href="tiktok-202609-sengoku.html"><div class="card" style="--c:#d4af37;--c2:#b3202a"><span class="arrow">›</span><div class="pf">TikTok LIVE</div><h2>⚔️ DCL天下戦国 ／ ライバーの野望</h2><div class="meta">2026-09-01 〜 2026-09-30</div></div></a><a href="tiktok-202609-newcomer.html"><div class="card" style="--c:#eb5000;--c2:#facd00"><span class="arrow">›</span><div class="pf">TikTok LIVE</div><h2>🌱DCLビギナーランキング

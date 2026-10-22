@@ -316,6 +316,7 @@ li .bdm.narrow-only,li .gradcorner.narrow-only{{display:none}}
   li .bdm.wide-only,li .gradcorner.wide-only{{display:none}}
   li .bdm.narrow-only{{display:inline-flex;font-size:11px;padding:5px 8px}}
   li .gradcorner.narrow-only{{display:inline-flex;position:static;font-size:11px;padding:5px 8px}}
+  .gradbox li .scwrap{{padding-top:30px}}   /* 昇格枠：バッジがTikTokロゴの下に来るように */
 }}
 li .bdm{{font-size:13px;font-weight:800;line-height:1;white-space:nowrap;
   padding:7px 11px;border-radius:9px;color:var(--accent);
@@ -632,12 +633,13 @@ def graduates_html(grads, ev_cfg):
         if r.get("time"): meta.append(f'<span>⏱ 配信 {html.escape(r["time"])}</span>')
         if r.get("days"): meta.append(f'<span>📅 有効LIVE {html.escape(r["days"])}日</span>')
         if r.get("fans"): meta.append(f'<span>💛 ファン {html.escape(r["fans"])}人</span>')
-        if bdm_on(r.get("user")): meta.insert(0, bdm_badge(r.get("user"), "narrow-only"))
+        nb = bdm_badge(r.get("user"), "narrow-only")   # スマホ用（ロゴの下＝ptの上）
         tt = f'<div class="cnr">{bdm_badge(r.get("user"), "wide-only")}{tt_link(r.get("user"), "ttcorner")}</div>'  # ランキングと同じ右上角
         lis.append(f'<li>{tt}<div class="gmedal">{"👑" if i == 0 else "🏆"}</div>'
                    f'<div class="gbody"><div class="gnm">{html.escape(r["name"])}</div>'
                    f'<div class="gmeta">{"".join(meta)}</div></div>'
-                   f'<div class="gsc">{val}<span class="unit">{unit}</span></div></li>')
+                   f'<div class="scwrap">{nb}<div class="gsc">{val}'
+                   f'<span class="unit">{unit}</span></div></div></li>')
     note = ev_cfg.get("graduate_note") or "昇格した方はランキングから外れます（以降の順位は繰り上がります）"
     return (f'<div class="gradbox"><div class="inner">'
             f'<div class="ghead">{html.escape(label)}{sub}</div>'

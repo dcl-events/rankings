@@ -87,15 +87,42 @@ RISE="$(python3 tools/daily_rise.py --month "$MONTH" --floor 1 --date "$DATE" --
 python3 build.py >>"$LOG" 2>&1 || fail "build失敗"
 
 # 4. 変更があれば push（1回）
+#    daily_*.py は実行した時点で snapshot（前回順位）を今回の順位で上書きする。
+#    push に失敗して再実行すると「同じデータ同士の比較」になり、変動が0件と出てしまう
+#    （2026-10-27に発生：朝の push 失敗→昼の再実行で「上位を抜いた人はいませんでした」と誤投稿）。
+#    そこで push 失敗時は、今回の変動本文（BEG/RISE）を .git の中に保存しておき、
+#    同じデータ期間末で再実行されたときは計算し直した本文ではなく保存分を使う。
+#    .git の中なので git add -A で公開されることはない。
+PENDING_DIR="$REPO/.git/pending-rankings"
+PENDING="$PENDING_DIR/${MONTH}_${DATE//\//-}"
+if [ -f "$PENDING.beg" ] && [ -f "$PENDING.rise" ]; then
+  BEG="$(cat "$PENDING.beg")"; RISE="$(cat "$PENDING.rise")"
+  say "前回 push 失敗時に保存した変動本文を使用（$PENDING）"
+fi
+save_pending(){
+  mkdir -p "$PENDING_DIR" && printf '%s\n' "$BEG" > "$PENDING.beg" && printf '%s\n' "$RISE" > "$PENDING.rise" \
+    && say "変動本文を保存（$PENDING）" || say "⚠️ 変動本文の保存に失敗"
+}
 if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git status --porcelain)" ]; then
-  if git add -A && git commit -q -m "daily: ビギナー＋RISE ランキング更新 ($MONTH / $DATE)" && git push -q >>"$LOG" 2>&1; then
+  git add -A && git commit -q -m "daily: ビギナー＋RISE ランキング更新 ($MONTH / $DATE)" \
+    || { save_pending; fail "git commit失敗（ローカルは更新済み）"; }
+else
+  say "変更なし（commitスキップ）"
+fi
+# 前回 push に失敗して残ったコミットもここで送る（未送信が無ければ何もしない）
+if [ -n "$(git log --oneline '@{u}..HEAD' 2>/dev/null)" ]; then
+  if git push -q >>"$LOG" 2>&1; then
     say "push完了"
   else
+    save_pending
     fail "git push失敗（ローカルは更新済み）"
   fi
 else
-  say "変更なし（pushスキップ）"
+  say "未送信コミットなし（pushスキップ）"
 fi
+# 送信できたので保存分は不要（古い期間末のものもまとめて片付ける）
+rm -f "$REPO/.git/pending-rankings/"*.beg "$REPO/.git/pending-rankings/"*.rise 2>/dev/null
+rmdir "$REPO/.git/pending-rankings" 2>/dev/null
 
 say "===== 完了 ====="
 # 5. Slack本文を「親」と「スレッド返信」の2つに分けて出力する。

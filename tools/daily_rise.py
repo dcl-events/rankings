@@ -218,14 +218,28 @@ def main():
             # {"month": YYYY-MM, "ranks": {...}}。月が変わった初日は比較しない（＝初回更新扱い）
             if snap.get("month") == month: prev = snap.get("ranks", {})
         except Exception: prev = {}
+    # サイト(build.py の graduate_showcase)は達成者(mlivers)をランキングから外して上部の別枠へ移し、
+    # 残りを繰り上げて表示する。Slackの順位もそれに合わせ、今回・前回とも「現在の達成者を除いて
+    # 再採番した順位」で比べる（達成者が抜けた分の繰り上がりを「N人抜き」と出さない）。
+    # snapshot の rank は達成者込みのまま（build.py がスタンプ突合に使うため形式は変えない）。
+    site_rank = {}
+    for b in rise:
+        if b["cid"] in mlivers: continue
+        site_rank[b["cid"]] = len(site_rank) + 1
+    prev_rank = {}
+    for cid, v in sorted(prev.items(), key=lambda kv: kv[1].get("rank", 10**9)):
+        if cid in mlivers: continue
+        prev_rank[cid] = len(prev_rank) + 1
     climbers = []
     newcomers = []
-    for i, b in enumerate(rise):
-        r = i + 1; pv = prev.get(b["cid"]) if prev else None
-        if prev and not pv:
+    for b in rise:
+        r = site_rank.get(b["cid"])
+        if r is None: continue                 # 達成者は別枠（順位変動の対象外）
+        pr = prev_rank.get(b["cid"]) if prev else None
+        if prev and b["cid"] not in prev:
             newcomers.append((b["name"], b["cid"], r, b["route"]))
-        elif pv and r < pv.get("rank", 0):
-            climbers.append((b["name"], b["cid"], pv["rank"], r, pv["rank"] - r))
+        elif pr and r < pr:
+            climbers.append((b["name"], b["cid"], pr, r, pr - r))
     climbers.sort(key=lambda x: x[3])
     newcomers.sort(key=lambda x: x[2])
 

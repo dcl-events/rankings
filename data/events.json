@@ -477,6 +477,139 @@
       "entry_min_prev_pt": 2000000,
       "graduate_showcase": true,
       "graduate_label": "🏆 達成者・昇格"
+    },
+    {
+      "id": "tiktok-202611-newcomer",
+      "platform": "TikTok LIVE",
+      "source": "csv",
+      "data_file": "tiktok-202611-newcomer.csv",
+      "title": "⚡️DCL RISE2⚡️\n🎁 11月累計 point",
+      "period_start": "2026-11-01",
+      "period_end": "2026-11-30",
+      "score_field": "point",
+      "score_label": "🎁point",
+      "time_field": "livetime",
+      "format": "int",
+      "display": "value",
+      "show_gap": true,
+      "top_n": 500,
+      "rules": [
+        {
+          "h": "参加ルール",
+          "items": [
+            "前月の獲得ポイントが200万pt未満、または当月デビューのライバー",
+            "当月100ダイヤ以上で掲載"
+          ]
+        },
+        {
+          "h": "昇格ルール",
+          "items": [
+            "当月200万pt到達で昇格",
+            "達成の翌日にRISE2掲載終了 → ⚡️DCL RISE1⚡️へ移行"
+          ]
+        },
+        {
+          "h": "ポイントルール",
+          "items": [
+            "通常ダイヤポイント：ダイヤ数 × 10pt",
+            "バトルダイヤポイント：ダイヤ数 × 5pt（通常ポイントに上乗せ）",
+            "バトル回数ポイント：1000pt（バトル回数分、繰り返し加算）",
+            "継続ボーナス：有効LIVE日数18日以上 かつ LIVE時間70時間以上で 50,000pt（月間・1回）"
+          ]
+        }
+      ],
+      "days_field": "days",
+      "fans_field": "fans",
+      "bonus_field": "bonus",
+      "links": [
+        {
+          "label": "⚡ TikTok LIVE 公式イベントはこちら",
+          "url": "https://dcl-event.github.io/dcl-tiktok-event-calendar/"
+        }
+      ],
+      "stamp_tier": "beginner",
+      "stamp_snapshot": "beginner_snapshot.json",
+      "grad_pt": 2000000,
+      "theme": {
+        "accent": "#ff7a3c",
+        "accent2": "#facd00",
+        "hero": "linear-gradient(135deg,#1a1013 0%,#3a1f24 42%,#5e2a2f 74%,#26161a 100%)",
+        "logo": "assets/rise2_logo.png",
+        "favicon": "assets/dcl_mark.png",
+        "dark": true,
+        "darkbg": "radial-gradient(1100px 420px at 10% -10%, #3a2026 0%, rgba(58,32,38,0) 62%),radial-gradient(900px 380px at 100% 2%, #5e2a2f 0%, rgba(94,42,47,0) 58%),#120a0d",
+        "surface": "#1d1216",
+        "line2": "#3a2329"
+      },
+      "list_min_dia": 100,
+      "fan_bonus": false,
+      "stamp_add": false
+    },
+    {
+      "id": "tiktok-202611-rise",
+      "platform": "TikTok LIVE",
+      "source": "csv",
+      "data_file": "tiktok-202611-rise.csv",
+      "title": "⚡️DCL RISE1⚡️\n🎁 11月累計 point",
+      "period_start": "2026-11-01",
+      "period_end": "2026-11-30",
+      "score_field": "point",
+      "score_label": "🎁point",
+      "time_field": "livetime",
+      "format": "int",
+      "display": "value",
+      "show_gap": true,
+      "top_n": 500,
+      "rules": [
+        {
+          "h": "参加ルール",
+          "items": [
+            "前月の獲得ポイントが200万pt以上のライバー",
+            "RISE2から昇格（当月200万pt到達）したライバー（達成日から即エントリー）"
+          ]
+        },
+        {
+          "h": "昇格ルール",
+          "items": [
+            "当月400万pt到達で昇格",
+            "昇格後は翌月から⚡️DCL RISE1⚡️の対象外（さらに上のステージへ）"
+          ]
+        },
+        {
+          "h": "ポイントルール",
+          "items": [
+            "通常ダイヤポイント：ダイヤ数 × 10pt",
+            "バトルダイヤポイント：ダイヤ数 × 5pt（通常ポイントに上乗せ）",
+            "バトル回数ポイント：1000pt（バトル回数分、繰り返し加算）",
+            "継続ボーナス：有効LIVE日数18日以上 かつ LIVE時間70時間以上で 50,000pt（月間・1回）"
+          ]
+        }
+      ],
+      "days_field": "days",
+      "fans_field": "fans",
+      "bonus_field": "bonus",
+      "theme": {
+        "accent": "#ffa32e",
+        "accent2": "#ff2f7b",
+        "hero": "linear-gradient(135deg,#17171a 0%,#33333a 30%,#0c0c0e 62%,#1f1f24 100%)",
+        "dark": true,
+        "favicon": "assets/rise_mark.png",
+        "logo": "assets/rise1_logo.png"
+      },
+      "links": [
+        {
+          "label": "⚡ TikTok LIVE 公式イベントはこちら",
+          "url": "https://dcl-event.github.io/dcl-tiktok-event-calendar/"
+        }
+      ],
+      "stamp_tier": "rise",
+      "stamp_snapshot": "rise_snapshot.json",
+      "milestone_pt": 4000000,
+      "entry_min_prev_pt": 2000000,
+      "graduate_showcase": true,
+      "graduate_label": "🏆 達成者・昇格",
+      "fan_bonus": false,
+      "stamp_add": false
     }
   ]
 }

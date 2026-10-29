@@ -548,6 +548,9 @@ def apply_stamp(rows, ev_cfg):
     snap_name = ev_cfg.get("stamp_snapshot")
     if not (tier and snap_name):
         return
+    if ev_cfg.get("stamp_add") is False:   # 2026-11〜：スタンプptはランキングに反映しない（スタンプラリー自体は継続）
+        print("  - stamp: このイベントは合算しない設定（stamp_add:false）")
+        return
     snap_path = DATA / snap_name
     pts_by_id = _load_stamp_pts(ev_cfg, tier)   # id→pt（repo内 data/stamp_points.json 優先／無ければstamp-rally直読み）
     if not (snap_path.exists() and pts_by_id is not None):

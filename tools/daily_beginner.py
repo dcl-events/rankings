@@ -56,6 +56,18 @@ def event_num(event_id, field, default):
         pass
     return default
 
+def event_flag(event_id, field, default=True):
+    """events.json の真偽設定（無ければ default）。月別の加点ON/OFFに使う。"""
+    try:
+        doc = json.load(open(os.path.join(REPO, "data", "events.json"), encoding="utf-8"))
+        for ev in doc.get("events", []):
+            if ev.get("id") == event_id:
+                return bool(ev.get(field, default))
+    except Exception:
+        pass
+    return default
+
+
 def err(*a): print(*a, file=sys.stderr)
 def toint(v):
     if v in (None, "-", ""): return 0
@@ -103,6 +115,10 @@ def main():
     CSV_OUT, URL, RISE_URL = paths_for(month)
     # 卒業ライン（月別）：events.json の当月ビギナーイベント grad_pt（無ければ既定30万）
     GRAD_PT = event_num(f"tiktok-{month.replace('-','')}-newcomer", "grad_pt", GRAD_PT_DEFAULT)
+    _ymn = month.replace('-', '')
+    FAN_ON   = event_flag(f"tiktok-{_ymn}-newcomer", "fan_bonus", True)   # 2026-11〜 廃止（月別）
+    STAMP_ON = event_flag(f"tiktok-{_ymn}-newcomer", "stamp_add", True)   # 2026-11〜 ランキングに反映しない
+    err(f"加点設定: ファンクラブボーナス={'ON' if FAN_ON else 'OFF'} / スタンプ合算={'ON' if STAMP_ON else 'OFF'}")
     # 掲載ライン：当月ダイヤが list_min_dia 以上で掲載（2026-10〜。pt floorは使わない＝バトルptだけの掲載を防ぐ）
     LIST_MIN_DIA = event_num(f"tiktok-{month.replace('-','')}-newcomer", "list_min_dia", 100)
 
@@ -173,13 +189,14 @@ def main():
             if not ((last_i < 10000) or is_new): continue
         days = toint(r[DAYS]); bonus = keizoku_bonus(days, r[L])
         base = cur * 10 + ah * 5 + ag * 1000 + bonus
-        fans = toint(r[FANS]); fanpct, fanbonus = fan_bonus(fans, base)
+        fans = toint(r[FANS])
+        fanpct, fanbonus = fan_bonus(fans, base) if FAN_ON else (0, 0)
         pt = base + fanbonus
         if cur < LIST_MIN_DIA: continue   # 掲載＝当月100ダイヤ以上（旧:pt>=floor。バトルptのみでの掲載を防ぐ）
         name = r[N].strip()
 
         # 卒業判定：当月pt＋スタンプ獲得pt(合算)>=30万で卒業。初回検知日を記録し、猶予明けで掲載終了
-        tot = pt + stamp_b.get(cid, 0)     # 合算ポイント（卒業ライン判定用）
+        tot = pt + (stamp_b.get(cid, 0) if STAMP_ON else 0)   # 合算ポイント（STAMP_ON=Falseなら合算しない）
         g = glivers.get(cid)
         if g and tot < GRAD_PT:      # 卒業ライン変更で条件を満たさなくなった人は卒業を取り消す
             del glivers[cid]; g = None

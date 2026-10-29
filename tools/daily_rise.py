@@ -55,6 +55,18 @@ def event_num(event_id, field, default):
         pass
     return default
 
+def event_flag(event_id, field, default=True):
+    """events.json の真偽設定（無ければ default）。月別の加点ON/OFFに使う。"""
+    try:
+        doc = json.load(open(os.path.join(REPO, "data", "events.json"), encoding="utf-8"))
+        for ev in doc.get("events", []):
+            if ev.get("id") == event_id:
+                return bool(ev.get(field, default))
+    except Exception:
+        pass
+    return default
+
+
 def err(*a): print(*a, file=sys.stderr)
 def toint(v):
     if v in (None, "-", ""): return 0
@@ -105,6 +117,9 @@ def main():
 
     # RISE達成フラグ：当月「base＋stampの合算」が MILESTONE_PT 到達で「◯/◯ ◯万pt達成！」を記録（月別）。
     MILESTONE_PT = event_num(f"tiktok-{ym}-rise", "milestone_pt", 3000000)
+    FAN_ON   = event_flag(f"tiktok-{ym}-rise", "fan_bonus", True)   # 2026-11〜 廃止（月別）
+    STAMP_ON = event_flag(f"tiktok-{ym}-rise", "stamp_add", True)   # 2026-11〜 ランキングに反映しない（仕組みは継続）
+    err(f"加点設定: ファンクラブボーナス={'ON' if FAN_ON else 'OFF'} / スタンプ合算={'ON' if STAMP_ON else 'OFF'}")
     MSTONE = os.path.join(REPO, "data", "rise_milestone.json")
     mstate = {"month": month, "livers": {}}
     if os.path.exists(MSTONE):
@@ -170,10 +185,11 @@ def main():
         if not new_model and last_i > LAST_MAX: continue   # 旧モデルのみ上位層(先月20万ダイヤ超)を除外
         days = toint(r[DAYS]); bonus = keizoku_bonus(days, r[L])
         base = cur * 10 + ah * 5 + ag * 1000 + bonus
-        fans = toint(r[FANS]); fanpct, fanbonus = fan_bonus(fans, base)
+        fans = toint(r[FANS])
+        fanpct, fanbonus = fan_bonus(fans, base) if FAN_ON else (0, 0)
         pt = base + fanbonus
         rid = str(r[ID]).strip()
-        tot = pt + stamp_r.get(rid, 0)          # 合算ポイント
+        tot = pt + (stamp_r.get(rid, 0) if STAMP_ON else 0)   # 合算ポイント（STAMP_ON=Falseなら合算しない）
         if new_model:
             grad = (rid in grad_set)                        # 当月ビギナー卒業（達成日から即エントリー）
             ppt = prev_pt.get(rid, 0)

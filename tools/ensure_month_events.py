@@ -14,7 +14,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EVENTS = os.path.join(REPO, "data", "events.json")
 DATA = os.path.join(REPO, "data")
 KINDS = ("newcomer", "rise")
-CSV_HEADER = "name,point,livetime,days,fans,bonus,fanpct,fanbonus\n"
+CSV_HEADER = "name,point,livetime,days,fans,bonus,fanpct,fanbonus,user\n"
 
 
 def ensure(month):

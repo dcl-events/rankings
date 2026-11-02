@@ -90,8 +90,8 @@ def rows_from_csv(ev_cfg):
             v = float(r[field])
         except (ValueError, KeyError, TypeError):
             continue
-        if v <= 0:
-            continue
+        if v <= 0 and not ev_cfg.get("list_all_members"):
+            continue      # 通常は0点（非アクティブ・#DIV/0!）を除外。在籍＝掲載のイベントは残す
         row = {"name": r["name"].strip(), "score": v}
         if time_field:
             row["time"] = (r.get(time_field) or "").strip()
@@ -456,8 +456,8 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
     fn = r.get("fans")
     parts = []
     if tm: parts.append(f"⏱ 配信 {html.escape(tm)}")
-    if dy: parts.append(f"📅 有効LIVE {html.escape(dy)}日")
-    if fn:
+    if dy and dy.strip() not in ("0", ""): parts.append(f"📅 有効LIVE {html.escape(dy)}日")
+    if fn and fn.strip() not in ("0", ""):
         flabel = ev_cfg.get("fans_label", "💛 アクティブファン")
         parts.append(f"{html.escape(flabel)} {html.escape(fn)}人")
     # ファンクラブボーナス(fanpct/fanbonus)は人数表記があれば足りるのでカードには出さない
@@ -682,6 +682,8 @@ def build_event(ev_cfg, report):
     def gap_for(i, r):
         if not ev_cfg.get("show_gap"):
             return ""
+        if not r.get("score"):
+            return ""              # まだ0ptの在籍者には距離を出さない
         if i == 1:
             return "首位"
         need = int(round(shown[i - 2]["score"] - r["score"])) + 1

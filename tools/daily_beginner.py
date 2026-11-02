@@ -116,6 +116,7 @@ def main():
     # 卒業ライン（月別）：events.json の当月ビギナーイベント grad_pt（無ければ既定30万）
     GRAD_PT = event_num(f"tiktok-{month.replace('-','')}-newcomer", "grad_pt", GRAD_PT_DEFAULT)
     _ymn = month.replace('-', '')
+    ALL_MEMBERS = event_flag(f"tiktok-{_ymn}-newcomer", "list_all_members", False)  # 在籍＝掲載（0ptでも載せる）
     FAN_ON   = event_flag(f"tiktok-{_ymn}-newcomer", "fan_bonus", True)   # 2026-11〜 廃止（月別）
     STAMP_ON = event_flag(f"tiktok-{_ymn}-newcomer", "stamp_add", True)   # 2026-11〜 ランキングに反映しない
     err(f"加点設定: ファンクラブボーナス={'ON' if FAN_ON else 'OFF'} / スタンプ合算={'ON' if STAMP_ON else 'OFF'}")
@@ -193,7 +194,7 @@ def main():
         join = r[J][:10]; is_new = join.startswith(month)
         cid = str(r[ID]).strip()
         if not cid.isdigit(): continue   # 退会ライバー（IDが「クリエイターがエージェンシーを退会しました」等）は除外
-        if cur < 1: continue
+        if cur < 1 and not ALL_MEMBERS: continue   # 在籍＝掲載の月は当月0ダイヤでも載せる
         # 参加判定：前月ポイント<30万 or 当月デビュー（前月pt未生成時は先月ダイヤ<1万にフォールバック）
         if prev_pt:
             _ppt = prev_pt.get(cid, 0)
@@ -209,7 +210,7 @@ def main():
         fans = toint(r[FANS])
         fanpct, fanbonus = fan_bonus(fans, base) if FAN_ON else (0, 0)
         pt = base + fanbonus
-        if cur < LIST_MIN_DIA: continue   # 掲載＝当月100ダイヤ以上（旧:pt>=floor。バトルptのみでの掲載を防ぐ）
+        if cur < LIST_MIN_DIA and not ALL_MEMBERS: continue   # 掲載＝当月100ダイヤ以上（旧:pt>=floor。バトルptのみでの掲載を防ぐ）
         name = r[N].strip()
 
         # 卒業判定：当月pt＋スタンプ獲得pt(合算)>=30万で卒業。初回検知日を記録し、猶予明けで掲載終了

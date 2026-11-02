@@ -117,6 +117,7 @@ def main():
 
     # RISE達成フラグ：当月「base＋stampの合算」が MILESTONE_PT 到達で「◯/◯ ◯万pt達成！」を記録（月別）。
     MILESTONE_PT = event_num(f"tiktok-{ym}-rise", "milestone_pt", 3000000)
+    ALL_MEMBERS = event_flag(f"tiktok-{ym}-rise", "list_all_members", False)  # 在籍＝掲載（0ptでも載せる）
     FAN_ON   = event_flag(f"tiktok-{ym}-rise", "fan_bonus", True)   # 2026-11〜 廃止（月別）
     STAMP_ON = event_flag(f"tiktok-{ym}-rise", "stamp_add", True)   # 2026-11〜 ランキングに反映しない（仕組みは継続）
     err(f"加点設定: ファンクラブボーナス={'ON' if FAN_ON else 'OFF'} / スタンプ合算={'ON' if STAMP_ON else 'OFF'}")
@@ -202,7 +203,7 @@ def main():
             grad = (rid in grad_set) or (last_i < LAST_MIN and tot >= GRAD_PT)
             include = mid or grad
         if not include: continue
-        if pt < floor: continue
+        if pt < floor and not ALL_MEMBERS: continue   # 在籍＝掲載の月は0ptでも載せる
         # RISE達成フラグ：合算300万pt到達を初回検知日で記録（達成日は固定）
         if tot >= MILESTONE_PT and rid not in mlivers:
             mlivers[rid] = {"name": r[N].strip(), "achieved_on": today,

@@ -545,7 +545,8 @@
       "list_min_dia": 1,
       "fan_bonus": true,
       "stamp_add": false,
-      "entry_min_prev_pt": 200000
+      "entry_min_prev_pt": 200000,
+      "list_all_members": true
     },
     {
       "id": "tiktok-202611-rise",
@@ -612,7 +613,8 @@
       "graduate_showcase": true,
       "graduate_label": "🏆 達成者・昇格",
       "fan_bonus": true,
-      "stamp_add": false
+      "stamp_add": false,
+      "list_all_members": true
     },
     {
       "id": "tiktok-202611-rise3",

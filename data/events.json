@@ -117,7 +117,8 @@
           "label": "⚡ TikTok LIVE 公式イベントはこちら",
           "url": "https://dcl-event.github.io/dcl-tiktok-event-calendar/"
         }
-      ]
+      ],
+      "order": 20
     },
     {
       "id": "tiktok-202607-growthbattle",
@@ -226,7 +227,8 @@
           "label": "⚡ TikTok LIVE 公式イベントはこちら",
           "url": "https://dcl-event.github.io/dcl-tiktok-event-calendar/"
         }
-      ]
+      ],
+      "order": 10
     },
     {
       "id": "tiktok-202609-newcomer",
@@ -280,7 +282,8 @@
         }
       ],
       "stamp_tier": "beginner",
-      "stamp_snapshot": "beginner_snapshot.json"
+      "stamp_snapshot": "beginner_snapshot.json",
+      "order": 20
     },
     {
       "id": "tiktok-202609-rise",
@@ -343,7 +346,8 @@
         }
       ],
       "stamp_tier": "rise",
-      "stamp_snapshot": "rise_snapshot.json"
+      "stamp_snapshot": "rise_snapshot.json",
+      "order": 10
     },
     {
       "id": "tiktok-202610-newcomer",
@@ -410,7 +414,8 @@
         "surface": "#1d1216",
         "line2": "#3a2329"
       },
-      "list_min_dia": 100
+      "list_min_dia": 100,
+      "order": 20
     },
     {
       "id": "tiktok-202610-rise",
@@ -476,7 +481,8 @@
       "milestone_pt": 4000000,
       "entry_min_prev_pt": 2000000,
       "graduate_showcase": true,
-      "graduate_label": "🏆 達成者・昇格"
+      "graduate_label": "🏆 達成者・昇格",
+      "order": 10
     },
     {
       "id": "tiktok-202611-rise2",
@@ -546,7 +552,8 @@
       "fan_bonus": true,
       "stamp_add": false,
       "entry_min_prev_pt": 200000,
-      "list_all_members": true
+      "list_all_members": true,
+      "order": 20
     },
     {
       "id": "tiktok-202611-rise",
@@ -614,7 +621,8 @@
       "graduate_label": "🏆 達成者・昇格",
       "fan_bonus": true,
       "stamp_add": false,
-      "list_all_members": true
+      "list_all_members": true,
+      "order": 10
     },
     {
       "id": "tiktok-202611-rise3",
@@ -685,7 +693,8 @@
       "clear_pt": 200000,
       "heartme_pt": 5000,
       "heart_field": "heart",
-      "fans_label": "💗 ハートミー"
+      "fans_label": "💗 ハートミー",
+      "order": 30
     }
   ]
 }

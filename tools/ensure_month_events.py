@@ -13,8 +13,9 @@ import sys, os, re, json, calendar
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EVENTS = os.path.join(REPO, "data", "events.json")
 DATA = os.path.join(REPO, "data")
-KINDS = ("newcomer", "rise")
+KINDS = ("newcomer", "rise", "rise3")
 CSV_HEADER = "name,point,livetime,days,fans,bonus,fanpct,fanbonus,user\n"
+CSV_HEADER_RISE3 = "name,point,livetime,days,fans,bonus,fanpct,fanbonus,heart,user\n"
 
 
 def ensure(month):
@@ -47,7 +48,7 @@ def ensure(month):
         csv_path = os.path.join(DATA, ev["data_file"])
         if not os.path.exists(csv_path):
             with open(csv_path, "w", encoding="utf-8") as fh:
-                fh.write(CSV_HEADER)
+                fh.write(CSV_HEADER_RISE3 if kind == "rise3" else CSV_HEADER)
 
     if created:
         with open(EVENTS, "w", encoding="utf-8") as fh:

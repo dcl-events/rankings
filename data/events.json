@@ -497,8 +497,8 @@
         {
           "h": "参加ルール",
           "items": [
-            "前月の獲得ポイントが200万pt未満、または当月デビューのライバー",
-            "当月100ダイヤ以上で掲載"
+            "前月の獲得ポイントが20万pt以上200万pt未満のライバー",
+            "RISE3をクリア（当月20万pt到達）したライバー（達成日から即エントリー）"
           ]
         },
         {
@@ -514,7 +514,8 @@
             "通常ダイヤポイント：ダイヤ数 × 10pt",
             "バトルダイヤポイント：ダイヤ数 × 5pt（通常ポイントに上乗せ）",
             "バトル回数ポイント：1000pt（バトル回数分、繰り返し加算）",
-            "継続ボーナス：有効LIVE日数18日以上 かつ LIVE時間70時間以上で 50,000pt（月間・1回）"
+            "継続ボーナス：有効LIVE日数18日以上 かつ LIVE時間70時間以上で 50,000pt（月間・1回）",
+            "ファンクラブボーナス：アクティブファン10人ごとに合計ポイント+1%（計算上限200人＝最大+20%）"
           ]
         }
       ],
@@ -541,9 +542,10 @@
         "surface": "#1d1216",
         "line2": "#3a2329"
       },
-      "list_min_dia": 100,
-      "fan_bonus": false,
-      "stamp_add": false
+      "list_min_dia": 1,
+      "fan_bonus": true,
+      "stamp_add": false,
+      "entry_min_prev_pt": 200000
     },
     {
       "id": "tiktok-202611-rise",
@@ -581,7 +583,8 @@
             "通常ダイヤポイント：ダイヤ数 × 10pt",
             "バトルダイヤポイント：ダイヤ数 × 5pt（通常ポイントに上乗せ）",
             "バトル回数ポイント：1000pt（バトル回数分、繰り返し加算）",
-            "継続ボーナス：有効LIVE日数18日以上 かつ LIVE時間70時間以上で 50,000pt（月間・1回）"
+            "継続ボーナス：有効LIVE日数18日以上 かつ LIVE時間70時間以上で 50,000pt（月間・1回）",
+            "ファンクラブボーナス：アクティブファン10人ごとに合計ポイント+1%（計算上限200人＝最大+20%）"
           ]
         }
       ],
@@ -608,8 +611,79 @@
       "entry_min_prev_pt": 2000000,
       "graduate_showcase": true,
       "graduate_label": "🏆 達成者・昇格",
-      "fan_bonus": false,
+      "fan_bonus": true,
       "stamp_add": false
+    },
+    {
+      "id": "tiktok-202611-rise3",
+      "platform": "TikTok LIVE",
+      "source": "csv",
+      "data_file": "tiktok-202611-rise3.csv",
+      "title": "⚡️DCL RISE3⚡️\n🎁 11月累計 point",
+      "period_start": "2026-11-01",
+      "period_end": "2026-11-30",
+      "score_field": "point",
+      "score_label": "🎁point",
+      "time_field": "livetime",
+      "format": "int",
+      "display": "value",
+      "show_gap": true,
+      "top_n": 500,
+      "rules": [
+        {
+          "h": "参加ルール",
+          "items": [
+            "前月の獲得ポイントが20万pt未満のライバー（デビュー直後は全員RISE3スタート）",
+            "当月1ダイヤ以上で掲載"
+          ]
+        },
+        {
+          "h": "クリアルール",
+          "items": [
+            "当月20万pt到達でクリア（ハートミー約100人）",
+            "達成の翌日にRISE3掲載終了 → ⚡️DCL RISE2⚡️へ移行（エントリーは達成日から）"
+          ]
+        },
+        {
+          "h": "ポイントルール",
+          "items": [
+            "通常ダイヤポイント：ダイヤ数 × 10pt",
+            "バトルダイヤポイント：ダイヤ数 × 5pt（通常ポイントに上乗せ）",
+            "バトル回数ポイント：1000pt（バトル回数分、繰り返し加算）",
+            "ハートミーポイント：ハートミー1個 2,000pt",
+            "継続ボーナス：有効LIVE日数18日以上 かつ LIVE時間70時間以上で 50,000pt（月間・1回）",
+            "ファンクラブボーナス：アクティブファン10人ごとに合計ポイント+1%（計算上限200人＝最大+20%）"
+          ]
+        }
+      ],
+      "days_field": "days",
+      "fans_field": "fans",
+      "bonus_field": "bonus",
+      "links": [
+        {
+          "label": "⚡ TikTok LIVE 公式イベントはこちら",
+          "url": "https://dcl-event.github.io/dcl-tiktok-event-calendar/"
+        }
+      ],
+      "theme": {
+        "accent": "#c07bff",
+        "accent2": "#ff5fa2",
+        "hero": "linear-gradient(135deg,#161024 0%,#2f1b4d 42%,#48217a 74%,#1a1230 100%)",
+        "logo": "assets/rise3_logo.png",
+        "favicon": "assets/dcl_mark.png",
+        "dark": true,
+        "darkbg": "radial-gradient(1100px 420px at 10% -10%, #2b1b4a 0%, rgba(43,27,74,0) 62%),radial-gradient(900px 380px at 100% 2%, #48217a 0%, rgba(72,33,122,0) 58%),#0d0a18",
+        "surface": "#191330",
+        "line2": "#2f2550"
+      },
+      "list_min_dia": 1,
+      "fan_bonus": true,
+      "stamp_add": false,
+      "entry_max_prev_pt": 200000,
+      "clear_pt": 200000,
+      "heartme_pt": 2000,
+      "heart_field": "heart",
+      "fans_label": "💗 ハートミー"
     }
   ]
 }

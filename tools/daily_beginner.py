@@ -134,6 +134,18 @@ def main():
     # 参加判定：前月ポイント<30万（前月最終TSVから事前生成した prev_month_points_<前月>.json）。
     # ＝参加上限を卒業ライン(30万)と同じに揃える。未生成なら旧ルール(先月ダイヤ<1万)へフォールバック。
     PART_PT = GRAD_PT
+    # 参加の下限（2026-11〜）：前月pt が ENTRY_MIN 以上（20万未満はRISE3）。0なら下限なし＝従来どおり。
+    ENTRY_MIN = event_num(f"tiktok-{_ymn}-newcomer", "entry_min_prev_pt", 0)
+    # 当月RISE3クリア者は達成日から即エントリー（data/rise3_cleared.json）
+    r3_clear = set()
+    _cf = os.path.join(REPO, "data", "rise3_cleared.json")
+    if os.path.exists(_cf):
+        try:
+            _c = json.load(open(_cf))
+            if _c.get("month") == month: r3_clear = set((_c.get("livers") or {}).keys())
+        except Exception: r3_clear = set()
+    if ENTRY_MIN:
+        err(f"参加: 前月pt {ENTRY_MIN:,}〜{PART_PT:,}未満 ／ RISE3クリア {len(r3_clear)}名を即エントリー")
     prevmonth = (datetime.strptime(month + "-01", "%Y-%m-%d") - timedelta(days=1)).strftime("%Y%m")
     PREVPT = os.path.join(REPO, "data", f"prev_month_points_{prevmonth}.json")
     prev_pt = {}
@@ -184,7 +196,12 @@ def main():
         if cur < 1: continue
         # 参加判定：前月ポイント<30万 or 当月デビュー（前月pt未生成時は先月ダイヤ<1万にフォールバック）
         if prev_pt:
-            if not ((prev_pt.get(cid, 0) < PART_PT) or is_new): continue
+            _ppt = prev_pt.get(cid, 0)
+            if ENTRY_MIN:
+                # 2026-11〜：前月pt 20万〜200万未満、または当月RISE3クリア（デビュー直後はRISE3から）
+                if not ((ENTRY_MIN <= _ppt < PART_PT) or cid in r3_clear): continue
+            else:
+                if not ((_ppt < PART_PT) or is_new): continue
         else:
             if not ((last_i < 10000) or is_new): continue
         days = toint(r[DAYS]); bonus = keizoku_bonus(days, r[L])

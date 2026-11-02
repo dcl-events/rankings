@@ -75,6 +75,11 @@ python3 tools/make_stamp_points.py >>"$LOG" 2>&1 && say "stamp_points.json 更�
 "$HOME/Claude/pococha/.venv/bin/python" tools/battle_dm.py >>"$LOG" 2>&1 \
   && say "battle_dm.json 更新OK" || say "⚠️ バトルDM可の取り込みに失敗（前回値のまま続行）"
 
+# 1-0. ⚡️DCL RISE3⚡️（最下位リーグ／ハートミー加点）。RISE2より先に走らせる＝
+#      当月クリア者(data/rise3_cleared.json)をRISE2が「即エントリー」として拾えるようにするため。
+R3="$(python3 tools/daily_rise3.py --month "$MONTH" --date "$DATE" --bare 2>>"$LOG")"
+[ -n "$R3" ] || say "⚠️ RISE3生成失敗（前回値のまま続行）"
+
 # 1. ビギナー（当月10万pt到達で卒業→7日猶予後に自動で掲載終了）※最新stampで合算順を計算
 BEG="$(python3 tools/daily_beginner.py --month "$MONTH" --floor 1000 --date "$DATE" --bare 2>>"$LOG")"
 [ -n "$BEG" ] || fail "ビギナー生成失敗（データTSVが見つからない等）"
@@ -97,10 +102,12 @@ PENDING_DIR="$REPO/.git/pending-rankings"
 PENDING="$PENDING_DIR/${MONTH}_${DATE//\//-}"
 if [ -f "$PENDING.beg" ] && [ -f "$PENDING.rise" ]; then
   BEG="$(cat "$PENDING.beg")"; RISE="$(cat "$PENDING.rise")"
+  [ -f "$PENDING.r3" ] && R3="$(cat "$PENDING.r3")"
   say "前回 push 失敗時に保存した変動本文を使用（$PENDING）"
 fi
 save_pending(){
-  mkdir -p "$PENDING_DIR" && printf '%s\n' "$BEG" > "$PENDING.beg" && printf '%s\n' "$RISE" > "$PENDING.rise" \
+  mkdir -p "$PENDING_DIR" && printf '%s\n' "$R3" > "$PENDING.r3" \
+    && printf '%s\n' "$BEG" > "$PENDING.beg" && printf '%s\n' "$RISE" > "$PENDING.rise" \
     && say "変動本文を保存（$PENDING）" || say "⚠️ 変動本文の保存に失敗"
 }
 if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git status --porcelain)" ]; then
@@ -134,6 +141,8 @@ beg_head="$(printf '%s\n' "$BEG" | head -2)"   # 🌱見出し＋URL
 beg_body="$(printf '%s\n' "$BEG" | tail -n +4)" # 順位変動・卒業・掲載終了
 rise_head="$(printf '%s\n' "$RISE" | head -2)"  # ⚡️見出し＋URL
 rise_body="$(printf '%s\n' "$RISE" | tail -n +4)" # 順位変動・新規RISE入り
+r3_head="$(printf '%s\n' "$R3" | head -2)"      # ⚡️RISE3見出し＋URL
+r3_body="$(printf '%s\n' "$R3" | tail -n +4)"   # 順位変動・クリア・掲載終了
 
 # --- 親メッセージ（短く：見出し＋メンション＋2つのURLだけ） ---
 printf '%s\n' "📊 TikTok LIVE ランキング更新（${DATE}時点）"
@@ -142,6 +151,7 @@ printf '%s\n' "<@U0A6WU3P3LL>"
 printf '\n'
 printf '%s\n\n' "$rise_head"
 printf '%s\n' "$beg_head"
+[ -n "$R3" ] && printf '\n%s\n' "$r3_head"
 
 printf '\n%s\n' "===THREAD==="
 
@@ -150,6 +160,10 @@ printf '%s\n' "⚡️DCL RISE1⚡️"
 printf '%s\n\n' "$rise_body"
 printf '%s\n' "⚡️DCL RISE2⚡️"
 printf '%s\n' "$beg_body"
+if [ -n "$R3" ]; then
+  printf '\n%s\n' "⚡️DCL RISE3⚡️"
+  printf '%s\n' "$r3_body"
+fi
 
 # 課題申告シート（自己申告制・マネージャー入力用）の加点状況＋リンクを添える。
 # 誰がオールクリア＝加点されたか / 申告が進んだかを前回との差分で出す（状態は stamp-rally 側に保存）。

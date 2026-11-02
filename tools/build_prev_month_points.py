@@ -37,10 +37,14 @@ def main():
     period = month + "-01"          # データ期間の先頭 '2026-08-01'
     cands = []
     for f in sorted(glob.glob(os.path.join(TSV_DIR, "creator_data_*.tsv"))):
+        # 「データ期間」は列名で引く（2026-11にバックステージリンク/Liny URLが挿入され固定indexが破綻したため）
         with open(f, encoding="utf-8") as fh:
-            fh.readline()                     # ヘッダ
-            row2 = fh.readline().split("\t")   # 先頭データ行
-        dperiod = row2[2] if len(row2) > 2 else ""
+            head = fh.readline().rstrip("\n").split("\t")
+            row2 = fh.readline().rstrip("\n").split("\t")
+        try:
+            dperiod = row2[head.index("データ期間")]
+        except (ValueError, IndexError):
+            dperiod = ""
         if dperiod.startswith(period):
             cands.append(f)
     if not cands:

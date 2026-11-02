@@ -5,7 +5,9 @@
 daily_rise.py / daily_beginner.py と同じ構造。違いは以下の3点だけ。
 
   1) 参加資格 : 前月pt < 20万（prev_month_points_<前月>.json）。記録が無い＝デビュー直後も対象。
-  2) ポイント : ハートミー（＝ファンクラブのアクティブなファン）1人 +2,000pt を base に足す。
+  2) ポイント : ハートミー（＝当月の「新規ファン」＝その月に新しく付いたファン）1人 +2,000pt を base に足す。
+                ※アクティブなファン（直近7日以内に投げた人）は月内に減る（10月実測で148名中98名が減少）ため
+                  ランキングのptには使わない。ファンクラブボーナスの%判定だけは仕様どおりアクティブファンを使う。
                 pt =（ダイヤ×10 + Matchダイヤ×5 + Match数×1,000 + 継続50,000 + ハートミー×2,000）
                      ×（1 + アクティブファン10人ごとに1%・上限+20%）
   3) 掲載     : 当月1ダイヤ以上（ハートミーは在籍数＝ストックなので、未配信者に加点が入るのを防ぐ）
@@ -15,7 +17,7 @@ daily_rise.py / daily_beginner.py と同じ構造。違いは以下の3点だけ
 掲載は RISE2→RISE1 と同じく「達成の翌日に掲載終了」。
 
 月別の設定は events.json の tiktok-<YYYYMM>-rise3 から読む:
-  entry_max_prev_pt(既定200000) / clear_pt(既定200000) / heartme_pt(既定2000) / list_min_dia(既定1)
+  entry_max_prev_pt(既定200000) / clear_pt(既定200000) / heartme_pt(既定2000・1人あたり) / list_min_dia(既定1)
   fan_bonus(既定true)
 
 使い方:
@@ -159,7 +161,7 @@ def main():
     rows = list(csv.reader(open(tsv, encoding="utf-8"), delimiter="\t"))
     hdr = rows[0]; c = {n: k for k, n in enumerate(hdr)}
     ID = c["クリエイターID"]; N = c["ライバー名"]; D = c["ダイヤモンド"]; L = c["LIVE時間"]
-    DAYS = c["有効LIVE日数"]; FANS = c["ファンクラブのアクティブなファン"]
+    DAYS = c["有効LIVE日数"]; FANS = c["ファンクラブのアクティブなファン"]; NEWF = c["新規ファン"]
     AG = c["LIVE Match数"]; AH = c["LIVE Matchで獲得したダイヤモンド数"]
     U = c["クリエイターのユーザー名"]
 
@@ -172,8 +174,10 @@ def main():
         if cur < LIST_MIN_DIA: continue         # 掲載＝当月1ダイヤ以上（未配信者にハートミー加点を入れない）
         if prev_pt.get(cid, 0) >= ENTRY_MAX: continue   # 前月20万pt以上＝RISE2/RISE1の領域
 
-        ah = toint(r[AH]); ag = toint(r[AG]); days = toint(r[DAYS]); fans = toint(r[FANS])
-        base = cur * 10 + ah * 5 + ag * 1000 + keizoku_bonus(days, r[L]) + fans * HEART_PT
+        ah = toint(r[AH]); ag = toint(r[AG]); days = toint(r[DAYS])
+        fans = toint(r[FANS])            # アクティブファン（ファンクラブボーナスの%判定用）
+        newf = toint(r[NEWF])            # ハートミー＝当月の新規ファン（加点はこちら）
+        base = cur * 10 + ah * 5 + ag * 1000 + keizoku_bonus(days, r[L]) + newf * HEART_PT
         fanpct, fanbonus = fan_bonus(fans, base) if FAN_ON else (0, 0)
         pt = base + fanbonus
         name = r[N].strip()
@@ -195,9 +199,9 @@ def main():
             continue                            # 翌日以降はRISE3から外れる（RISE2で継続）
 
         r3.append({"cid": cid, "name": name, "pt": pt, "cur": cur, "ag": ag,
-                   "live": hm(r[L]), "days": days, "fans": fans,
+                   "live": hm(r[L]), "days": days, "fans": fans, "newfans": newf,
                    "bonus": keizoku_bonus(days, r[L]), "fanpct": fanpct, "fanbonus": fanbonus,
-                   "heart": fans * HEART_PT, "user": str(r[U]).strip()})
+                   "heart": newf * HEART_PT, "user": str(r[U]).strip()})
     r3.sort(key=lambda x: -x["pt"])
 
     # CSV（他リーグと同じ列＋heart）
@@ -206,9 +210,10 @@ def main():
     else:
         with open(CSV_OUT, "w", encoding="utf-8", newline="") as f:
             w = csv.writer(f)
-            w.writerow(["name", "point", "livetime", "days", "fans", "bonus", "fanpct", "fanbonus", "heart", "user"])
+            w.writerow(["name", "point", "livetime", "days", "fans", "newfans",
+                        "bonus", "fanpct", "fanbonus", "heart", "user"])
             for b in r3:
-                w.writerow([b["name"], b["pt"], b["live"], b["days"], b["fans"],
+                w.writerow([b["name"], b["pt"], b["live"], b["days"], b["fans"], b["newfans"],
                             b["bonus"], b["fanpct"], b["fanbonus"], b["heart"], b["user"]])
     err(f"CSV {len(r3)}名（クリア新規 {len(newclear)}名／本日掲載終了 {len(dropped)}名）")
 

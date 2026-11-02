@@ -15,7 +15,7 @@ EVENTS = os.path.join(REPO, "data", "events.json")
 DATA = os.path.join(REPO, "data")
 KINDS = ("newcomer", "rise", "rise3")
 CSV_HEADER = "name,point,livetime,days,fans,bonus,fanpct,fanbonus,user\n"
-CSV_HEADER_RISE3 = "name,point,livetime,days,fans,bonus,fanpct,fanbonus,heart,user\n"
+CSV_HEADER_RISE3 = "name,point,livetime,days,fans,newfans,bonus,fanpct,fanbonus,heart,user\n"
 
 
 def ensure(month):

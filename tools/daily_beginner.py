@@ -37,11 +37,17 @@ BONUS_DAYS = 18     # 有効LIVE日数（月間）
 BONUS_HOURS = 70    # LIVE時間（月間・時間）
 FAN_CAP = 200       # ファンクラブボーナスの計算上限人数（10人ごとに+1%＝最大+20%）
 
+
+def nc_kind(month):
+    """RISE2ページのid接尾辞。2026-11にURLを rise2 へ改称（10月以前は newcomer のまま）。"""
+    return "rise2" if month >= "2026-11" else "newcomer"
+
 def paths_for(month):
     """対象月(YYYY-MM)から CSV出力先・公開URL を作る（月替わりで自動的に当月へ切り替わる）。"""
     ym = month.replace("-", "")
-    return (os.path.join(REPO, "data", f"tiktok-{ym}-newcomer.csv"),
-            f"https://dcl-events.github.io/rankings/tiktok-{ym}-newcomer.html",
+    k = nc_kind(month)
+    return (os.path.join(REPO, "data", f"tiktok-{ym}-{k}.csv"),
+            f"https://dcl-events.github.io/rankings/tiktok-{ym}-{k}.html",
             f"https://dcl-events.github.io/rankings/tiktok-{ym}-rise.html")
 
 
@@ -114,14 +120,14 @@ def main():
     today = asof or datetime.now(JST).strftime("%Y-%m-%d")
     CSV_OUT, URL, RISE_URL = paths_for(month)
     # 卒業ライン（月別）：events.json の当月ビギナーイベント grad_pt（無ければ既定30万）
-    GRAD_PT = event_num(f"tiktok-{month.replace('-','')}-newcomer", "grad_pt", GRAD_PT_DEFAULT)
+    GRAD_PT = event_num(f"tiktok-{month.replace('-','')}-{nc_kind(month)}", "grad_pt", GRAD_PT_DEFAULT)
     _ymn = month.replace('-', '')
-    ALL_MEMBERS = event_flag(f"tiktok-{_ymn}-newcomer", "list_all_members", False)  # 在籍＝掲載（0ptでも載せる）
-    FAN_ON   = event_flag(f"tiktok-{_ymn}-newcomer", "fan_bonus", True)   # 2026-11〜 廃止（月別）
-    STAMP_ON = event_flag(f"tiktok-{_ymn}-newcomer", "stamp_add", True)   # 2026-11〜 ランキングに反映しない
+    ALL_MEMBERS = event_flag(f"tiktok-{_ymn}-{nc_kind(month)}", "list_all_members", False)  # 在籍＝掲載（0ptでも載せる）
+    FAN_ON   = event_flag(f"tiktok-{_ymn}-{nc_kind(month)}", "fan_bonus", True)   # 2026-11〜 廃止（月別）
+    STAMP_ON = event_flag(f"tiktok-{_ymn}-{nc_kind(month)}", "stamp_add", True)   # 2026-11〜 ランキングに反映しない
     err(f"加点設定: ファンクラブボーナス={'ON' if FAN_ON else 'OFF'} / スタンプ合算={'ON' if STAMP_ON else 'OFF'}")
     # 掲載ライン：当月ダイヤが list_min_dia 以上で掲載（2026-10〜。pt floorは使わない＝バトルptだけの掲載を防ぐ）
-    LIST_MIN_DIA = event_num(f"tiktok-{month.replace('-','')}-newcomer", "list_min_dia", 100)
+    LIST_MIN_DIA = event_num(f"tiktok-{month.replace('-','')}-{nc_kind(month)}", "list_min_dia", 100)
 
     # 卒業状態（月が変わったらリセット）
     gstate = {"month": month, "livers": {}}
@@ -136,7 +142,7 @@ def main():
     # ＝参加上限を卒業ライン(30万)と同じに揃える。未生成なら旧ルール(先月ダイヤ<1万)へフォールバック。
     PART_PT = GRAD_PT
     # 参加の下限（2026-11〜）：前月pt が ENTRY_MIN 以上（20万未満はRISE3）。0なら下限なし＝従来どおり。
-    ENTRY_MIN = event_num(f"tiktok-{_ymn}-newcomer", "entry_min_prev_pt", 0)
+    ENTRY_MIN = event_num(f"tiktok-{_ymn}-{nc_kind(month)}", "entry_min_prev_pt", 0)
     # 当月RISE3クリア者は達成日から即エントリー（data/rise3_cleared.json）
     r3_clear = set()
     _cf = os.path.join(REPO, "data", "rise3_cleared.json")

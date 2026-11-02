@@ -45,11 +45,16 @@ FAN_CAP = 200                # ファンクラブボーナスの計算上限人�
 GRACE_DAYS = 1               # クリアの翌日に掲載終了（RISE2と同じ）
 
 
+
+def nc_kind(month):
+    """RISE2ページのid接尾辞。2026-11にURLを rise2 へ改称（10月以前は newcomer のまま）。"""
+    return "rise2" if month >= "2026-11" else "newcomer"
+
 def paths_for(month):
     ym = month.replace("-", "")
     return (os.path.join(REPO, "data", f"tiktok-{ym}-rise3.csv"),
             f"https://dcl-events.github.io/rankings/tiktok-{ym}-rise3.html",
-            f"https://dcl-events.github.io/rankings/tiktok-{ym}-newcomer.html")
+            f"https://dcl-events.github.io/rankings/tiktok-{ym}-{nc_kind(month)}.html")
 
 
 def _event(event_id, field, default):

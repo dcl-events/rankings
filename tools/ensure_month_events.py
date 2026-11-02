@@ -13,7 +13,7 @@ import sys, os, re, json, calendar
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EVENTS = os.path.join(REPO, "data", "events.json")
 DATA = os.path.join(REPO, "data")
-KINDS = ("newcomer", "rise", "rise3")
+KINDS = ("rise2", "rise", "rise3")   # 2026-11〜 RISE2のidは rise2（10月以前は newcomer）
 CSV_HEADER = "name,point,livetime,days,fans,bonus,fanpct,fanbonus,user\n"
 CSV_HEADER_RISE3 = "name,point,livetime,days,fans,newfans,bonus,fanpct,fanbonus,heart,user\n"
 
@@ -31,8 +31,9 @@ def ensure(month):
         if new_id in ids:
             continue
         # 直近（idの昇順で最後＝最新月）の同種イベントを雛形にする
+        pat = r"tiktok-\d{6}-(?:rise2|newcomer)" if kind == "rise2" else rf"tiktok-\d{{6}}-{kind}"
         srcs = sorted((ev for ev in doc["events"]
-                       if re.fullmatch(rf"tiktok-\d{{6}}-{kind}", ev.get("id", ""))),
+                       if re.fullmatch(pat, ev.get("id", ""))),
                       key=lambda ev: ev["id"])
         if not srcs:
             sys.exit(f"雛形になる過去イベントが見つかりません: tiktok-YYYYMM-{kind}")

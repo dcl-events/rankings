@@ -479,10 +479,10 @@
       "graduate_label": "🏆 達成者・昇格"
     },
     {
-      "id": "tiktok-202611-newcomer",
+      "id": "tiktok-202611-rise2",
       "platform": "TikTok LIVE",
       "source": "csv",
-      "data_file": "tiktok-202611-newcomer.csv",
+      "data_file": "tiktok-202611-rise2.csv",
       "title": "⚡️DCL RISE2⚡️\n🎁 11月累計 point",
       "period_start": "2026-11-01",
       "period_end": "2026-11-30",

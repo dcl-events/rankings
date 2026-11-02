@@ -37,6 +37,11 @@ BONUS_DAYS = 18     # 有効LIVE日数（月間）
 BONUS_HOURS = 70    # LIVE時間（月間・時間）
 FAN_CAP = 200       # ファンクラブボーナスの計算上限人数（10人ごとに+1%＝最大+20%）
 
+
+def nc_kind(month):
+    """RISE2ページのid接尾辞。2026-11にURLを rise2 へ改称（10月以前は newcomer のまま）。"""
+    return "rise2" if month >= "2026-11" else "newcomer"
+
 def paths_for(month):
     """対象月(YYYY-MM)から CSV出力先・公開URL を作る（月替わりで自動的に当月へ切り替わる）。"""
     ym = month.replace("-", "")
@@ -113,7 +118,7 @@ def main():
     today = datetime.now(JST).strftime("%Y-%m-%d")
     ym = month.replace("-", "")
     # 卒業ピック用のビギナー卒業ライン（月別・events.json）と、RISE達成ライン（月別）
-    GRAD_PT = event_num(f"tiktok-{ym}-newcomer", "grad_pt", GRAD_PT_DEFAULT)
+    GRAD_PT = event_num(f"tiktok-{ym}-{nc_kind(month)}", "grad_pt", GRAD_PT_DEFAULT)
 
     # RISE達成フラグ：当月「base＋stampの合算」が MILESTONE_PT 到達で「◯/◯ ◯万pt達成！」を記録（月別）。
     MILESTONE_PT = event_num(f"tiktok-{ym}-rise", "milestone_pt", 3000000)

@@ -53,7 +53,8 @@ YM="${MONTH/-/}"
 # 対象月のイベントがevents.jsonに無ければ前月から複製して用意する
 python3 tools/ensure_month_events.py --month "$MONTH" 2>>"$LOG" || fail "対象月イベントの用意に失敗"
 # サイト側の表示期間(period_end)も同じ日付に揃える
-python3 tools/data_asof.py --set-events "tiktok-${YM}-newcomer,tiktok-${YM}-rise" \
+# RISE2のidは2026-11から rise2（それ以前は newcomer）。両方渡して存在する方だけ更新させる。
+python3 tools/data_asof.py --set-events "tiktok-${YM}-newcomer,tiktok-${YM}-rise2,tiktok-${YM}-rise,tiktok-${YM}-rise3" \
   >/dev/null 2>>"$LOG" || fail "period_end の更新に失敗"
 say "===== 開始 (month=$MONTH date=$DATE) ====="
 

@@ -694,7 +694,11 @@
       "heartme_pt": 5000,
       "heart_field": "heart",
       "fans_label": "💗 NEWハートミー",
-      "order": 30
+      "order": 30,
+      "clear_badge": {
+        "file": "rise3_cleared.json",
+        "label": "🎓 {md} クリア"
+      }
     }
   ]
 }

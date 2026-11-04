@@ -655,6 +655,42 @@ def graduates_html(grads, ev_cfg):
             f'<div class="gnote">{html.escape(note)}</div></div></div>')
 
 
+def apply_clear_badges(rows, ev_cfg):
+    """クリア記録JSONを読み、達成日バッジ（例「🎓 11/4 クリア」）を付ける。
+    RISE1/RISE2は apply_stamp 内（stamp_tier別）で付けているが、スタンプ加点を使わない
+    RISE3はそこを通らないため、この関数で同じ見た目のバッジを付ける。
+    events.json 例: "clear_badge": {"file": "rise3_cleared.json", "label": "🎓 {md} クリア"}"""
+    src = ev_cfg.get("clear_badge")
+    if not src:
+        return
+    f = DATA / src.get("file", "")
+    if not f.exists():
+        return
+    try:
+        doc = json.load(open(f, encoding="utf-8")) or {}
+    except Exception:
+        return
+    m = re.search(r"tiktok-(\d{4})(\d{2})-", ev_cfg.get("id", ""))
+    if m and doc.get("month") and doc["month"] != f"{m.group(1)}-{m.group(2)}":
+        return                      # 別の月の記録は使わない（月替わりで持ち越さない）
+    by_name = {}
+    for v in (doc.get("livers") or {}).values():
+        nm = str(v.get("name", "")).strip()
+        md = v.get("clear_md") or v.get("achieved_md") or ""
+        if not md and v.get("cleared_on"):
+            co = v["cleared_on"]; md = f"{int(co[5:7])}/{int(co[8:10])}"
+        if nm and md:
+            by_name.setdefault(nm, []).append(md)
+    label = src.get("label", "🎓 {md} クリア")
+    hit = 0
+    for r in rows:
+        mds = by_name.get(r["name"])
+        if mds and len(mds) == 1:   # 同名が複数いる場合は付けない（誤表示を防ぐ）
+            r["grad"] = label.format(md=mds[0]); hit += 1
+    if hit:
+        print(f"  ✓ クリアバッジ: {hit}名")
+
+
 def build_event(ev_cfg, report):
     # プラットフォーム既定テーマに、events.json の theme(accent/accent2/hero/dark/favicon/logo)を上書き
     theme = dict(PF_THEME.get(ev_cfg["platform"], DEFAULT_THEME))
@@ -664,6 +700,7 @@ def build_event(ev_cfg, report):
     else:
         rows, meta = rows_from_csv(ev_cfg)
     apply_stamp(rows, ev_cfg)   # スタンプラリー獲得ptを合算（stamp_tier設定時のみ）→ 直後のソートで再ランキング
+    apply_clear_badges(rows, ev_cfg)   # RISE3のクリア達成日バッジ
     rows.sort(key=lambda r: r["score"], reverse=True)
     # graduate_showcase:true なら達成/卒業フラグの付いた人をランキングから外し、上部の別枠へ
     grads = []

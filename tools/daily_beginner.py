@@ -125,6 +125,7 @@ def main():
     ALL_MEMBERS = event_flag(f"tiktok-{_ymn}-{nc_kind(month)}", "list_all_members", False)  # 在籍＝掲載（0ptでも載せる）
     FAN_ON   = event_flag(f"tiktok-{_ymn}-{nc_kind(month)}", "fan_bonus", True)   # 2026-11〜 廃止（月別）
     STAMP_ON = event_flag(f"tiktok-{_ymn}-{nc_kind(month)}", "stamp_add", True)   # 2026-11〜 ランキングに反映しない
+    KEEP_CLEARED = event_flag(f"tiktok-{_ymn}-{nc_kind(month)}", "clear_keep_listed", False)  # Trueならクリア後も残す（上部の別枠に表示）
     err(f"加点設定: ファンクラブボーナス={'ON' if FAN_ON else 'OFF'} / スタンプ合算={'ON' if STAMP_ON else 'OFF'}")
     # 掲載ライン：当月ダイヤが list_min_dia 以上で掲載（2026-10〜。pt floorは使わない＝バトルptだけの掲載を防ぐ）
     LIST_MIN_DIA = event_num(f"tiktok-{month.replace('-','')}-{nc_kind(month)}", "list_min_dia", 100)
@@ -237,7 +238,8 @@ def main():
         if g and today >= g["drop_on"]:
             if today == g["drop_on"]:      # 「本日掲載終了」の報告は猶予明け当日だけ（過去卒業者を毎日再掲しない）
                 dropped.append((cid, name, g["graduated_on"]))
-            continue          # 猶予明け以降はビギナーから常に除外（報告はしない）
+            if not KEEP_CLEARED:
+                continue      # 猶予明け以降はビギナーから常に除外（報告はしない）
 
         beg.append({"cid": cid, "name": name, "pt": pt, "tot": tot,
                     "cur": cur, "ag": ag, "live": hm(r[L]), "days": days, "fans": fans, "bonus": bonus, "fanpct": fanpct, "fanbonus": fanbonus,
@@ -312,7 +314,8 @@ def main():
         if not bare: msg.append(RISE_URL)
     if dropped:
         msg.append("")
-        msg.append("🏁 本日RISE2掲載終了（⚡️DCL RISE1⚡️で継続）")
+        msg.append("🏁 本日からRISE2の達成者枠へ移動（⚡️DCL RISE1⚡️で継続）" if KEEP_CLEARED
+                   else "🏁 本日RISE2掲載終了（⚡️DCL RISE1⚡️で継続）")
         for _cid, name, _gon in dropped:
             msg.append(f"・{name}{uh(_cid)}")
         if not bare: msg.append(RISE_URL)

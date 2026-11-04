@@ -291,9 +291,9 @@ li .tm span{{white-space:nowrap}}
 li .tm .bns{{color:var(--brand-orange);font-weight:700}}
 li .tm .stmp{{color:#e0338c;font-weight:700}}
 li .gradcorner{{position:absolute;top:14px;right:16px;color:#fff;
-  background:linear-gradient(90deg,#f0a500,#ff6a00);border-radius:999px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:999px;
   padding:2px 10px;font-size:11px;font-weight:800;white-space:nowrap;
-  box-shadow:0 2px 6px rgba(240,120,0,.35)}}
+  box-shadow:0 2px 6px rgba(0,0,0,.30)}}
 li .bar{{height:7px;border-radius:4px;margin-top:7px;
   background:linear-gradient(90deg,var(--brand-orange),var(--brand-yellow))}}
 li .sc{{font-family:'Jost',sans-serif;font-variant-numeric:tabular-nums;font-weight:700;
@@ -308,6 +308,8 @@ li .cnr{{flex-wrap:wrap;justify-content:flex-end;max-width:74%}}
 li .nm .nmspace{{float:right;height:1px}}
 li.cnr1 .nm .nmspace{{width:108px}}
 li.cnr2 .nm .nmspace{{width:196px}}
+/* バッジのぶんだけカードを少し高く（バッジとポイントの重なり防止） */
+ul.rank li.cnr1,ul.rank li.cnr2{{padding-top:28px}}
 li .scwrap{{display:flex;flex-direction:column;align-items:flex-end;gap:7px}}
 li .bdm.narrow-only,li .gradcorner.narrow-only{{display:none}}
 @media (max-width:560px){{
@@ -318,6 +320,7 @@ li .bdm.narrow-only,li .gradcorner.narrow-only{{display:none}}
   li .gradcorner.narrow-only{{display:inline-flex;position:static;font-size:11px;padding:5px 8px}}
   li .scwrap{{margin-right:-4px}}   /* バッジの右端をTikTokロゴの右端に合わせる */
   .gradbox li .scwrap{{padding-top:30px}}   /* 昇格枠：バッジがTikTokロゴの下に来るように */
+  ul.rank li.cnr1,ul.rank li.cnr2{{padding-top:14px}}  /* スマホはバッジがptの上に積まれるので高さ据え置き */
 }}
 li .bdm{{display:inline-flex;align-items:center;justify-content:center;
   height:28px;padding:0 11px;box-sizing:border-box;
@@ -338,16 +341,16 @@ li .ttinline svg{{width:14px;height:14px;display:block}}
 
 /* 🏆 達成者・昇格ショーケース（graduate_showcase:true のとき） */
 .gradbox{{margin:0 0 16px;border-radius:20px;padding:2px;
-  background:linear-gradient(120deg,#f6c445,#ff6a00 48%,#ff2f7b);
-  box-shadow:0 10px 26px rgba(240,120,0,.22)}}
+  background:linear-gradient(120deg,var(--accent),var(--accent2) 52%,var(--accent));
+  box-shadow:0 10px 26px rgba(0,0,0,.28)}}
 .gradbox .inner{{background:var(--cardbg);border-radius:18px;padding:14px 16px 12px}}
 .gradbox .ghead{{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;
   font-weight:800;font-size:15px;margin-bottom:10px}}
 .gradbox .ghead .gsub{{font-size:11.5px;font-weight:700;color:#fff;
-  background:linear-gradient(90deg,#f0a500,#ff6a00);border-radius:999px;padding:2px 10px}}
+  background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:999px;padding:2px 10px}}
 .gradbox ul{{list-style:none;margin:0;padding:0}}
 .gradbox li{{position:relative;display:flex;align-items:center;gap:12px;
-  min-height:104px;padding:18px 2px 16px;border-top:1px dashed var(--line)}}
+  min-height:116px;padding:18px 2px 16px;border-top:1px dashed var(--line)}}
 /* TikTokは行の右上角（ランキングのカードと同じ位置）。ptはその下に来る */
 .gradbox li .cnr{{top:10px;right:2px}}
 .gradbox li:first-child{{border-top:none}}
@@ -678,9 +681,10 @@ def apply_clear_badges(rows, ev_cfg):
     by_name = {}
     for v in (doc.get("livers") or {}).values():
         nm = str(v.get("name", "")).strip()
-        md = v.get("clear_md") or v.get("achieved_md") or ""
-        if not md and v.get("cleared_on"):
-            co = v["cleared_on"]; md = f"{int(co[5:7])}/{int(co[8:10])}"
+        md = v.get("clear_md") or v.get("achieved_md") or v.get("grad_md") or ""
+        co = v.get("cleared_on") or v.get("graduated_on") or ""
+        if not md and co:
+            md = f"{int(co[5:7])}/{int(co[8:10])}"
         if nm and md:
             by_name.setdefault(nm, []).append(md)
     label = src.get("label", "🎓 {md} クリア")

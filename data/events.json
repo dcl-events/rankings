@@ -553,7 +553,16 @@
       "stamp_add": false,
       "entry_min_prev_pt": 200000,
       "list_all_members": true,
-      "order": 20
+      "order": 20,
+      "graduate_showcase": true,
+      "graduate_label": "🎓 RISE2クリア",
+      "graduate_note": "クリアした方はランキングから外れ、⚡️DCL RISE1⚡️へ移ります（以降の順位は繰り上がります）",
+      "milestone_pt": 2000000,
+      "clear_keep_listed": true,
+      "clear_badge": {
+        "file": "beginner_graduated.json",
+        "label": "🎓 {md} クリア"
+      }
     },
     {
       "id": "tiktok-202611-rise",

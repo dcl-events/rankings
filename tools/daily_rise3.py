@@ -139,6 +139,7 @@ def main():
     HEART_PT  = event_num(eid, "heartme_pt", HEARTME_PT_DEFAULT)
     LIST_MIN_DIA = event_num(eid, "list_min_dia", 1)
     FAN_ON = event_flag(eid, "fan_bonus", True)
+    KEEP_CLEARED = event_flag(eid, "clear_keep_listed", False)  # Trueならクリア後も残す（上部の別枠に表示）
     err(f"設定: 参加=前月pt<{ENTRY_MAX:,} / クリア={CLEAR_PT:,}pt / ハートミー={HEART_PT:,}pt per 1人 "
         f"/ 掲載=当月{LIST_MIN_DIA}ダイヤ以上 / ファンクラブボーナス={'ON' if FAN_ON else 'OFF'}")
 
@@ -201,7 +202,8 @@ def main():
         if cv and today >= cv["drop_on"]:
             if today == cv["drop_on"]:
                 dropped.append((cid, name))
-            continue                            # 翌日以降はRISE3から外れる（RISE2で継続）
+            if not KEEP_CLEARED:
+                continue                        # 翌日以降はRISE3から外れる（RISE2で継続）
 
         r3.append({"cid": cid, "name": name, "pt": pt, "cur": cur, "ag": ag,
                    "live": hm(r[L]), "days": days, "fans": fans, "newfans": newf,
@@ -263,7 +265,8 @@ def main():
         if not bare: msg.append(RISE2_URL)
     if dropped:
         msg.append("")
-        msg.append("🏁 本日RISE3掲載終了（⚡️DCL RISE2⚡️で継続）")
+        msg.append("🏁 本日からRISE3の達成者枠へ移動（⚡️DCL RISE2⚡️で継続）" if KEEP_CLEARED
+                   else "🏁 本日RISE3掲載終了（⚡️DCL RISE2⚡️で継続）")
         for _cid, nm in dropped:
             msg.append(f"・{nm}")
         if not bare: msg.append(RISE2_URL)

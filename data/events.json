@@ -698,7 +698,12 @@
       "clear_badge": {
         "file": "rise3_cleared.json",
         "label": "🎓 {md} クリア"
-      }
+      },
+      "graduate_showcase": true,
+      "graduate_label": "🎓 RISE3クリア",
+      "graduate_note": "クリアした方はランキングから外れ、⚡️DCL RISE2⚡️へ移ります（以降の順位は繰り上がります）",
+      "milestone_pt": 200000,
+      "clear_keep_listed": true
     }
   ]
 }

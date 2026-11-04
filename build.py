@@ -640,7 +640,9 @@ def graduates_html(grads, ev_cfg):
         if md: meta.append(f'<span class="gday">{md.group(1)} 達成</span>')
         if r.get("time"): meta.append(f'<span>⏱ 配信 {html.escape(r["time"])}</span>')
         if r.get("days"): meta.append(f'<span>📅 有効LIVE {html.escape(r["days"])}日</span>')
-        if r.get("fans"): meta.append(f'<span>💛 ファン {html.escape(r["fans"])}人</span>')
+        if r.get("fans"):
+            flabel = ev_cfg.get("fans_label", "💛 ファン")
+            meta.append(f'<span>{html.escape(flabel)} {html.escape(r["fans"])}人</span>')
         nb = bdm_badge(r.get("user"), "narrow-only")   # スマホ用（ロゴの下＝ptの上）
         tt = f'<div class="cnr">{bdm_badge(r.get("user"), "wide-only")}{tt_link(r.get("user"), "ttcorner")}</div>'  # ランキングと同じ右上角
         lis.append(f'<li>{tt}<div class="gmedal">{"👑" if i == 0 else "🏆"}</div>'

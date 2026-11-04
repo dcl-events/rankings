@@ -269,7 +269,7 @@ details.rules[open]>summary::after{{transform:rotate(180deg)}}
 /* ランキング */
 ul.rank{{list-style:none;margin:0;padding:0}}
 ul.rank li{{position:relative;display:flex;align-items:center;gap:14px;background:#fff;border-radius:16px;
-  padding:14px 16px;margin-bottom:10px;border:1px solid var(--line);
+  padding:26px 16px 16px;min-height:111px;margin-bottom:10px;border:1px solid var(--line);
   box-shadow:0 4px 14px rgba(120,80,20,.05)}}
 li .num{{font-family:'Jost',sans-serif;font-size:20px;font-weight:700;min-width:46px;
   text-align:center;color:var(--accent);line-height:1.05}}
@@ -308,8 +308,6 @@ li .cnr{{flex-wrap:wrap;justify-content:flex-end;max-width:74%}}
 li .nm .nmspace{{float:right;height:1px}}
 li.cnr1 .nm .nmspace{{width:108px}}
 li.cnr2 .nm .nmspace{{width:196px}}
-/* バッジのぶんだけカードを少し高く（バッジとポイントの重なり防止） */
-ul.rank li.cnr1,ul.rank li.cnr2{{padding-top:28px}}
 li .scwrap{{display:flex;flex-direction:column;align-items:flex-end;gap:7px}}
 li .bdm.narrow-only,li .gradcorner.narrow-only{{display:none}}
 @media (max-width:560px){{
@@ -320,7 +318,7 @@ li .bdm.narrow-only,li .gradcorner.narrow-only{{display:none}}
   li .gradcorner.narrow-only{{display:inline-flex;position:static;font-size:11px;padding:5px 8px}}
   li .scwrap{{margin-right:-4px}}   /* バッジの右端をTikTokロゴの右端に合わせる */
   .gradbox li .scwrap{{padding-top:30px}}   /* 昇格枠：バッジがTikTokロゴの下に来るように */
-  ul.rank li.cnr1,ul.rank li.cnr2{{padding-top:14px}}  /* スマホはバッジがptの上に積まれるので高さ据え置き */
+  ul.rank li{{padding:14px 16px;min-height:0}}   /* スマホはバッジがptの上に積まれるので余白は元のまま */
 }}
 li .bdm{{display:inline-flex;align-items:center;justify-content:center;
   height:28px;padding:0 11px;box-sizing:border-box;

@@ -58,20 +58,7 @@ python3 tools/data_asof.py --set-events "tiktok-${YM}-newcomer,tiktok-${YM}-rise
   >/dev/null 2>>"$LOG" || fail "period_end の更新に失敗"
 say "===== 開始 (month=$MONTH date=$DATE) ====="
 
-# 0. スタンプラリー更新（★日次の合算順位計算より前に実行）：名簿マージ→JSON再生成→_manifest最新化。
-#    ここで data/stamp_points.json を最新化してから daily_* が読むことで、
-#    「日次の合算順(Slack)」と「build.pyの合算順(web)」を必ず一致させる（stamp-rallyは
-#    クリエイターデータ_Claude/課題申告シートが入力で、ランキングsnapshotには依存しない）。
-#    失敗しても非致命（前回値のまま続行＝ランキング公開は止めない）。
-if ! "$HOME/Claude/stamp-rally/tools/run-daily.sh" >>"$LOG" 2>&1; then
-  say "⚠️ スタンプラリー更新に失敗（合算は前回値のまま続行）"
-else
-  say "スタンプラリー更新OK（合算用 _manifest 最新化）"
-fi
-python3 tools/make_stamp_points.py >>"$LOG" 2>&1 && say "stamp_points.json 更新OK" \
-  || say "⚠️ stamp_points.json 生成に失敗（前回値のまま続行）"
-
-# 0-2. 課題申告シート N列「バトルDM可」を取り込む（TikTokリンク左のバッジ用）。
+# 0-2. RISEチェックシート「バトルDM可」列を取り込む（TikTokリンク左の⚔バッジ用。列名で読むため位置非依存）。
 #      人が入力する列を読むだけ。失敗しても非致命（前回値のまま続行）。
 "$HOME/Claude/pococha/.venv/bin/python" tools/battle_dm.py >>"$LOG" 2>&1 \
   && say "battle_dm.json 更新OK" || say "⚠️ バトルDM可の取り込みに失敗（前回値のまま続行）"
@@ -89,7 +76,17 @@ BEG="$(python3 tools/daily_beginner.py --month "$MONTH" --floor 1000 --date "$DA
 RISE="$(python3 tools/daily_rise.py --month "$MONTH" --floor 1 --date "$DATE" --bare 2>>"$LOG")"
 [ -n "$RISE" ] || fail "RISE生成失敗（データTSVが見つからない等）"
 
-# 3. サイト再生成（両ランキングまとめて1回。日次と同じ最新stampで合算）
+# 2-5. RISEチェックシート更新（★daily_rise3/beginner/rise の後＝今朝のsnapshotを読むため）。
+#      当月ダイヤ等を最新化し、ランキング列=前月ptでRISE卒業/1/2/3を振り分け、
+#      当月RISEランキングに載った新規ユーザーを名簿へ取り込む（昇格は前月ptで自動反映）。
+#      スタンプラリーは2026-11廃止（合算・課題レポートは停止済）。失敗しても非致命（ランキング公開は止めない）。
+if ! "$HOME/Claude/stamp-rally/tools/run-daily.sh" >>"$LOG" 2>&1; then
+  say "⚠️ RISEチェックシート更新に失敗（続行）"
+else
+  say "RISEチェックシート更新OK"
+fi
+
+# 3. サイト再生成（両ランキングまとめて1回）
 python3 build.py >>"$LOG" 2>&1 || fail "build失敗"
 
 # 4. 変更があれば push（1回）
@@ -166,19 +163,5 @@ if [ -n "$R3" ]; then
   printf '%s\n' "$r3_body"
 fi
 
-# 課題申告シート（自己申告制・マネージャー入力用）の加点状況＋リンクを添える。
-# 誰がオールクリア＝加点されたか / 申告が進んだかを前回との差分で出す（状態は stamp-rally 側に保存）。
-# 失敗しても非致命：見出しとリンクだけ出して続行する。
-printf '\n'
-if ! python3 "$HOME/Claude/stamp-rally/tools/task_report.py" 2>>"$LOG"; then
-  say "⚠️ 課題申告レポートの生成に失敗（リンクのみ掲載）"
-  printf '%s\n' "📋 課題申告シート_Claude（自己申告制）"
-fi
-printf '%s\n' "https://docs.google.com/spreadsheets/d/1A-WSX4mteR-E5kY8V82dTUqoTcD0GDLA0Uq0qiDTzh4/edit?gid=1676003252"
-
-# 参加状況の見方（🔵は取り込み条件つき）。ラリー列でRISE1/RISE2を区別。
-printf '\n%s\n' "🔖 参加状況の見方"
-printf '%s\n' "🟢 参加中：ランキング掲載中"
-printf '%s\n' "🟡 参加中（反映待ち）：先月在籍・当月ランキング未反映（戻る見込み）"
-printf '%s\n' "🔵 スタンプラリーのみ：ランキング未掲載の新人（1000pt未満・当月に配信・入会8月以降）"
-printf '%s\n' "🔴 対象外：離脱　／　RISE1・RISE2はラリー列で区別"
+# スタンプラリーは2026-11に廃止。課題申告レポート（task_report.py）と参加状況レジェンドの
+# Slack掲載は停止。ランキング本文（RISE1/2/3）だけを投稿する。

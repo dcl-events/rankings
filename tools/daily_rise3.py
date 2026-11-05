@@ -171,6 +171,11 @@ def main():
     DAYS = c["有効LIVE日数"]; FANS = c["ファンクラブのアクティブなファン"]; NEWF = c["新規ファン"]
     AG = c["LIVE Match数"]; AH = c["LIVE Matchで獲得したダイヤモンド数"]
     U = c["クリエイターのユーザー名"]
+    # cid→ユーザー名（Slack表示で名前の後ろに ｜@ユーザー名 を付ける用。RISE1/RISE2と同じ体裁）
+    user_by_cid = {str(r[ID]).strip(): str(r[U]).strip() for r in rows[1:] if len(r) > max(ID, U)}
+    def uh(cid):
+        u = user_by_cid.get(cid, "")
+        return f"｜@{u}" if u else ""
 
     r3 = []; newclear = []; dropped = []
     for r in rows[1:]:
@@ -250,8 +255,8 @@ def main():
         if rk is None: continue                     # クリア者は別枠（順位変動の対象外）
         pr = adj.get(b["cid"]) if prev else None
         if pr and rk < pr:
-            climbers.append((b["name"], pr, rk, pr - rk))
-    climbers.sort(key=lambda x: x[2])
+            climbers.append((b["name"], b["cid"], pr, rk, pr - rk))
+    climbers.sort(key=lambda x: x[3])
 
     # Slack本文
     if bare:
@@ -263,22 +268,22 @@ def main():
         msg.append("（初回更新。順位変動の比較は次回から）")
     elif climbers:
         msg.append("📈 上のランクを抜いた人")
-        for nm, pr, nr, k in climbers[:10]:
-            msg.append(f"・{nm}：{pr}位→{nr}位（{k}人抜き）")
+        for nm, cid_c, pr, nr, k in climbers[:10]:
+            msg.append(f"・{nm}{uh(cid_c)}：{pr}位→{nr}位（{k}人抜き）")
     else:
         msg.append("📊 上位を抜いた人はいませんでした（順位変動なし）")
     if newclear:
         msg.append("")
         msg.append(f"🎓 RISE3クリア（{CLEAR_PT//10000}万pt到達 → ⚡️DCL RISE2⚡️へ）")
         for _cid, nm, pt in newclear:
-            msg.append(f"・{nm}：{pt:,}pt")
+            msg.append(f"・{nm}{uh(_cid)}：{pt:,}pt")
         if not bare: msg.append(RISE2_URL)
     if dropped:
         msg.append("")
         msg.append("🏁 本日からRISE3の達成者枠へ移動（⚡️DCL RISE2⚡️で継続）" if KEEP_CLEARED
                    else "🏁 本日RISE3掲載終了（⚡️DCL RISE2⚡️で継続）")
         for _cid, nm in dropped:
-            msg.append(f"・{nm}")
+            msg.append(f"・{nm}{uh(_cid)}")
         if not bare: msg.append(RISE2_URL)
     print("\n".join(msg))
 

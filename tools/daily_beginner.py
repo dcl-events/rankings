@@ -126,6 +126,7 @@ def main():
     FAN_ON   = event_flag(f"tiktok-{_ymn}-{nc_kind(month)}", "fan_bonus", True)   # 2026-11〜 廃止（月別）
     STAMP_ON = event_flag(f"tiktok-{_ymn}-{nc_kind(month)}", "stamp_add", True)   # 2026-11〜 ランキングに反映しない
     KEEP_CLEARED = event_flag(f"tiktok-{_ymn}-{nc_kind(month)}", "clear_keep_listed", False)  # Trueならクリア後も残す（上部の別枠に表示）
+    SHOWCASE = event_flag(f"tiktok-{_ymn}-{nc_kind(month)}", "graduate_showcase", False)       # 上部の別枠＝順位からは外す
     err(f"加点設定: ファンクラブボーナス={'ON' if FAN_ON else 'OFF'} / スタンプ合算={'ON' if STAMP_ON else 'OFF'}")
     # 掲載ライン：当月ダイヤが list_min_dia 以上で掲載（2026-10〜。pt floorは使わない＝バトルptだけの掲載を防ぐ）
     LIST_MIN_DIA = event_num(f"tiktok-{month.replace('-','')}-{nc_kind(month)}", "list_min_dia", 100)
@@ -277,14 +278,22 @@ def main():
     # 卒業掲載終了で空いた枠のぶんだけ全員が繰り上がるので、
     # 前回順位は「卒業者を除いて再採番した順位」と比べる（誤って「N人抜き」と出さない）
     drop_cids = {d[0] for d in dropped}
+    # 上部の別枠（graduate_showcase）を使う月は、クリア者をランキングから外して表示するので
+    # Slackの順位も今回・前回ともクリア者を除いて再採番して比べる
+    skip = set(glivers) if SHOWCASE else set()
+    site_rank = {}
+    for b in beg:
+        if b["cid"] in skip: continue
+        site_rank[b["cid"]] = len(site_rank) + 1
     adj = {}
-    n = 0
     for cid, v in sorted(prev.items(), key=lambda kv: kv[1].get("rank", 10**9)):
-        if cid in drop_cids: continue
-        n += 1; adj[cid] = n
+        if cid in drop_cids or cid in skip: continue
+        adj[cid] = len(adj) + 1
     climbers = []
-    for i, b in enumerate(beg):
-        r = i + 1; pr = adj.get(b["cid"]) if prev else None
+    for b in beg:
+        r = site_rank.get(b["cid"])
+        if r is None: continue                      # クリア者は別枠（順位変動の対象外）
+        pr = adj.get(b["cid"]) if prev else None
         if pr and r < pr:
             climbers.append((b["name"], b["cid"], pr, r, pr - r))
     climbers.sort(key=lambda x: x[3])

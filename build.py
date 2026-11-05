@@ -680,7 +680,7 @@ def apply_clear_badges(rows, ev_cfg):
     for v in (doc.get("livers") or {}).values():
         nm = str(v.get("name", "")).strip()
         md = v.get("clear_md") or v.get("achieved_md") or v.get("grad_md") or ""
-        co = v.get("cleared_on") or v.get("graduated_on") or ""
+        co = v.get("cleared_on") or v.get("graduated_on") or v.get("achieved_on") or ""
         if not md and co:
             md = f"{int(co[5:7])}/{int(co[8:10])}"
         if nm and md:

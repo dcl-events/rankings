@@ -631,7 +631,11 @@
       "fan_bonus": true,
       "stamp_add": false,
       "list_all_members": true,
-      "order": 10
+      "order": 10,
+      "clear_badge": {
+        "file": "rise_milestone.json",
+        "label": "🏆 {md} 400万pt達成！"
+      }
     },
     {
       "id": "tiktok-202611-rise3",

@@ -140,6 +140,7 @@ def main():
     LIST_MIN_DIA = event_num(eid, "list_min_dia", 1)
     FAN_ON = event_flag(eid, "fan_bonus", True)
     KEEP_CLEARED = event_flag(eid, "clear_keep_listed", False)  # Trueならクリア後も残す（上部の別枠に表示）
+    SHOWCASE = event_flag(eid, "graduate_showcase", False)      # 上部の別枠を使う＝順位からは外す
     err(f"設定: 参加=前月pt<{ENTRY_MAX:,} / クリア={CLEAR_PT:,}pt / ハートミー={HEART_PT:,}pt per 1人 "
         f"/ 掲載=当月{LIST_MIN_DIA}ダイヤ以上 / ファンクラブボーナス={'ON' if FAN_ON else 'OFF'}")
 
@@ -231,14 +232,23 @@ def main():
             _s = json.load(open(SNAP))
             prev = (_s.get("ranks") or {}) if _s.get("month") == month else {}
         except Exception: prev = {}
+    # サイト(build.pyのgraduate_showcase)はクリア者を上部の別枠へ移し、残りを繰り上げて表示する。
+    # Slackの順位もそれに合わせ、今回・前回とも「クリア者を除いて再採番した順位」で比べる。
     drop_cids = {d[0] for d in dropped}
-    adj, n = {}, 0
+    skip = set(clivers) if SHOWCASE else set()      # 別枠の人は順位に数えない
+    site_rank = {}
+    for b in r3:
+        if b["cid"] in skip: continue
+        site_rank[b["cid"]] = len(site_rank) + 1
+    adj = {}
     for cid, v in sorted(prev.items(), key=lambda kv: kv[1].get("rank", 10**9)):
-        if cid in drop_cids: continue
-        n += 1; adj[cid] = n
+        if cid in drop_cids or cid in skip: continue
+        adj[cid] = len(adj) + 1
     climbers = []
-    for i2, b in enumerate(r3):
-        rk = i2 + 1; pr = adj.get(b["cid"]) if prev else None
+    for b in r3:
+        rk = site_rank.get(b["cid"])
+        if rk is None: continue                     # クリア者は別枠（順位変動の対象外）
+        pr = adj.get(b["cid"]) if prev else None
         if pr and rk < pr:
             climbers.append((b["name"], pr, rk, pr - rk))
     climbers.sort(key=lambda x: x[2])

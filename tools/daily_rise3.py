@@ -28,6 +28,9 @@ daily_rise.py / daily_beginner.py と同じ構造。違いは以下の3点だけ
 import sys, os, re, csv, glob, json
 from datetime import datetime, timedelta, timezone
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import debut  # 参加日/参加時順位の共有モジュール（tools/debut.py）
+
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SNAP = os.path.join(REPO, "data", "rise3_snapshot.json")
 CLEARED = os.path.join(REPO, "data", "rise3_cleared.json")
@@ -258,6 +261,11 @@ def main():
             climbers.append((b["name"], b["cid"], pr, rk, pr - rk))
     climbers.sort(key=lambda x: x[3])
 
+    # 参加日＝初めてランキングに載った日／参加時順位（表示順位＝達成者枠を除いた採番）を記録
+    ranked_rows = [{"cid": b["cid"], "name": b["name"], "pt": b["pt"], "rank": site_rank[b["cid"]]}
+                   for b in r3 if b["cid"] in site_rank]
+    newly = debut.record_debut(month, "rise3", ranked_rows, today, dry=dry)
+
     # Slack本文
     if bare:
         msg = ["⚡️DCL RISE3⚡️", URL, ""]
@@ -272,6 +280,8 @@ def main():
             msg.append(f"・{nm}{uh(cid_c)}：{pr}位→{nr}位（{k}人抜き）")
     else:
         msg.append("📊 上位を抜いた人はいませんでした（順位変動なし）")
+    if prev:                     # 初回更新（月初）は全員が新規になるので出さない
+        msg += debut.slack_lines(newly, uh)
     if newclear:
         msg.append("")
         msg.append(f"🎓 RISE3クリア（{CLEAR_PT//10000}万pt到達 → ⚡️DCL RISE2⚡️へ）")

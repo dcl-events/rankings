@@ -10,8 +10,10 @@
 import json
 import os
 
-PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
-                    "data", "debut_records.json")
+DATA_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
+PATH = os.path.join(DATA_DIR, "debut_records.json")
+FIRST_BC = os.path.join(DATA_DIR, "first_broadcast_resolved.json")
+WINDOW_DAYS = 30   # 初配信からこの日数以内にランキングに載った人＝「新規参加（デビュー）」とみなす
 
 
 def load(month):
@@ -60,3 +62,44 @@ def slack_lines(newly, uh=None, label="🆕 新規参加"):
         out.append(f"・{rec['name']}{handle}：参加時 {rec['rank']}位/{rec['total']}人"
                    f"（{rec['pt']:,}pt）")
     return out
+
+
+def load_first_broadcast():
+    """初配信日の確定版 {cid: "YYYY/MM/DD"}。stamp-rally の gen_tasksheet が毎朝書き出す
+    （①手動オーバーライド → ②マスターU列 → ③日次TSVからの再構成 の優先順で解決済み）。"""
+    try:
+        return json.load(open(FIRST_BC, encoding="utf-8")) or {}
+    except Exception:
+        return {}
+
+
+def is_new_debut(cid, rec, first_bc=None, window_days=WINDOW_DAYS):
+    """「本当に初配信してからランキングに載った人」か。
+    初配信からランキング初掲載までが window_days 以内なら True。
+    （例：初配信10/23→11/1掲載=9日→True／初配信2月→11/8に復帰で掲載=261日→False）
+    初配信日が未登録の人は判定できないので False（取りこぼしは呼び出し側が件数で報告する）。"""
+    from datetime import datetime
+    if first_bc is None:
+        first_bc = load_first_broadcast()
+    fb = (first_bc or {}).get(str(cid), "")
+    if not fb or not rec.get("date"):
+        return False
+    try:
+        f = datetime.strptime(fb.replace("/", "-"), "%Y-%m-%d")
+        d = datetime.strptime(rec["date"], "%Y-%m-%d")
+    except ValueError:
+        return False
+    return (d - f).days <= window_days          # 負の日数（再構成のズレ）も通す
+
+
+def filter_new_debuts(newly, first_bc=None, window_days=WINDOW_DAYS):
+    """newly を「本当のデビュー組」だけに絞る。戻り値 (絞った結果, 初配信日が未登録で判定できなかった人)。"""
+    if first_bc is None:
+        first_bc = load_first_broadcast()
+    keep, unknown = [], []
+    for cid, rec in newly:
+        if str(cid) not in (first_bc or {}):
+            unknown.append((cid, rec)); continue
+        if is_new_debut(cid, rec, first_bc, window_days):
+            keep.append((cid, rec))
+    return keep, unknown

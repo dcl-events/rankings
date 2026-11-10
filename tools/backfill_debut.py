@@ -10,9 +10,7 @@ import json, os, re, subprocess, sys
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(REPO, "data", "debut_records.json")
-LEAGUES = {                      # league: (snapshot, 達成者枠の記録)
-    "rise1": ("data/rise_snapshot.json", "data/rise_milestone.json"),
-    "rise2": ("data/beginner_snapshot.json", "data/beginner_graduated.json"),
+LEAGUES = {                      # league: (snapshot, 達成者枠の記録)。RISE3のみ運用（2026-11-10）
     "rise3": ("data/rise3_snapshot.json", "data/rise3_cleared.json"),
 }
 

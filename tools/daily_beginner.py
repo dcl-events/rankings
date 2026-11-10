@@ -23,8 +23,6 @@ point = M×10 + AH×5 + AG×1000  （M=ダイヤ, AH=Matchダイヤ, AG=Match数
 import sys, os, re, csv, glob, json
 from datetime import datetime, timedelta, timezone
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import debut  # 参加日/参加時順位の共有モジュール（tools/debut.py）
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SNAP = os.path.join(REPO, "data", "beginner_snapshot.json")
@@ -301,10 +299,6 @@ def main():
             climbers.append((b["name"], b["cid"], pr, r, pr - r))
     climbers.sort(key=lambda x: x[3])
 
-    # 参加日＝初めてランキングに載った日／参加時順位（表示順位＝達成者枠を除いた採番）を記録
-    ranked_rows = [{"cid": b["cid"], "name": b["name"], "pt": b["tot"], "rank": site_rank[b["cid"]]}
-                   for b in beg if b["cid"] in site_rank]
-    newly = debut.record_debut(month, "rise2", ranked_rows, today, dry=dry)
 
     # Slackメッセージ
     if bare:   # まとめ投稿に埋め込む用（メンション・「更新」表記は親側が持つ）

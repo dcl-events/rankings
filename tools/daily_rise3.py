@@ -281,7 +281,16 @@ def main():
     else:
         msg.append("📊 上位を抜いた人はいませんでした（順位変動なし）")
     if prev:                     # 初回更新（月初）は全員が新規になるので出さない
-        msg += debut.slack_lines(newly, uh)
+        # 「ランキングに初めて載った人」には復帰組（過去に初配信した人）も混ざるので、
+        # 初配信からの日数で「本当のデビュー組」だけに絞る（既定30日以内）。
+        debuts, unknown_fb = debut.filter_new_debuts(newly)
+        msg += debut.slack_lines(debuts, uh)
+        if unknown_fb:
+            err("初配信日が未登録で判定できなかった新規: "
+                + " / ".join(r["name"] for _c, r in unknown_fb))
+        skipped = len(newly) - len(debuts) - len(unknown_fb)
+        if skipped:
+            err(f"新規だがデビュー組でない（復帰/既存）ため非掲載: {skipped}名")
     if newclear:
         msg.append("")
         msg.append(f"🎓 RISE3クリア（{CLEAR_PT//10000}万pt到達 → ⚡️DCL RISE2⚡️へ）")

@@ -5,7 +5,7 @@
   data/debut_records.json = {"month": "YYYY-MM",
                              "leagues": {"rise1"|"rise2"|"rise3": {cid: {...}}}}
 戻り値は「今日はじめて載った人」のリスト＝Slackの「🆕 新規参加」とシートの参加日/参加時順位に使う。
-月が変わったら自動でリセット（当月の参加日だけを持つ）。
+★月が変わっても消さない・既にある人は上書きしない＝参加日と参加時順位は一度入ったら固定。
 """
 import json
 import os
@@ -16,38 +16,46 @@ FIRST_BC = os.path.join(DATA_DIR, "first_broadcast_resolved.json")
 WINDOW_DAYS = 30   # 初配信からこの日数以内にランキングに載った人＝「新規参加（デビュー）」とみなす
 
 
-def load(month):
-    doc = {"month": month, "leagues": {}}
+def load(month=None):
+    """記録を読む。★月が変わっても消さない＝参加日と参加時順位は一度入ったら永続。
+    旧形式（トップレベルの "month" が当月の月だけを持つ）も読めるように移行する。"""
+    doc = {"leagues": {}}
     if os.path.exists(PATH):
         try:
             d = json.load(open(PATH, encoding="utf-8")) or {}
-            if d.get("month") == month:
+            if isinstance(d, dict) and d.get("leagues") is not None:
                 doc = d
+                old_month = d.get("month")          # 旧形式：各レコードに月が無い
+                if old_month:
+                    for livers in doc["leagues"].values():
+                        for rec in livers.values():
+                            rec.setdefault("month", old_month)
         except Exception:
             pass
-    doc.setdefault("month", month)
     doc.setdefault("leagues", {})
+    doc.pop("month", None)
     return doc
 
 
 def record_debut(month, league, ranked, today, dry=False):
     """ranked = [{"cid","name","pt","rank"}, ...]（表示順位の昇順・達成者枠は含めない）。
     すでに記録がある人は上書きしない＝参加日と参加時順位は固定。"""
-    doc = load(month)
+    doc = load()
     livers = doc["leagues"].setdefault(league, {})
     total = len(ranked)
     newly = []
     for row in ranked:
         cid = str(row.get("cid") or "").strip()
         if not cid or cid in livers:
-            continue
-        rec = {"name": row.get("name", ""), "date": today,
+            continue                     # ★既にある人は絶対に上書きしない（参加日・参加時順位は固定）
+        rec = {"name": row.get("name", ""), "date": today, "month": month,
                "md": f"{int(today[5:7])}/{int(today[8:10])}",
                "rank": int(row.get("rank") or 0), "total": total,
                "pt": int(row.get("pt") or 0)}
         livers[cid] = rec
         newly.append((cid, rec))
     if not dry and newly:
+        doc["updated"] = today
         json.dump(doc, open(PATH, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     return newly
 

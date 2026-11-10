@@ -111,3 +111,14 @@ def filter_new_debuts(newly, first_bc=None, window_days=WINDOW_DAYS):
         if is_new_debut(cid, rec, first_bc, window_days):
             keep.append((cid, rec))
     return keep, unknown
+
+
+def is_month_debut(cid, rec, first_bc=None):
+    """「ランキングに参加した月に初配信した人」か（シートの参加日/参加時順位を出す条件）。
+    例：初配信11/4→11/5参加=True／初配信10/23→11/1参加=False（前月デビュー）／初配信日が未登録=False。
+    ※月をまたぐ境目（初配信11/30→12/1参加）は False になる。必要なら呼び出し側で足す。"""
+    fb = (first_bc if first_bc is not None else load_first_broadcast()).get(str(cid), "")
+    d = rec.get("date") or ""
+    if not fb or not d:
+        return False
+    return fb.replace("/", "-")[:7] == d[:7]

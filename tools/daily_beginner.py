@@ -316,14 +316,13 @@ def main():
         msg.append("📊 上位を抜いた人はいませんでした（順位変動なし）")
     if newgrads:
         msg.append("")
-        msg.append(f"🎓 RISE2昇格（⚡️DCL RISE1⚡️へ）")
+        msg.append(f"🎓 本日RISE2クリア（{GRAD_PT//10000}万pt到達）"
+                   "＝ランキングから上部のクリア枠へ移り、⚡️DCL RISE1⚡️へ入ります")
         for cid_g, name, drop in newgrads:
-            m, d = drop[5:7].lstrip("0"), drop[8:10].lstrip("0")
             gr = glivers.get(cid_g, {}).get("grad_rank")
-            pos = f"{gr}位で" if gr else ""
-            msg.append(f"・{name}{uh(cid_g)}：{pos}昇格（RISE2掲載は {m}/{d} まで）")
+            msg.append(f"・{name}{uh(cid_g)}" + (f"：{gr}位でクリア" if gr else ""))
         if not bare: msg.append(RISE_URL)
-    if dropped and not KEEP_CLEARED:    # 達成者枠に残す運用では翌日の「枠へ移動」は重複なので出さない
+    if dropped and not KEEP_CLEARED:    # クリア枠に残す運用では翌日の「枠へ移動」は重複なので出さない
         msg.append("")
         msg.append("🏁 本日RISE2掲載終了（⚡️DCL RISE1⚡️で継続）")
         for _cid, name, _gon in dropped:

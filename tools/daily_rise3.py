@@ -294,7 +294,7 @@ def main():
     if newclear:
         msg.append("")
         msg.append(f"🎓 本日RISE3クリア（{CLEAR_PT//10000}万pt到達）"
-                   "＝ランキングから上部の達成者枠へ移り、⚡️DCL RISE2⚡️に昇格します")
+                   "＝ランキングから上部のクリア枠へ移り、⚡️DCL RISE2⚡️へ入ります")
         for _cid, nm, pt in newclear:
             msg.append(f"・{nm}{uh(_cid)}：{pt:,}pt")
         if not bare: msg.append(RISE2_URL)
@@ -307,7 +307,7 @@ def main():
             msg.append(f"・{nm}{uh(_cid)}")
         if not bare: msg.append(RISE2_URL)
     elif dropped:
-        err("（達成者枠に残す運用のため「枠へ移動」の通知は省略: "
+        err("（クリア枠に残す運用のため「枠へ移動」の通知は省略: "
             + " / ".join(nm for _c, nm in dropped) + "）")
     print("\n".join(msg))
 

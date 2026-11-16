@@ -337,7 +337,7 @@ li .ttinline{{display:inline-flex;vertical-align:-4px;align-items:center;justify
   border:1px solid rgba(0,0,0,.10);text-decoration:none}}
 li .ttinline svg{{width:14px;height:14px;display:block}}
 
-/* 🏆 達成者・昇格ショーケース（graduate_showcase:true のとき） */
+/* 🎓 クリア枠（graduate_showcase:true のとき）＝用語は「クリア」に統一 */
 .gradbox{{margin:0 0 16px;border-radius:20px;padding:2px;
   background:linear-gradient(120deg,var(--accent),var(--accent2) 52%,var(--accent));
   box-shadow:0 10px 26px rgba(0,0,0,.28)}}
@@ -628,9 +628,9 @@ def graduates_html(grads, ev_cfg):
     """達成/卒業した人をランキングから外し、上部のショーケースに並べる。"""
     if not grads:
         return ""
-    label = ev_cfg.get("graduate_label") or "🏆 達成者・昇格"
+    label = ev_cfg.get("graduate_label") or "🎓 クリア"
     mp = ev_cfg.get("milestone_pt")
-    sub = f'<span class="gsub">{int(mp)//10000:,}万pt達成</span>' if mp else ""
+    sub = f'<span class="gsub">{int(mp)//10000:,}万pt</span>' if mp else ""   # 見出しが「◯◯クリア」なので重複させない
     unit = html.escape(ev_cfg.get("score_label", ""))
     lis = []
     for i, r in enumerate(grads):
@@ -638,7 +638,7 @@ def graduates_html(grads, ev_cfg):
         meta = []
         gd = r.get("grad") or ""
         md = re.search(r"(\d+/\d+)", gd)
-        if md: meta.append(f'<span class="gday">{md.group(1)} 達成</span>')
+        if md: meta.append(f'<span class="gday">{md.group(1)} クリア</span>')
         if r.get("time"): meta.append(f'<span>⏱ 配信 {html.escape(r["time"])}</span>')
         if r.get("days"): meta.append(f'<span>📅 有効LIVE {html.escape(r["days"])}日</span>')
         if r.get("fans"):
@@ -651,7 +651,7 @@ def graduates_html(grads, ev_cfg):
                    f'<div class="gmeta">{"".join(meta)}</div></div>'
                    f'<div class="scwrap">{nb}<div class="gsc">{val}'
                    f'<span class="unit">{unit}</span></div></div></li>')
-    note = ev_cfg.get("graduate_note") or "昇格した方はランキングから外れます（以降の順位は繰り上がります）"
+    note = ev_cfg.get("graduate_note") or "クリアした方はランキングから外れます（以降の順位は繰り上がります）"
     return (f'<div class="gradbox"><div class="inner">'
             f'<div class="ghead">{html.escape(label)}{sub}</div>'
             f'<ul>{"".join(lis)}</ul>'
@@ -745,7 +745,7 @@ def build_event(ev_cfg, report):
     if ev_cfg.get("show_count", True):
         cap = f"（上位{top_n}位 / 参加 {total} 名）" if total > top_n else f"／ 参加 {total} 名"
         if grads:
-            cap += f"／ 昇格 {len(grads)} 名"
+            cap += f"／ クリア {len(grads)} 名"
     else:
         cap = f"（上位{top_n}位）" if total > top_n else ""
     # theme.logo があればタイトル1行目をロゴ画像に差し替え、2行目以降をサブタイトルにする

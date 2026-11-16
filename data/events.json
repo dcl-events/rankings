@@ -683,15 +683,16 @@
       "milestone_pt": 4000000,
       "entry_min_prev_pt": 2000000,
       "graduate_showcase": true,
-      "graduate_label": "🏆 達成者・昇格",
+      "graduate_label": "🎓 RISE1クリア",
       "fan_bonus": true,
       "stamp_add": false,
       "list_all_members": true,
       "order": 10,
       "clear_badge": {
         "file": "rise_milestone.json",
-        "label": "🏆 {md} 400万pt達成！"
-      }
+        "label": "🎓 {md} クリア"
+      },
+      "graduate_note": "クリアした方はランキングから外れます（RISE卒業・以降の順位は繰り上がります）"
     },
     {
       "id": "tiktok-202611-rise3",

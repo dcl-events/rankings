@@ -7,7 +7,8 @@ RISE1 / RISE2 / RISE3 タブへ書き出す（毎朝の洗い替え）。
 
 列（1行目=最終更新、2行目=見出し、3行目〜=データ。他タブと同じ体裁）:
   ライバー名 / バックステージリンク / Liny URL / データ期間 / クリエイターID /
-  クリエイターのユーザー名 / 当日順位（卒業者はスプシのみ） / 前日順位 / ポイント
+  クリエイターのユーザー名 / 当日順位（卒業者はスプシのみ） / 前日順位 / 順位変動 /
+  ポイント / 昇格・卒業
 
 ・順位は各リーグの snapshot（daily_rise*.py が毎朝書く）をそのまま使う。
   **snapshot はクリア（卒業）した人も含んだ順位**＝サイトはクリア者を上部の別枠に
@@ -15,6 +16,8 @@ RISE1 / RISE2 / RISE3 タブへ書き出す（毎朝の洗い替え）。
 ・前日順位は data/sheet_rank_prev.json に前回書き出した順位を持って比較する。
   同じデータ期間で再実行しても前日順位がズレないように、1世代前も保持する。
   状態ファイルが無い初回は、git履歴の1つ前の snapshot から拾う。
+・「昇格・卒業」はクリア記録（rise3_cleared / beginner_graduated / rise_milestone）から
+  「11/4 RISE2へ昇格」の形で入れる。記録の month が当月と違えば空欄（前月分は載せない）。
 ・ライバー名/リンク/ID等は最新TSV（tiktok-automation/out/creator_data_*.tsv）をIDで突合。
 """
 import argparse
@@ -41,18 +44,24 @@ JST = timezone(timedelta(hours=9))
 
 HEADER = ["ライバー名", "バックステージリンク", "Liny URL", "データ期間", "クリエイターID",
           "クリエイターのユーザー名", "当日順位（卒業者はスプシのみ）", "前日順位", "順位変動",
-          "ポイント"]
+          "ポイント", "昇格・卒業"]
 LINK_COLS = ("バックステージリンク", "Liny URL")
 C_CID = HEADER.index("クリエイターID")
 C_PREV = HEADER.index("前日順位")
 C_DIFF = HEADER.index("順位変動")
+C_CLEAR = HEADER.index("昇格・卒業")
 
-# リーグ → (snapshotファイル, タブgid, events.jsonのid接尾辞)
+# リーグ → (snapshotファイル, タブgid, events.jsonのid接尾辞, クリア記録ファイル, クリア時の表記)
 LEAGUES = {
-    "rise1": ("rise_snapshot.json", 985924559, "rise"),
-    "rise2": ("beginner_snapshot.json", 1431297116, "rise2"),
-    "rise3": ("rise3_snapshot.json", 154264078, "rise3"),
+    "rise1": ("rise_snapshot.json", 985924559, "rise",
+              "rise_milestone.json", "RISE卒業"),
+    "rise2": ("beginner_snapshot.json", 1431297116, "rise2",
+              "beginner_graduated.json", "RISE1へ昇格"),
+    "rise3": ("rise3_snapshot.json", 154264078, "rise3",
+              "rise3_cleared.json", "RISE2へ昇格"),
 }
+# クリア日の持ち方がリーグごとに違う（rise3=cleared_on / rise2=graduated_on / rise1=achieved_on）
+DATE_KEYS = ("cleared_on", "graduated_on", "achieved_on")
 
 
 def err(*a):
@@ -117,6 +126,25 @@ def prev_from_git(fname):
         return {}
 
 
+def load_clears(fname, month, label):
+    """クリエイターID → 「11/4 RISE2へ昇格」。該当月の記録だけを使う。"""
+    try:
+        doc = json.load(open(os.path.join(DATA, fname), encoding="utf-8"))
+    except Exception as e:
+        err(f"  ⚠️ {fname} を読めない: {e}")
+        return {}
+    if month and doc.get("month") and doc.get("month") != month:
+        return {}                                   # 月が変わったら前月分は載せない
+    out = {}
+    for cid, v in (doc.get("livers") or {}).items():
+        md = v.get("clear_md") or ""
+        if not md:
+            d = next((v[k] for k in DATE_KEYS if v.get(k)), "")
+            md = f"{int(d[5:7])}/{int(d[8:10])}" if len(d) >= 10 else ""
+        out[cid] = f"{md} {label}".strip()
+    return out
+
+
 def load_state():
     try:
         return json.load(open(STATE, encoding="utf-8"))
@@ -147,8 +175,9 @@ def move_text(prev, rank):
 
 
 def build_rows(league, period, tsv, prev_ranks):
-    fname, _gid, _sfx = LEAGUES[league]
-    _month, ranks = snapshot(fname)
+    fname, _gid, _sfx, cfname, clabel = LEAGUES[league]
+    month, ranks = snapshot(fname)
+    clears = load_clears(cfname, month, clabel)
     rows = []
     for cid, v in sorted(ranks.items(), key=lambda kv: kv[1].get("rank", 10 ** 9)):
         t = tsv.get(cid) or {}
@@ -166,6 +195,7 @@ def build_rows(league, period, tsv, prev_ranks):
             int(pr) if pr else "",                  # 新規掲載は空欄
             move_text(pr, rank),                    # Slackと同じ書き方「4位→2位（2人抜き）」
             int(v.get("pt") or 0),
+            clears.get(cid, ""),                    # 例「11/4 RISE2へ昇格」（未クリアは空欄）
         ])
     return rows, ranks
 
@@ -217,7 +247,7 @@ def main():
         Credentials.from_service_account_file(CREDS, scopes=SCOPES))
 
     for lg in targets:
-        fname, gid, sfx = LEAGUES[lg]
+        fname, gid, sfx = LEAGUES[lg][:3]
         month = a.month or snapshot(fname)[0]
         period = event_period(month, sfx)
         st = state.get(lg) or {}
@@ -230,8 +260,10 @@ def main():
         title = write_sheet(gc, gid, rows, dry=a.dry_run, label=lg.upper())
         miss = sum(1 for r in rows if r[C_CID] not in tsv)
         nuki = sum(1 for r in rows if "人抜き" in str(r[C_DIFF]))
+        clr = sum(1 for r in rows if r[C_CLEAR])
         print(f"✅ {title}: {len(rows)}名（期間 {period}"
               f"・前日順位あり {sum(1 for r in rows if r[C_PREV] != '')}名・人抜き {nuki}名"
+              + (f"・昇格/卒業 {clr}名" if clr else "")
               + (f"・TSV未突合 {miss}名" if miss else "") + ")")
         if not a.dry_run and st.get("date") != period:
             # prev_ranks には「今回 前日順位として実際に使った順位」を残す。

@@ -86,6 +86,16 @@ else
   say "RISEチェックシート更新OK"
 fi
 
+# 2-6. RISE1/2/3の当日ランキングをスプレッドシートの RISE1/RISE2/RISE3 タブへ書き出す
+#      （★daily_rise3/beginner/rise の後＝今朝のsnapshotを読む。前日順位は前回書き出し分と比較）。
+#      クリア（卒業）した人も順位に含めたまま載せる＝サイトとは違う（シートだけの仕様）。
+#      失敗しても非致命（ランキング公開は止めない）。
+if ! "$HOME/Claude/pococha/.venv/bin/python" tools/export_rank_sheets.py >>"$LOG" 2>&1; then
+  say "⚠️ RISE1/2/3タブへの書き出しに失敗（続行）"
+else
+  say "RISE1/2/3タブ 書き出しOK"
+fi
+
 # 2-8. ライバーのアイコン画像を docs/assets/avatars/ に落とす（events.json の icons:true のイベント分だけ＝
 #      2026-11はRISE1のみ先行）。URLを回収するのは run-daily.sh（tiktok-automation）の 2-c で、
 #      署名付きURLは時間が経つと403になるので同じ朝のうちにここで画像化する。

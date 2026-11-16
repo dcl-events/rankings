@@ -202,7 +202,7 @@ def main():
         if cv and pt < CLEAR_PT:                # ライン変更で条件を外れたら取り消す
             del clivers[cid]; cv = None
         if pt >= CLEAR_PT and not cv:
-            cv = {"name": name, "cleared_on": today,
+            cv = {"name": name, "user": str(r[U]).strip(), "cleared_on": today,
                   "clear_md": f"{int(today[5:7])}/{int(today[8:10])}",
                   "drop_on": (datetime.strptime(today, "%Y-%m-%d")
                               + timedelta(days=GRACE_DAYS)).strftime("%Y-%m-%d")}

@@ -676,19 +676,28 @@ def apply_clear_badges(rows, ev_cfg):
     m = re.search(r"tiktok-(\d{4})(\d{2})-", ev_cfg.get("id", ""))
     if m and doc.get("month") and doc["month"] != f"{m.group(1)}-{m.group(2)}":
         return                      # 別の月の記録は使わない（月替わりで持ち越さない）
-    by_name = {}
+    #   突合はユーザー名(@xxx)を優先する。表示名は改名されると記録と一致しなくなり、
+    #   クリア済みなのにランキング本体に居座る事故が起きるため（例: こざる→生肉女）。
+    by_name, by_user = {}, {}
     for v in (doc.get("livers") or {}).values():
         nm = str(v.get("name", "")).strip()
+        us = str(v.get("user", "")).strip()
         md = v.get("clear_md") or v.get("achieved_md") or v.get("grad_md") or ""
         co = v.get("cleared_on") or v.get("graduated_on") or v.get("achieved_on") or ""
         if not md and co:
             md = f"{int(co[5:7])}/{int(co[8:10])}"
-        if nm and md:
+        if not md:
+            continue
+        if nm:
             by_name.setdefault(nm, []).append(md)
+        if us:
+            by_user.setdefault(us, []).append(md)
     label = src.get("label", "🎓 {md} クリア")
     hit = 0
     for r in rows:
-        mds = by_name.get(r["name"])
+        mds = by_user.get(str(r.get("user", "")).strip()) if r.get("user") else None
+        if not mds:
+            mds = by_name.get(r["name"])
         if mds and len(mds) == 1:   # 同名が複数いる場合は付けない（誤表示を防ぐ）
             r["grad"] = label.format(md=mds[0]); hit += 1
     if hit:

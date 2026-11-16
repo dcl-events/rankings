@@ -231,7 +231,7 @@ def main():
             if cid not in prev_beg:
                 # 既に当月30万pt超で初登場＝RISE在籍/卒業済み。ビギナー猶予の対象にせず非掲載
                 continue
-            g = {"name": name, "graduated_on": today,
+            g = {"name": name, "user": str(r[U]).strip(), "graduated_on": today,
                  "grad_md": f"{int(today[5:7])}/{int(today[8:10])}",  # 卒業フラグ表示用 M/D
                  "drop_on": (datetime.strptime(today, "%Y-%m-%d")
                              + timedelta(days=GRACE_DAYS)).strftime("%Y-%m-%d")}

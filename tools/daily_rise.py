@@ -212,7 +212,7 @@ def main():
         if pt < floor and not ALL_MEMBERS: continue   # 在籍＝掲載の月は0ptでも載せる
         # RISE達成フラグ：合算300万pt到達を初回検知日で記録（達成日は固定）
         if tot >= MILESTONE_PT and rid not in mlivers:
-            mlivers[rid] = {"name": r[N].strip(), "achieved_on": today,
+            mlivers[rid] = {"name": r[N].strip(), "user": str(r[U]).strip(), "achieved_on": today,
                             "achieved_md": f"{int(today[5:7])}/{int(today[8:10])}"}
         rise.append({"cid": str(r[ID]).strip(), "name": r[N].strip(), "pt": pt, "tot": tot,
                      "cur": cur, "ag": ag, "live": hm(r[L]), "days": days, "fans": fans, "bonus": bonus, "fanpct": fanpct, "fanbonus": fanbonus,

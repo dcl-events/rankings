@@ -40,12 +40,12 @@ STATE = os.path.join(DATA, "sheet_rank_prev.json")
 JST = timezone(timedelta(hours=9))
 
 HEADER = ["ライバー名", "バックステージリンク", "Liny URL", "データ期間", "クリエイターID",
-          "クリエイターのユーザー名", "当日順位（卒業者はスプシのみ）", "前日順位", "人抜き（前日比）",
+          "クリエイターのユーザー名", "当日順位（卒業者はスプシのみ）", "前日順位", "順位変動",
           "ポイント"]
 LINK_COLS = ("バックステージリンク", "Liny URL")
 C_CID = HEADER.index("クリエイターID")
 C_PREV = HEADER.index("前日順位")
-C_DIFF = HEADER.index("人抜き（前日比）")
+C_DIFF = HEADER.index("順位変動")
 
 # リーグ → (snapshotファイル, タブgid, events.jsonのid接尾辞)
 LEAGUES = {
@@ -132,6 +132,20 @@ def col_a1(n):
     return s
 
 
+def move_text(prev, rank):
+    """順位変動をSlackと同じ書き方で返す（例「4位→2位（2人抜き）」）。
+    前日に載っていない人は「新規掲載」、同じ順位は「変動なし」。"""
+    if not prev:
+        return "新規掲載"
+    prev = int(prev)
+    d = prev - rank
+    if d > 0:
+        return f"{prev}位→{rank}位（{d}人抜き）"
+    if d < 0:
+        return f"{prev}位→{rank}位（{-d}人に抜かれた）"
+    return "変動なし"
+
+
 def build_rows(league, period, tsv, prev_ranks):
     fname, _gid, _sfx = LEAGUES[league]
     _month, ranks = snapshot(fname)
@@ -141,9 +155,6 @@ def build_rows(league, period, tsv, prev_ranks):
         name = (t.get("ライバー名") or v.get("name") or "").strip()
         pr = prev_ranks.get(cid)
         rank = int(v.get("rank") or 0)
-        # 人抜き＝前日順位 − 当日順位。プラスが抜いた人数、マイナスは抜かれた人数。
-        # 前日に載っていない人（新規掲載）は比較できないので空欄。
-        diff = (int(pr) - rank) if pr else ""
         rows.append([
             name,
             (t.get("バックステージリンク") or "").strip(),
@@ -153,7 +164,7 @@ def build_rows(league, period, tsv, prev_ranks):
             (t.get("クリエイターのユーザー名") or "").strip(),
             rank,
             int(pr) if pr else "",                  # 新規掲載は空欄
-            diff,
+            move_text(pr, rank),                    # Slackと同じ書き方「4位→2位（2人抜き）」
             int(v.get("pt") or 0),
         ])
     return rows, ranks
@@ -218,7 +229,7 @@ def main():
         rows, ranks = build_rows(lg, period, tsv, prev)
         title = write_sheet(gc, gid, rows, dry=a.dry_run, label=lg.upper())
         miss = sum(1 for r in rows if r[C_CID] not in tsv)
-        nuki = sum(1 for r in rows if isinstance(r[C_DIFF], int) and r[C_DIFF] > 0)
+        nuki = sum(1 for r in rows if "人抜き" in str(r[C_DIFF]))
         print(f"✅ {title}: {len(rows)}名（期間 {period}"
               f"・前日順位あり {sum(1 for r in rows if r[C_PREV] != '')}名・人抜き {nuki}名"
               + (f"・TSV未突合 {miss}名" if miss else "") + ")")

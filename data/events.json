@@ -2,6 +2,15 @@
   "_comment": "公開するイベントだけをここに列挙する。source=pococha_report は ../pococha/data/event_report.csv から event_identifier で抽出。source=csv は data/<data_file> を読む(TikTok貼り付け用)。score_field=応援ptなど集計列。display: value(金額表示) / rank(順位のみ) / bar(1位を100%とした相対バー)。",
   "events": [
     {
+      "id": "tiktok-202611-shibuya-audition-1st",
+      "platform": "TikTok LIVE",
+      "static": true,
+      "card_url": "https://dcl-lrm.com/for-liver/shibuya-audition-1st-round.html",
+      "title": "渋谷スクランブル交差点 大型ビジョン広告掲載 モデルオーディション 1次審査",
+      "period_start": "2026-11-16",
+      "period_end": "2027-01-31"
+    },
+    {
       "id": "tiktok-202612-pride5-gold",
       "platform": "TikTok LIVE",
       "static": true,

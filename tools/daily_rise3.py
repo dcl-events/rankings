@@ -204,6 +204,7 @@ def main():
         if pt >= CLEAR_PT and not cv:
             cv = {"name": name, "user": str(r[U]).strip(), "cleared_on": today,
                   "clear_md": f"{int(today[5:7])}/{int(today[8:10])}",
+                  "clear_pt": int(pt),          # クリアを検知した日のpt（後から復元できないので残す）
                   "drop_on": (datetime.strptime(today, "%Y-%m-%d")
                               + timedelta(days=GRACE_DAYS)).strftime("%Y-%m-%d")}
             clivers[cid] = cv

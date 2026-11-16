@@ -7,7 +7,8 @@ RISE1 / RISE2 / RISE3 タブへ書き出す（毎朝の洗い替え）。
 
 列（1行目=最終更新、2行目=見出し、3行目〜=データ。他タブと同じ体裁）:
   ライバー名 / バックステージリンク / Liny URL / データ期間 / クリエイターID /
-  クリエイターのユーザー名 / 当日順位 / 前日順位 / 順位変動 / ポイント / 昇格・卒業
+  クリエイターのユーザー名 / 当日順位 / 前日順位 / 順位変動 / ポイント / クリア時ポイント /
+  昇格・卒業
 
 ・順位は各リーグの snapshot（daily_rise*.py が毎朝書く）が元だが、**snapshot の rank は
   クリア者込み**なので、サイト（build.py の graduate_showcase）と同じになるよう
@@ -19,6 +20,8 @@ RISE1 / RISE2 / RISE3 タブへ書き出す（毎朝の洗い替え）。
 ・「昇格・卒業」はクリア記録（rise3_cleared / beginner_graduated / rise_milestone）から
   「11/4 RISE2へ昇格」の形で入れる。記録の month が当月と違えば空欄（前月分は載せない）。
   クリアして上のリーグへ行った人も、元のリーグのタブからは消さない（ユーザー指示）。
+・「クリア時ポイント」はクリア記録の `clear_pt`（daily_rise*.py がクリア検知時に記録）。
+  「ポイント」はクリア後も伸び続ける現在値なので、到達時点の値は別列で持つ。
 ・ライバー名/リンク/ID等は最新TSV（tiktok-automation/out/creator_data_*.tsv）をIDで突合。
 """
 import argparse
@@ -45,7 +48,7 @@ JST = timezone(timedelta(hours=9))
 
 HEADER = ["ライバー名", "バックステージリンク", "Liny URL", "データ期間", "クリエイターID",
           "クリエイターのユーザー名", "当日順位", "前日順位", "順位変動",
-          "ポイント", "昇格・卒業"]
+          "ポイント", "クリア時ポイント", "昇格・卒業"]
 LINK_COLS = ("バックステージリンク", "Liny URL")
 C_CID = HEADER.index("クリエイターID")
 C_RANK = HEADER.index("当日順位")
@@ -141,7 +144,8 @@ def load_clears(fname, month, label):
     for cid, v in (doc.get("livers") or {}).items():
         d = next((v[k] for k in DATE_KEYS if v.get(k)), "")
         md = v.get("clear_md") or (f"{int(d[5:7])}/{int(d[8:10])}" if len(d) >= 10 else "")
-        out[cid] = {"text": f"{md} {label}".strip(), "on": d or "9999-99-99"}
+        out[cid] = {"text": f"{md} {label}".strip(), "on": d or "9999-99-99",
+                    "pt": v.get("clear_pt")}
     return out
 
 
@@ -208,6 +212,7 @@ def build_rows(league, period, tsv, prev_ranks):
             int(prev) if prev else "",               # 新規掲載は空欄
             move_text(prev, rank) if rank else "",   # Slackと同じ書き方「4位→2位（2人抜き）」
             int(v.get("pt") or 0),
+            int(cl["pt"]) if cl and cl.get("pt") else "",   # クリアを検知した日のpt
             cl["text"] if cl else "",               # 例「11/4 RISE2へ昇格」（未クリアは空欄）
         ]
 

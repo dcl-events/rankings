@@ -213,7 +213,9 @@ def main():
         # RISE達成フラグ：合算300万pt到達を初回検知日で記録（達成日は固定）
         if tot >= MILESTONE_PT and rid not in mlivers:
             mlivers[rid] = {"name": r[N].strip(), "user": str(r[U]).strip(), "achieved_on": today,
-                            "achieved_md": f"{int(today[5:7])}/{int(today[8:10])}"}
+                            "achieved_md": f"{int(today[5:7])}/{int(today[8:10])}",
+                            # クリアを検知した日の合算pt（後から復元できないので残す）
+                            "clear_pt": int(tot)}
         rise.append({"cid": str(r[ID]).strip(), "name": r[N].strip(), "pt": pt, "tot": tot,
                      "cur": cur, "ag": ag, "live": hm(r[L]), "days": days, "fans": fans, "bonus": bonus, "fanpct": fanpct, "fanbonus": fanbonus,
                      "user": str(r[U]).strip(),

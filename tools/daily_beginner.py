@@ -233,6 +233,7 @@ def main():
                 continue
             g = {"name": name, "user": str(r[U]).strip(), "graduated_on": today,
                  "grad_md": f"{int(today[5:7])}/{int(today[8:10])}",  # 卒業フラグ表示用 M/D
+                 "clear_pt": int(tot),          # クリアを検知した日の合算pt（後から復元できないので残す）
                  "drop_on": (datetime.strptime(today, "%Y-%m-%d")
                              + timedelta(days=GRACE_DAYS)).strftime("%Y-%m-%d")}
             glivers[cid] = g

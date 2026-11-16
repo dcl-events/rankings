@@ -40,8 +40,12 @@ STATE = os.path.join(DATA, "sheet_rank_prev.json")
 JST = timezone(timedelta(hours=9))
 
 HEADER = ["ライバー名", "バックステージリンク", "Liny URL", "データ期間", "クリエイターID",
-          "クリエイターのユーザー名", "当日順位（卒業者はスプシのみ）", "前日順位", "ポイント"]
+          "クリエイターのユーザー名", "当日順位（卒業者はスプシのみ）", "前日順位", "人抜き（前日比）",
+          "ポイント"]
 LINK_COLS = ("バックステージリンク", "Liny URL")
+C_CID = HEADER.index("クリエイターID")
+C_PREV = HEADER.index("前日順位")
+C_DIFF = HEADER.index("人抜き（前日比）")
 
 # リーグ → (snapshotファイル, タブgid, events.jsonのid接尾辞)
 LEAGUES = {
@@ -136,6 +140,10 @@ def build_rows(league, period, tsv, prev_ranks):
         t = tsv.get(cid) or {}
         name = (t.get("ライバー名") or v.get("name") or "").strip()
         pr = prev_ranks.get(cid)
+        rank = int(v.get("rank") or 0)
+        # 人抜き＝前日順位 − 当日順位。プラスが抜いた人数、マイナスは抜かれた人数。
+        # 前日に載っていない人（新規掲載）は比較できないので空欄。
+        diff = (int(pr) - rank) if pr else ""
         rows.append([
             name,
             (t.get("バックステージリンク") or "").strip(),
@@ -143,8 +151,9 @@ def build_rows(league, period, tsv, prev_ranks):
             period,
             cid,                                    # 19桁なので必ず文字列のまま（RAW書き込み）
             (t.get("クリエイターのユーザー名") or "").strip(),
-            int(v.get("rank") or 0),
+            rank,
             int(pr) if pr else "",                  # 新規掲載は空欄
+            diff,
             int(v.get("pt") or 0),
         ])
     return rows, ranks
@@ -156,7 +165,7 @@ def write_sheet(gc, gid, rows, dry=False, label=""):
     if dry:   # dry-runではスプレッドシートに一切触らない
         print(f"  [dry-run] {label}: {len(rows)}名ぶんを書き込む予定（1行目={body[0][0]}）")
         for r in rows[:3]:
-            print("    ", " | ".join(str(c) for c in [r[0]] + r[4:]))
+            print("    ", " | ".join(str(c) for c in [r[0]] + r[C_CID:]))
         return label
     sh = gc.open_by_key(SPREADSHEET_ID)
     ws = next((w for w in sh.worksheets() if w.id == gid), None)
@@ -208,14 +217,18 @@ def main():
             prev = st.get("ranks") or prev_from_git(fname)
         rows, ranks = build_rows(lg, period, tsv, prev)
         title = write_sheet(gc, gid, rows, dry=a.dry_run, label=lg.upper())
-        miss = sum(1 for r in rows if r[4] not in tsv)
-        print(f"✅ {title}: {len(rows)}名（期間 {period}・前日順位あり {sum(1 for r in rows if r[7] != '')}名"
+        miss = sum(1 for r in rows if r[C_CID] not in tsv)
+        nuki = sum(1 for r in rows if isinstance(r[C_DIFF], int) and r[C_DIFF] > 0)
+        print(f"✅ {title}: {len(rows)}名（期間 {period}"
+              f"・前日順位あり {sum(1 for r in rows if r[C_PREV] != '')}名・人抜き {nuki}名"
               + (f"・TSV未突合 {miss}名" if miss else "") + ")")
         if not a.dry_run and st.get("date") != period:
+            # prev_ranks には「今回 前日順位として実際に使った順位」を残す。
+            # こうしておけば同じデータ期間で再実行しても前日順位が消えない（初回はgit由来）。
             state[lg] = {"date": period,
                          "ranks": {cid: v.get("rank") for cid, v in ranks.items()},
                          "prev_date": st.get("date", ""),
-                         "prev_ranks": st.get("ranks") or {}}
+                         "prev_ranks": prev}
     if not a.dry_run:
         state["updated"] = datetime.now(JST).strftime("%Y-%m-%d %H:%M")
         json.dump(state, open(STATE, "w", encoding="utf-8"), ensure_ascii=False, indent=1)

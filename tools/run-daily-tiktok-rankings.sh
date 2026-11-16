@@ -86,6 +86,13 @@ else
   say "RISEチェックシート更新OK"
 fi
 
+# 2-8. ライバーのアイコン画像を docs/assets/avatars/ に落とす（events.json の icons:true のイベント分だけ＝
+#      2026-11はRISE1のみ先行）。URLを回収するのは run-daily.sh（tiktok-automation）の 2-c で、
+#      署名付きURLは時間が経つと403になるので同じ朝のうちにここで画像化する。
+#      装飾なので失敗しても非致命（前回落とした画像のまま続行）。
+python3 tools/fetch_avatars.py --quiet >>"$LOG" 2>&1 \
+  && say "アイコン画像 取得OK" || say "⚠️ アイコン画像の取得に失敗（前回分のまま続行）"
+
 # 3. サイト再生成（両ランキングまとめて1回）
 python3 build.py >>"$LOG" 2>&1 || fail "build失敗"
 

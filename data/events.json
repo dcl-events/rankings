@@ -692,7 +692,8 @@
         "file": "rise_milestone.json",
         "label": "🎓 {md} クリア"
       },
-      "graduate_note": "クリアした方はランキングから外れます（RISE卒業・以降の順位は繰り上がります）"
+      "graduate_note": "クリアした方はランキングから外れます（RISE卒業・以降の順位は繰り上がります）",
+      "icons": true
     },
     {
       "id": "tiktok-202611-rise3",

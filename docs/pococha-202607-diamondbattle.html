@@ -148,6 +148,23 @@ li .ttinline{display:inline-flex;vertical-align:-4px;align-items:center;justify-
   border:1px solid rgba(0,0,0,.10);text-decoration:none}
 li .ttinline svg{width:14px;height:14px;display:block}
 
+/* ライバーのアイコン（events.json の icons:true のイベントだけ。画像は docs/assets/avatars/<ユーザー名>.webp） */
+li .av{width:52px;height:52px;border-radius:50%;object-fit:cover;flex:none;
+  border:2px solid var(--line);margin-left:-6px;background:rgba(127,127,140,.14)}
+li .avph{display:flex;align-items:center;justify-content:center;font-family:'Jost',sans-serif;
+  font-weight:700;font-size:20px;color:var(--muted);text-transform:uppercase}
+li.g1 .av{border-color:var(--gold)}
+li.g2 .av{border-color:var(--silver)}
+li.g3 .av{border-color:var(--bronze)}
+.gradbox li .av{width:46px;height:46px;margin-left:0}
+@media (max-width:560px){
+  li .av{width:34px;height:34px;margin-left:-11px}
+  li .avph{font-size:14px}
+  .gradbox li .av{width:34px;height:34px;margin-left:0}
+  ul.rank.icons li{gap:8px}
+  ul.rank.icons li .num{min-width:29px}
+}
+
 /* 🎓 クリア枠（graduate_showcase:true のとき）＝用語は「クリア」に統一 */
 .gradbox{margin:0 0 16px;border-radius:20px;padding:2px;
   background:linear-gradient(120deg,var(--accent),var(--accent2) 52%,var(--accent));
@@ -210,7 +227,7 @@ footer{text-align:center;font-size:12px;color:var(--muted);margin-top:44px;
   <h1>ダイヤ獲得ランキングバトル</h1>
   <div class="meta">2026-07-22 〜 2026-07-26　／ 参加 15 名</div>
 </header>
-<div class="updated">最終更新: 2026-11-16 11:17 JST</div>
+<div class="updated">最終更新: 2026-11-16 14:18 JST</div>
 
 
 

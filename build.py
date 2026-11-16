@@ -13,10 +13,13 @@ import csv
 import re
 import json
 import html
+import sys
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).parent
+sys.path.insert(0, str(ROOT / "tools"))
+from avatars import av_relpath   # アイコン画像のファイル名ルール（tools/fetch_avatars.py と共通）
 DATA = ROOT / "data"
 DOCS = ROOT / "docs"
 POCOCHA_REPORT = ROOT.parent / "pococha" / "data" / "event_report.csv"
@@ -337,6 +340,23 @@ li .ttinline{{display:inline-flex;vertical-align:-4px;align-items:center;justify
   border:1px solid rgba(0,0,0,.10);text-decoration:none}}
 li .ttinline svg{{width:14px;height:14px;display:block}}
 
+/* ライバーのアイコン（events.json の icons:true のイベントだけ。画像は docs/assets/avatars/<ユーザー名>.webp） */
+li .av{{width:52px;height:52px;border-radius:50%;object-fit:cover;flex:none;
+  border:2px solid var(--line);margin-left:-6px;background:rgba(127,127,140,.14)}}
+li .avph{{display:flex;align-items:center;justify-content:center;font-family:'Jost',sans-serif;
+  font-weight:700;font-size:20px;color:var(--muted);text-transform:uppercase}}
+li.g1 .av{{border-color:var(--gold)}}
+li.g2 .av{{border-color:var(--silver)}}
+li.g3 .av{{border-color:var(--bronze)}}
+.gradbox li .av{{width:46px;height:46px;margin-left:0}}
+@media (max-width:560px){{
+  li .av{{width:34px;height:34px;margin-left:-11px}}
+  li .avph{{font-size:14px}}
+  .gradbox li .av{{width:34px;height:34px;margin-left:0}}
+  ul.rank.icons li{{gap:8px}}
+  ul.rank.icons li .num{{min-width:29px}}
+}}
+
 /* 🎓 クリア枠（graduate_showcase:true のとき）＝用語は「クリア」に統一 */
 .gradbox{{margin:0 0 16px;border-radius:20px;padding:2px;
   background:linear-gradient(120deg,var(--accent),var(--accent2) 52%,var(--accent));
@@ -445,6 +465,16 @@ def tt_link(user, cls):
             f'rel="noopener nofollow" aria-label="{u} のTikTok"><svg><use href="#tt"/></svg></a>')
 
 
+def avatar_html(r, cls="av"):
+    """ライバーの丸アイコン。画像が無ければ表示名の頭文字で代替する。
+    画像は tools/fetch_avatars.py が docs/assets/avatars/<ユーザー名>.webp に落とす。"""
+    rel = av_relpath(r.get("user")) if r.get("user") else ""
+    if rel and (DOCS / rel).exists():
+        return f'<img class="{cls}" src="{rel}" alt="" loading="lazy" decoding="async">'
+    ch = next((c for c in str(r.get("name") or "") if c.strip()), "")
+    return f'<span class="{cls} avph" aria-hidden="true">{html.escape(ch)}</span>'
+
+
 def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
     display = ev_cfg.get("display", "value")
     top = f"top g{rank}" if rank <= 3 else ""
@@ -496,7 +526,8 @@ def render_item(rank, r, ev_cfg, maxscore, gap_text=""):
                 + bdm_badge(user, "narrow-only")
         if stack:
             sc = f'<div class="scwrap">{stack}{sc}</div>'
-    return (f'<li class="{top} cnr{nbadge}">{tt_corner}<div class="num">{num}</div>'
+    av = avatar_html(r) if ev_cfg.get("icons") else ""
+    return (f'<li class="{top} cnr{nbadge}">{tt_corner}<div class="num">{num}</div>{av}'
             f'<div class="body">{body}</div>{sc}</li>')
 
 
@@ -646,7 +677,8 @@ def graduates_html(grads, ev_cfg):
             meta.append(f'<span>{html.escape(flabel)} {html.escape(r["fans"])}人</span>')
         nb = bdm_badge(r.get("user"), "narrow-only")   # スマホ用（ロゴの下＝ptの上）
         tt = f'<div class="cnr">{bdm_badge(r.get("user"), "wide-only")}{tt_link(r.get("user"), "ttcorner")}</div>'  # ランキングと同じ右上角
-        lis.append(f'<li>{tt}<div class="gmedal">{"👑" if i == 0 else "🏆"}</div>'
+        av = avatar_html(r) if ev_cfg.get("icons") else ""
+        lis.append(f'<li>{tt}<div class="gmedal">{"👑" if i == 0 else "🏆"}</div>{av}'
                    f'<div class="gbody"><div class="gnm">{html.escape(r["name"])}</div>'
                    f'<div class="gmeta">{"".join(meta)}</div></div>'
                    f'<div class="scwrap">{nb}<div class="gsc">{val}'
@@ -765,7 +797,7 @@ def build_event(ev_cfg, report):
 {rules_html(ev_cfg)}
 {graduates_html(grads, ev_cfg)}
 {'<div class="ranklead">▼ 現在のランキング</div>' if grads else ''}
-<ul class="rank">{items}</ul>
+<ul class="rank{' icons' if ev_cfg.get('icons') else ''}">{items}</ul>
 {links_html(ev_cfg)}"""
     (DOCS / f"{ev_cfg['id']}.html").write_text(
         page_shell(meta["title"], body, theme), encoding="utf-8")

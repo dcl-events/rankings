@@ -293,17 +293,22 @@ def main():
             err(f"新規だがデビュー組でない（復帰/既存）ため非掲載: {skipped}名")
     if newclear:
         msg.append("")
-        msg.append(f"🎓 RISE3クリア（{CLEAR_PT//10000}万pt到達 → ⚡️DCL RISE2⚡️へ）")
+        msg.append(f"🎓 本日RISE3クリア（{CLEAR_PT//10000}万pt到達）"
+                   "＝ランキングから上部の達成者枠へ移り、⚡️DCL RISE2⚡️に昇格します")
         for _cid, nm, pt in newclear:
             msg.append(f"・{nm}{uh(_cid)}：{pt:,}pt")
         if not bare: msg.append(RISE2_URL)
-    if dropped:
+    if dropped and not KEEP_CLEARED:
+        # クリア当日に「🎓 RISE3クリア」で報告し、その日から上部の達成者枠に入る。
+        # 達成者枠に残す運用（clear_keep_listed）では翌日に出す「枠へ移動」は重複なので出さない。
         msg.append("")
-        msg.append("🏁 本日からRISE3の達成者枠へ移動（⚡️DCL RISE2⚡️で継続）" if KEEP_CLEARED
-                   else "🏁 本日RISE3掲載終了（⚡️DCL RISE2⚡️で継続）")
+        msg.append("🏁 本日RISE3掲載終了（⚡️DCL RISE2⚡️で継続）")
         for _cid, nm in dropped:
             msg.append(f"・{nm}{uh(_cid)}")
         if not bare: msg.append(RISE2_URL)
+    elif dropped:
+        err("（達成者枠に残す運用のため「枠へ移動」の通知は省略: "
+            + " / ".join(nm for _c, nm in dropped) + "）")
     print("\n".join(msg))
 
     if dry:

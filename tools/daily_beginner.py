@@ -323,10 +323,9 @@ def main():
             pos = f"{gr}位で" if gr else ""
             msg.append(f"・{name}{uh(cid_g)}：{pos}昇格（RISE2掲載は {m}/{d} まで）")
         if not bare: msg.append(RISE_URL)
-    if dropped:
+    if dropped and not KEEP_CLEARED:    # 達成者枠に残す運用では翌日の「枠へ移動」は重複なので出さない
         msg.append("")
-        msg.append("🏁 本日からRISE2の達成者枠へ移動（⚡️DCL RISE1⚡️で継続）" if KEEP_CLEARED
-                   else "🏁 本日RISE2掲載終了（⚡️DCL RISE1⚡️で継続）")
+        msg.append("🏁 本日RISE2掲載終了（⚡️DCL RISE1⚡️で継続）")
         for _cid, name, _gon in dropped:
             msg.append(f"・{name}{uh(_cid)}")
         if not bare: msg.append(RISE_URL)

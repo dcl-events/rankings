@@ -152,16 +152,22 @@ say "===== 完了 ====="
 #      親  = マーカーより前  → conversations_add_message（thread_ts なし）
 #      詳細 = マーカーより後 → 同ツールに親の ts を thread_ts で指定
 #    で2回投稿する。--bare 出力は「1行目=見出し / 2行目=URL / 3行目=空 / 4行目以降=詳細」。
+#
+#    ★2026-11-16 池さんの指示でスレッドの中身を変更：
+#      細かい順位アップ（◯人抜きの一覧）はSlackに出さずスプレッドシートで見てもらう。
+#      スレッドは tools/slack_notice.py が組み立てる（RISE昇格・RISE1卒業・RISE3新規参加・スプシ3枚）。
+#      各日次スクリプトの詳細本文（順位変動つき）はログにだけ残す。
 beg_head="$(printf '%s\n' "$BEG" | head -2)"   # 🌱見出し＋URL
-beg_body="$(printf '%s\n' "$BEG" | tail -n +4)" # 順位変動・卒業・掲載終了
 rise_head="$(printf '%s\n' "$RISE" | head -2)"  # ⚡️見出し＋URL
-rise_body="$(printf '%s\n' "$RISE" | tail -n +4)" # 順位変動・新規RISE入り
 r3_head="$(printf '%s\n' "$R3" | head -2)"      # ⚡️RISE3見出し＋URL
-r3_body="$(printf '%s\n' "$R3" | tail -n +4)"   # 順位変動・クリア・掲載終了
+{
+  echo "----- 日次スクリプトの詳細本文（Slackには出さない） -----"
+  printf '%s\n\n' "$RISE"; printf '%s\n\n' "$BEG"; printf '%s\n' "$R3"
+} >>"$LOG"
 
-# --- 親メッセージ（短く：見出し＋メンション＋2つのURLだけ） ---
+# --- 親メッセージ（短く：見出し＋メンション＋3つのURLだけ） ---
 printf '%s\n' "📊 TikTok LIVE ランキング更新（${DATE}時点）"
-printf '%s\n' "<@U0A6WU3P3LL>"
+printf '%s\n' "<@U0A6WU3P3LL> <@U097QG2V1JQ> <@U0A973X8H6C>"
 [ -n "$STALE_NOTE" ] && printf '%s\n' "$STALE_NOTE"
 printf '\n'
 printf '%s\n\n' "$rise_head"
@@ -170,15 +176,14 @@ printf '%s\n' "$beg_head"
 
 printf '\n%s\n' "===THREAD==="
 
-# --- スレッド返信（詳細：メンションは付けない） ---
-printf '%s\n' "⚡️DCL RISE1⚡️"
-printf '%s\n\n' "$rise_body"
-printf '%s\n' "⚡️DCL RISE2⚡️"
-printf '%s\n' "$beg_body"
-if [ -n "$R3" ]; then
-  printf '\n%s\n' "⚡️DCL RISE3⚡️"
-  printf '%s\n' "$r3_body"
+# --- スレッド返信（昇格・卒業／新規参加／スプシURL。メンションは付けない） ---
+NOTICE="$(python3 tools/slack_notice.py 2>>"$LOG")"
+if [ -n "$NOTICE" ]; then
+  printf '%s\n' "$NOTICE"
+else
+  say "⚠️ slack_notice.py が空（スレッドはスプシURLだけ出す）"
+  printf '%s\n' "📄 順位の詳細（当日順位・前日順位・◯人抜き）はスプレッドシートで確認"
+  printf '%s\n' "RISE1 https://docs.google.com/spreadsheets/d/1A-WSX4mteR-E5kY8V82dTUqoTcD0GDLA0Uq0qiDTzh4/edit?gid=985924559#gid=985924559"
+  printf '%s\n' "RISE2 https://docs.google.com/spreadsheets/d/1A-WSX4mteR-E5kY8V82dTUqoTcD0GDLA0Uq0qiDTzh4/edit?gid=1431297116#gid=1431297116"
+  printf '%s\n' "RISE3 https://docs.google.com/spreadsheets/d/1A-WSX4mteR-E5kY8V82dTUqoTcD0GDLA0Uq0qiDTzh4/edit?gid=154264078#gid=154264078"
 fi
-
-# スタンプラリーは2026-11に廃止。課題申告レポート（task_report.py）と参加状況レジェンドの
-# Slack掲載は停止。ランキング本文（RISE1/2/3）だけを投稿する。

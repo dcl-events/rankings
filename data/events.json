@@ -618,7 +618,8 @@
       "clear_badge": {
         "file": "beginner_graduated.json",
         "label": "🎓 {md} クリア"
-      }
+      },
+      "icons": true
     },
     {
       "id": "tiktok-202611-rise",
@@ -774,7 +775,8 @@
       "graduate_label": "🎓 RISE3クリア",
       "graduate_note": "クリアした方はランキングから外れ、⚡️DCL RISE2⚡️へ移ります（以降の順位は繰り上がります）",
       "milestone_pt": 200000,
-      "clear_keep_listed": true
+      "clear_keep_listed": true,
+      "icons": true
     }
   ]
 }

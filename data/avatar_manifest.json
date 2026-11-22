@@ -616,9 +616,9 @@
    "fetched": "2026-11-16 15:00"
   },
   "x_4th": {
-   "hash": "f55d0d9338af4b193d5b4d51fc834269",
-   "bytes": 3334,
-   "fetched": "2026-11-21 10:58"
+   "hash": "f9ef5c681608edae4ab4117211be7a15",
+   "bytes": 2848,
+   "fetched": "2026-11-22 11:20"
   },
   "yuka84130": {
    "hash": "515f3daa641a4c2de5b18944c721e6ab",
@@ -709,7 +709,22 @@
    "hash": "2cf4d025e7b8e87cec2cc1c8cfc6a506",
    "bytes": 4358,
    "fetched": "2026-11-21 10:58"
+  },
+  "akr7wp": {
+   "hash": "cd8ae5567f0b10f83d92d7bbc2283ca1",
+   "bytes": 3442,
+   "fetched": "2026-11-22 11:20"
+  },
+  "alo_puni_v": {
+   "hash": "2ae539a5bd95ba7b63e7e6e50cc0a26c",
+   "bytes": 3336,
+   "fetched": "2026-11-22 11:20"
+  },
+  "niconicochan.1130": {
+   "hash": "89723c6a93e1b302ab5cd88617a50e4c",
+   "bytes": 2816,
+   "fetched": "2026-11-22 11:20"
   }
  },
- "updated": "2026-11-21 10:58"
+ "updated": "2026-11-22 11:20"
 }

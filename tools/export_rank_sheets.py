@@ -7,8 +7,8 @@ RISE1 / RISE2 / RISE3 タブへ書き出す（毎朝の洗い替え）。
 
 列（1行目=最終更新、2行目=見出し、3行目〜=データ。他タブと同じ体裁）:
   ライバー名 / バックステージリンク / Liny URL / データ期間 / クリエイターID /
-  クリエイターのユーザー名 / 当日順位 / 前日順位 / 順位変動 / ポイント / クリア時ポイント /
-  昇格・卒業
+  クリエイターのユーザー名 / 初配信日 / 当日順位 / 前日順位 / 順位変動 / ポイント /
+  クリア時ポイント / 昇格・卒業
 
 ・順位は各リーグの snapshot（daily_rise*.py が毎朝書く）が元だが、**snapshot の rank は
   クリア者込み**なので、サイト（build.py の graduate_showcase）と同じになるよう
@@ -22,6 +22,8 @@ RISE1 / RISE2 / RISE3 タブへ書き出す（毎朝の洗い替え）。
   クリアして上のリーグへ行った人も、元のリーグのタブからは消さない（ユーザー指示）。
 ・「クリア時ポイント」はクリア記録の `clear_pt`（daily_rise*.py がクリア検知時に記録）。
   「ポイント」はクリア後も伸び続ける現在値なので、到達時点の値は別列で持つ。
+・初配信日は同じスプレッドシートの「RISEチェックシート_Claude」(gid=1676003252)のD列から
+  クリエイターIDで突合（ルーティンの 2-5 で当日分に更新された直後に読む）。
 ・ライバー名/リンク/ID等は最新TSV（tiktok-automation/out/creator_data_*.tsv）をIDで突合。
 """
 import argparse
@@ -44,13 +46,15 @@ CREDS = "/Users/sukeaki.ito/Claude/pococha/service_account.json"
 SPREADSHEET_ID = "1A-WSX4mteR-E5kY8V82dTUqoTcD0GDLA0Uq0qiDTzh4"
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 STATE = os.path.join(DATA, "sheet_rank_prev.json")
+CHECK_GID = 1676003252          # 同じスプレッドシートの「RISEチェックシート_Claude」＝初配信日の取得元
 JST = timezone(timedelta(hours=9))
 
 HEADER = ["ライバー名", "バックステージリンク", "Liny URL", "データ期間", "クリエイターID",
-          "クリエイターのユーザー名", "当日順位", "前日順位", "順位変動",
+          "クリエイターのユーザー名", "初配信日", "当日順位", "前日順位", "順位変動",
           "ポイント", "クリア時ポイント", "昇格・卒業"]
 LINK_COLS = ("バックステージリンク", "Liny URL")
 C_CID = HEADER.index("クリエイターID")
+C_FIRST = HEADER.index("初配信日")
 C_RANK = HEADER.index("当日順位")
 C_PREV = HEADER.index("前日順位")
 C_DIFF = HEADER.index("順位変動")
@@ -90,6 +94,31 @@ def load_tsv():
             if cid:
                 out[cid] = r
     return out, path
+
+
+def load_first_broadcast(gc):
+    """「RISEチェックシート_Claude」から クリエイターID → 初配信日（YYYY/MM/DD）。
+    あちらはルーティンの 2-5（このスクリプトの直前）で当日分に更新されている。
+    gen_tasksheet.py 側で ①手動オーバーライド→②マスターU列→③再構成 の優先で入った値をそのまま使う。"""
+    if gc is None:
+        return {}
+    try:
+        sh = gc.open_by_key(SPREADSHEET_ID)
+        ws = next((w for w in sh.worksheets() if w.id == CHECK_GID), None)
+        if ws is None:
+            err(f"  ⚠️ gid={CHECK_GID}（RISEチェックシート_Claude）が無い＝初配信日は空欄")
+            return {}
+        vals = ws.get_all_values()
+        hdr = vals[1] if len(vals) > 1 else []
+        ic, idt = hdr.index("クリエイターID"), hdr.index("初配信日")
+        out = {}
+        for r in vals[2:]:
+            if len(r) > max(ic, idt) and r[ic].strip() and r[idt].strip():
+                out[r[ic].strip()] = r[idt].strip()
+        return out
+    except Exception as e:
+        err(f"  ⚠️ 初配信日を取れない（空欄で続行）: {e}")
+        return {}
 
 
 def event_period(month, suffix):
@@ -190,7 +219,7 @@ def move_text(prev, rank):
     return "変動なし"
 
 
-def build_rows(league, period, tsv, prev_ranks):
+def build_rows(league, period, tsv, prev_ranks, firstbc):
     fname, _gid, _sfx, cfname, clabel = LEAGUES[league]
     month, ranks = snapshot(fname)
     clears = load_clears(cfname, month, clabel)
@@ -208,6 +237,7 @@ def build_rows(league, period, tsv, prev_ranks):
             period,
             cid,                                    # 19桁なので必ず文字列のまま（RAW書き込み）
             (t.get("クリエイターのユーザー名") or "").strip(),
+            firstbc.get(cid, ""),                   # 初配信日（RISEチェックシート_Claude 由来）
             rank or "",                             # クリア者は順位なし（サイトのクリア枠と同じ）
             int(prev) if prev else "",               # 新規掲載は空欄
             move_text(prev, rank) if rank else "",   # Slackと同じ書き方「4位→2位（2人抜き）」
@@ -269,6 +299,9 @@ def main():
     state = load_state()
     gc = None if a.dry_run else gspread.authorize(
         Credentials.from_service_account_file(CREDS, scopes=SCOPES))
+    firstbc = load_first_broadcast(gc)
+    print(f"📅 初配信日: RISEチェックシート_Claude から {len(firstbc)}名"
+          + ("（dry-runなので読みに行かない＝空欄）" if gc is None else ""))
 
     for lg in targets:
         fname, gid, sfx = LEAGUES[lg][:3]
@@ -280,14 +313,16 @@ def main():
             err(f"  （{lg}: 同じデータ期間での再実行なので1世代前の順位を使う）")
         else:
             prev = st.get("ranks") or prev_from_git(fname)
-        rows, ranks = build_rows(lg, period, tsv, prev)
+        rows, ranks = build_rows(lg, period, tsv, prev, firstbc)
         title = write_sheet(gc, gid, rows, dry=a.dry_run, label=lg.upper())
         miss = sum(1 for r in rows if r[C_CID] not in tsv)
         nuki = sum(1 for r in rows if "人抜き" in str(r[C_DIFF]))
         clr = sum(1 for r in rows if r[C_CLEAR])
+        nofb = sum(1 for r in rows if not r[C_FIRST])
         print(f"✅ {title}: 掲載 {len(rows) - clr}名＋クリア {clr}名（期間 {period}"
               f"・前日順位あり {sum(1 for r in rows if r[C_PREV] != '')}名・人抜き {nuki}名"
-              + (f"・TSV未突合 {miss}名" if miss else "") + ")")
+              + (f"・TSV未突合 {miss}名" if miss else "")
+              + (f"・初配信日なし {nofb}名" if nofb else "") + ")")
         if not a.dry_run and st.get("date") != period:
             # prev_ranks には「今回 前日順位として実際に使った順位」を残す。
             # こうしておけば同じデータ期間で再実行しても前日順位が消えない（初回はgit由来）。

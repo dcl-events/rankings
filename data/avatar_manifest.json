@@ -696,9 +696,9 @@
    "fetched": "2026-11-21 10:58"
   },
   "herios33": {
-   "hash": "4d0e2fb6ecbb2aa37445717ea4f41b50",
-   "bytes": 2030,
-   "fetched": "2026-11-26 10:21"
+   "hash": "ff324566b4ae6966e94f647add9ceaa8",
+   "bytes": 4486,
+   "fetched": "2026-11-27 10:23"
   },
   "mashu_cloud": {
    "hash": "30ed0808d3d71305d1d4b7ad7efed39d",
@@ -731,9 +731,9 @@
    "fetched": "2026-11-23 11:20"
   },
   "kanade_chan_": {
-   "hash": "464c6acc67fc7496016bd640f26bb5c4",
-   "bytes": 3552,
-   "fetched": "2026-11-23 11:21"
+   "hash": "4e696b0a6e85549c01e45c321e76265e",
+   "bytes": 2182,
+   "fetched": "2026-11-27 10:23"
   },
   "mimi0610.jp": {
    "hash": "7e1ff99c2aa03a1d66ab0b1b65536f7e",
@@ -756,10 +756,40 @@
    "fetched": "2026-11-26 10:21"
   },
   "violet.life.with.gugu": {
-   "hash": "2f131c879eb16607cceba1427f0f68c2",
-   "bytes": 2956,
-   "fetched": "2026-11-26 10:21"
+   "hash": "15bbd7d486d67a737052a72cdbcce715",
+   "bytes": 4370,
+   "fetched": "2026-11-27 10:23"
+  },
+  "icepoint5": {
+   "hash": "912d3e621949e9f97f2e7282df74dd44",
+   "bytes": 2390,
+   "fetched": "2026-11-27 10:23"
+  },
+  "menhera62": {
+   "hash": "5ac8cdd37430f762d9557c80c8e42406",
+   "bytes": 1390,
+   "fetched": "2026-11-27 10:23"
+  },
+  "neon56331": {
+   "hash": "d2160b9dcfebcd676f5e1335f48c1925",
+   "bytes": 4062,
+   "fetched": "2026-11-27 10:23"
+  },
+  "uniuniuni_03": {
+   "hash": "ca720a30813d85d436bb8bb1d7500e76",
+   "bytes": 2928,
+   "fetched": "2026-11-27 10:23"
+  },
+  "user485324309826": {
+   "hash": "5418d6e203f59f3cf6eb41b894392b43",
+   "bytes": 512,
+   "fetched": "2026-11-27 10:23"
+  },
+  "yuu_live01": {
+   "hash": "87d138bcfa669d0a97b23f9d2210ae66",
+   "bytes": 2972,
+   "fetched": "2026-11-27 10:23"
   }
  },
- "updated": "2026-11-26 10:21"
+ "updated": "2026-11-27 10:23"
 }
